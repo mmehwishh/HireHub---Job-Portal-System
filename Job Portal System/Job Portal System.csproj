@@ -102,6 +102,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>JobPortal.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="HireHub-Database\HireHub_DB.sql" />
     <Content Include="Images\CompanyLogos\HireHub.png" />
     <Content Include="JobPortal.edmx.diagram">
       <DependentUpon>JobPortal.edmx</DependentUpon>
