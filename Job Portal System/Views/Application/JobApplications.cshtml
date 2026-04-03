@@ -294,6 +294,23 @@ else
                     let dt = data.interview_date.substring(0, 16);
                     $('#intDate').val(dt);
                 }
+                if (data.interview_date) {
+                    // 1. Extract numbers from "/Date(8732164871)/"
+                    var dateString = data.interview_date.substring(6);
+                    var currentTime = new Date(parseInt(dateString));
+
+                    // 2. Format it to: yyyy-MM-ddThh:mm
+                    var year = currentTime.getFullYear();
+                    var month = ("0" + (currentTime.getMonth() + 1)).slice(-2);
+                    var day = ("0" + currentTime.getDate()).slice(-2);
+                    var hours = ("0" + currentTime.getHours()).slice(-2);
+                    var minutes = ("0" + currentTime.getMinutes()).slice(-2);
+
+                    var formattedDate = year + "-" + month + "-" + day + "T" + hours + ":" + minutes;
+
+                    // 3. Now set the value
+                    $('#intDate').val(formattedDate);
+                }
 
                 $('#intLocation').val(data.location_or_link);
                 $('#intInterviewer').val(data.interviewer_name);
@@ -308,10 +325,26 @@ else
     }
 
     function submitSchedule() {
+        // 1. Pehle values pick karein
+        var dateVal = $('#intDate').val();
+        var appId = $('#modalAppId').val();
+
+        // 2. Validation: Date lazmi honi chahiye warna C# 500 error dega
+        if (!dateVal) {
+            alert("Please select a valid Date and Time for the interview.");
+            return;
+        }
+
+        if (!appId) {
+            alert("Error: Application ID is missing.");
+            return;
+        }
+
+        // 3. Data object prepare karein
         var data = {
-            appId: $('#modalAppId').val(),
+            appId: appId,
             type: $('#intType').val(),
-            date: $('#intDate').val(),
+            date: dateVal, // Ab yeh format yyyy-MM-ddThh:mm mein jayega
             location: $('#intLocation').val(),
             interviewer: $('#intInterviewer').val(),
             email: $('#intEmail').val(),
@@ -320,13 +353,21 @@ else
             status: $('#intStatus').val()
         };
 
+        console.log("Sending Data:", data);
+
+        // 4. AJAX Post
         $.post('/Employeer/ScheduleInterview', data, function (res) {
             if (res.success) {
                 alert("Interview saved successfully");
                 location.reload();
             } else {
-                alert(res.message);
+                // Agar server side validation fail hui toh message dikhayein
+                alert("Server Error: " + res.message);
             }
+        }).fail(function (xhr, status, error) {
+            // Agar 500 error aaye toh console mein details check karein
+            console.error("Error details:", xhr.responseText);
+            alert("A system error occurred. Please check if the date format is correct.");
         });
     }
 </script>

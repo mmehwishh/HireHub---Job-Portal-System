@@ -229,6 +229,10 @@ namespace Job_Portal_System.Controllers
             string internalNotes,
             string status)
         {
+            if (date == null)
+            {
+                return Json(new { success = false, message = "Invalid Date format." });
+            }
             using (var transaction = db.Database.BeginTransaction())
             {
                 try
@@ -245,6 +249,10 @@ namespace Job_Portal_System.Controllers
 
                     if (existingInterview != null)
                     {
+                        if (existingInterview.created_at == null)
+                        {
+                            existingInterview.created_at = DateTime.Now;
+                        }
                         existingInterview.interview_type = type;
                         existingInterview.interview_date = date;
                         existingInterview.location_or_link = location;
