@@ -1,0 +1,201 @@
+﻿@model Job_Portal_System.ViewModel.JobSeekerProfileViewModel
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<style>
+    /* Hero Section */
+    .profile-hero {
+        background: linear-gradient(to right, #002E7F, #004bb8);
+        padding: 60px 30px;
+        text-align: center;
+        color: white;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+    }
+
+        .profile-hero img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        }
+
+    .hero-name {
+        font-size: 32px;
+        font-weight: 800;
+        margin-top: 15px;
+        letter-spacing: 0.3px;
+    }
+
+    .hero-tagline {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+
+    /* Main Profile Card */
+    .profile-details-card {
+        max-width: 900px;
+        background: #fff;
+        margin: -40px auto 40px auto;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .info-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: #002E7F;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        margin-bottom: 18px;
+        align-items: center;
+    }
+
+        .info-item i {
+            font-size: 20px;
+            color: #002E7F;
+            width: 35px;
+        }
+
+    .info-text-title {
+        font-weight: 600;
+        color: #002E7F;
+        margin-bottom: 2px;
+    }
+
+    .info-text {
+        color: #333;
+        font-size: 15px;
+    }
+
+    .edit-profile-btn {
+        background: #002E7F;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        color: white;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .edit-profile-btn:hover {
+            background: #003b99;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+</style>
+
+<!-- HERO SECTION -->
+<div class="profile-hero">
+    <img src="@(!string.IsNullOrEmpty(Model.ProfileImage) ? Model.ProfileImage : Url.Content("~/Content/Images/default-profile.png"))" />
+
+    <h2 class="hero-name">@Model.FullName</h2>
+
+    <p class="hero-tagline">
+        @Model.experience_level — @Model.education
+    </p>
+</div>
+
+<!-- MAIN DETAILS CARD -->
+<div class="profile-details-card">
+
+    <div class="info-title">Profile Information</div>
+
+    <!-- BIO -->
+    <div class="info-item">
+        <i class="fa-solid fa-user-pen"></i>
+        <div>
+            <div class="info-text-title">Bio</div>
+            <div class="info-text">@Model.Bio</div>
+        </div>
+    </div>
+
+    <!-- DOB -->
+    <div class="info-item">
+        <i class="fa-solid fa-cake-candles"></i>
+        <div>
+            <div class="info-text-title">Date of Birth</div>
+            <div class="info-text">@Model.dob</div>
+        </div>
+    </div>
+
+    <!-- Gender -->
+    <div class="info-item">
+        <i class="fa-solid fa-venus-mars"></i>
+        <div>
+            <div class="info-text-title">Gender</div>
+            <div class="info-text">@Model.gender</div>
+        </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="info-item">
+        <i class="fa-solid fa-phone"></i>
+        <div>
+            <div class="info-text-title">Phone</div>
+            <div class="info-text">@Model.phone</div>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="info-item">
+        <i class="fa-solid fa-location-dot"></i>
+        <div>
+            <div class="info-text-title">Address</div>
+            <div class="info-text">@Model.address</div>
+        </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="info-item">
+        <i class="fa-solid fa-briefcase"></i>
+        <div>
+            <div class="info-text-title">Experience Level</div>
+            <div class="info-text">@Model.experience_level</div>
+        </div>
+    </div>
+
+    <!-- Education -->
+    <div class="info-item">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <div>
+            <div class="info-text-title">Education</div>
+            <div class="info-text">@Model.education</div>
+        </div>
+    </div>
+
+    <!-- Resume -->
+    <div class="info-item">
+        <i class="fa-solid fa-file-lines"></i>
+        <div>
+            <div class="info-text-title">Resume</div>
+            <div class="info-text">
+                @if (!string.IsNullOrEmpty(Model.Resume))
+                {
+                    <a href="@Model.Resume" target="_blank" style="color:#002E7F;font-weight:600;">Download Resume</a>
+                }
+                else
+                {
+                    <span>No Resume Uploaded</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("MyProfile", "JobSeeker")" class="edit-profile-btn">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+        </a>
+    </div>
+
+</div>

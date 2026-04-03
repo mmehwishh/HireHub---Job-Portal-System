@@ -1,0 +1,98 @@
+﻿@model Job_Portal_System.JOB
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>JOB</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.job_title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.job_title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.job_description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.job_description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.requirements)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.requirements)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.location)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.location)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.salary_range)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.salary_range)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.job_type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.job_type)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.posted_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.posted_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.expiry_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.expiry_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EMPLOYER.company_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EMPLOYER.company_name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.job_id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

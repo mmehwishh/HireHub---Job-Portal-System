@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Job_Portal_System.JOB_SEEKER_PROFILE>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.dob)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.gender)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.phone)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.experience_level)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.education)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.resume_file)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProfilePicturePath)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Bio)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.USER.full_name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.dob)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.gender)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.phone)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.address)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.experience_level)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.education)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.resume_file)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProfilePicturePath)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Bio)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.USER.full_name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.seeker_id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.seeker_id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.seeker_id })
+        </td>
+    </tr>
+}
+
+</table>

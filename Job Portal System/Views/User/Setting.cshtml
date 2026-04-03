@@ -1,0 +1,11 @@
+﻿@model Job_Portal_System.USER
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Account Settings</h2>
+
+<p>Email: @Model.Email</p>
+
+<a href="/Account/ChangePassword" class="btn btn-warning">Change Password</a>

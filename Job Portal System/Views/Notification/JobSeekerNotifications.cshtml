@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Job_Portal_System.NOTIFICATION>
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<style>
+    .notif-container {
+        max-width: 850px;
+        margin: auto;
+    }
+
+    .notif-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 15px 18px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: 0.2s;
+    }
+
+        .notif-item.unread {
+            border-left: 6px solid #002E7F;
+            background: #F0F5FF;
+        }
+
+        .notif-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+    .notif-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #002E7F;
+        color: white;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .notif-body {
+        flex-grow: 1;
+    }
+
+    .notif-message {
+        font-size: 16px;
+        font-weight: 600;
+        color: #002E7F;
+    }
+
+    .notif-time {
+        font-size: 13px;
+        color: #666;
+        margin-top: 3px;
+    }
+
+    .notif-action button {
+        background: #002E7F;
+        padding: 6px 12px;
+        border-radius: 8px;
+        color: white;
+        border: none;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+        .notif-action button:hover {
+            opacity: 0.8;
+        }
+</style>
+
+
+
+<h2 style="color:#002E7F;font-weight:700;margin-bottom:20px;">My Notifications</h2>
+
+@if (!Model.Any())
+{
+    <p>No notifications yet.</p>
+}
+else
+{
+    <div class="notif-container">
+        @foreach (var note in Model)
+        {
+            <div class="notif-item @(note.read_status == "UNREAD" ? "unread" : "read")">
+
+                <div class="notif-icon">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+
+                <div class="notif-body">
+                    <div class="notif-message">@note.message</div>
+                    <div class="notif-time">
+                        @(note.created_at)
+                    </div>
+                </div>
+
+                <div class="notif-action">
+                    @if (note.read_status == "UNREAD")
+                    {
+                        using (Html.BeginForm("JobSeekerMarkAsRead", "Notification", FormMethod.Post))
+                        {
+                            @Html.Hidden("id", note.notification_id)
+                            <button type="submit">Mark as Read</button>
+                        }
+                    }
+                </div>
+
+            </div>
+        }
+    </div>
+}

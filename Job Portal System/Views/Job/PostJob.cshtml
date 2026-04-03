@@ -1,0 +1,165 @@
+﻿@model Job_Portal_System.ViewModel.JobViewModel
+@{
+    ViewBag.Title = "Post a Job";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<style>
+    /* Page Title */
+    .page-title {
+        color: #002E7F;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group .hint {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+        flex-basis: 100%;
+        margin-left: 180px; /* Label ki width ke barabar */
+    }
+
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+
+    /* Form Card */
+    .form-card {
+        max-width: 900px;
+        background: #fff;
+        margin: auto;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+        .form-group label {
+            width: 180px;
+            font-weight: 600;
+            color: #002E7F;
+        }
+
+        .form-group .form-control {
+            flex: 1;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            font-size: 15px;
+        }
+
+        .form-group textarea.form-control {
+            resize: vertical;
+        }
+
+    .btn-submit, .btn-cancel {
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+        transition: 0.3s;
+    }
+
+    .btn-submit {
+        background: #002E7F;
+        color: #fff;
+    }
+
+        .btn-submit:hover {
+            background: #003b99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+    .btn-cancel {
+        background: #ccc;
+        color: #333;
+    }
+
+        .btn-cancel:hover {
+            background: #bbb;
+        }
+</style>
+
+<div class="page-title">Post a Job</div>
+
+<div class="form-card">
+    @using (Html.BeginForm("PostJob", "Job", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.JobTitle)
+            @Html.TextBoxFor(m => m.JobTitle, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.JobDescription)
+            @Html.TextAreaFor(m => m.JobDescription, new { @class = "form-control", rows = 5 })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Requirements)
+            @Html.TextAreaFor(m => m.Requirements, new { @class = "form-control", rows = 3 })
+        </div>
+
+        @* --- Naya Skills Section --- *@
+        <div class="form-group" style="flex-wrap: wrap;">
+            <label>Required Skills</label>
+            <div class="skills-container">
+                @Html.TextBoxFor(m => m.RequiredSkills, new { @class = "form-control", list = "skillsList", placeholder = "e.g. C#, SQL, Python" })
+                <datalist id="skillsList">
+                    @* Agar aapke pas ViewBag mein skills hain toh yahan show hongi *@
+                    @if (ViewBag.ExistingSkills != null)
+                    {
+                        foreach (var skill in ViewBag.ExistingSkills)
+                        {
+                            <option value="@skill"></option>
+                        }
+                    }
+                </datalist>
+            </div>
+            <span class="hint">Separate multiple skills with commas (,). New skills will be added automatically.</span>
+        </div>
+        @* --------------------------- *@
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Location)
+            @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.SalaryRange)
+            @Html.TextBoxFor(m => m.SalaryRange, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.JobType)
+            @Html.TextBoxFor(m => m.JobType, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ExpiryDate)
+            @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        </div>
+
+        <div class="text-center mt-4">
+            <input type="submit" value="Post Job" class="btn-submit" />
+            <a href="@Url.Action("ManageJobs", "Job")" class="btn-cancel">Cancel</a>
+        </div>
+    }
+</div>

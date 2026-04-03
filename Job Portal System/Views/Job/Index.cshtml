@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Job_Portal_System.JOB>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.job_title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.job_description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.requirements)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.location)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.salary_range)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.job_type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.posted_date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.expiry_date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EMPLOYER.company_name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.job_title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.job_description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.requirements)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.location)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.salary_range)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.job_type)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.posted_date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.expiry_date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.status)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EMPLOYER.company_name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.job_id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.job_id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.job_id })
+        </td>
+    </tr>
+}
+
+</table>

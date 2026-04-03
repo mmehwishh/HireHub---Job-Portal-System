@@ -1,0 +1,43 @@
+﻿@model Job_Portal_System.SAVED_JOBS
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>SAVED_JOBS</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.saved_at)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.saved_at)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.JOB_SEEKER_PROFILE.gender)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.JOB_SEEKER_PROFILE.gender)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.JOB.job_title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.JOB.job_title)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

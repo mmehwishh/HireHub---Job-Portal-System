@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+<style>
+    body {
+        background-color: #f5f8ff; /* Light blue background */
+        font-family: Arial, sans-serif;
+    }
+
+    h2 {
+        color: #002e7f;
+        text-align: center;
+        margin-top: 50px;
+        font-size: 32px;
+    }
+
+    form {
+        background-color: white;
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+        color: #002e7f;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #002e7f;
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        button:hover {
+            background-color: #004bb8;
+        }
+
+    p {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+        p[style*="color:red"] {
+            color: red;
+        }
+
+        p[style*="color:green"] {
+            color: green;
+        }
+</style>
+
+<h2>Login</h2>
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+{
+    <div>
+        <label>Username or Email:</label>
+        <input type="text" name="email" required />
+    </div>
+
+    <div>
+        <label>Password:</label>
+        <input type="password" name="password" required />
+    </div>
+
+    <button type="submit">Login</button>
+
+    <p style="color:red;">@ViewBag.Error</p>
+    <p style="color:green;">@ViewBag.Success</p>
+}

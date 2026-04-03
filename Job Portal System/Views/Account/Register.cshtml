@@ -1,0 +1,148 @@
+﻿@model Job_Portal_System.USER
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg,#eef2ff,#f8f9ff);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+    }
+
+    .register-card {
+        background: #ffffff;
+        width: 420px;
+        padding: 35px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    .register-title {
+        text-align: center;
+        color: #002e7f;
+        font-weight: 600;
+        margin-bottom: 25px;
+        font-size: 28px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #002e7f;
+        margin-bottom: 6px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+        color: #002e7f;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 11px;
+        border-radius: 6px;
+        border: 1px solid #dcdcdc;
+        transition: all 0.25s ease;
+        font-size: 14px;
+    }
+
+        .form-control:focus {
+            border-color: #002e7f;
+            box-shadow: 0 0 0 2px rgba(0,46,127,0.08);
+            outline: none;
+        }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 12px;
+        background: #002e7f;
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 6px;
+        font-size: 15px;
+        transition: 0.3s;
+    }
+
+        .btn-register:hover {
+            background: #004bb8;
+        }
+
+    .alert {
+        margin-bottom: 18px;
+        border-radius: 6px;
+        padding: 10px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        background: #ffe5e5;
+        color: #c70000;
+    }
+</style>
+
+<div class="register-container">
+
+    <div class="register-card">
+
+        <h2 class="register-title">Create Account</h2>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.full_name , "Full Name")
+                @Html.TextBoxFor(m => m.full_name, new { @class = "form-control", placeholder = "Enter full name" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.username , "Username")
+                @Html.TextBoxFor(m => m.username, new { @class = "form-control", placeholder = "Choose username" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.email , "E-mail")
+                @Html.TextBoxFor(m => m.email, new { @class = "form-control", placeholder = "Enter email address" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.password_hash, "Password")
+                <input type="password" name="password_hash" class="form-control" placeholder="Create password" />
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Confirm Password")
+                <input type="password" name="confirmPassword" class="form-control" placeholder="Confirm password" />
+            </div>
+
+            <div class="form-group">
+                <label>Select Role</label>
+                <select name="selectedRole" class="form-control">
+                    <option value="">-- Select Role --</option>
+                    <option value="Job Seeker">Job Seeker</option>
+                    <option value="Employer">Employer</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-register">Register</button>
+        }
+
+    </div>
+
+</div>

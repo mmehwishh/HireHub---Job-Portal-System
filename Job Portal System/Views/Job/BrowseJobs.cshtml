@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Job_Portal_System.JOB>
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<div class="jobsearch-container">
+
+    <div class="header-section">
+        <h2 class="page-title">Job Search</h2>
+        <p class="page-subtitle">Find jobs that match your skills, experience and passion.</p>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="get" class="search-bar">
+        <input name="search" class="search-input" placeholder="Job title, keyword..." />
+
+        <input name="location" class="search-input" placeholder="Location" />
+
+        <input name="company" class="search-input" placeholder="Company name" />
+
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+    
+    <!-- Job Cards Section -->
+    <div class="jobs-wrapper">
+
+        @foreach (var j in Model)
+        {
+            <div class="job-card">
+
+                <div class="job-info">
+                    <h3 class="job-title">@j.job_title</h3>
+                    <p class="job-desc">@j.job_description</p>
+                </div>
+
+                <div class="job-actions">
+                    <a href="/Job/JobDetails/@j.job_id" class="view-btn">View Details</a>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+    body {
+        font-family: "Poppins", sans-serif !important;
+    }
+
+    .jobsearch-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 25px;
+    }
+
+    /* HEADER */
+    .page-title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #002e7f;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        margin-top: -8px;
+        margin-bottom: 25px;
+    }
+
+    /* SEARCH BAR */
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 14px 18px;
+        font-size: 15px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+    }
+
+        .search-input:focus {
+            border-color: #002e7f;
+            outline: none;
+        }
+
+    .search-btn {
+        background: #002e7f;
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .search-btn:hover {
+            background: #001e5c;
+        }
+
+    /* JOB CARDS */
+    .jobs-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .job-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 22px;
+        border-radius: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        box-shadow: 0px 3px 6px rgba(0,0,0,0.06);
+        transition: 0.2s;
+    }
+
+        .job-card:hover {
+            border-color: #002e7f;
+            box-shadow: 0px 5px 14px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+
+    .job-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #002e7f;
+        margin-bottom: 4px;
+    }
+
+    .job-desc {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 10px;
+        max-width: 500px;
+    }
+
+    /* BUTTON */
+    .view-btn {
+        background: #002e7f;
+        color: white;
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+        .view-btn:hover {
+            background: #001e5c;
+            transform: translateY(-2px);
+        }
+</style>

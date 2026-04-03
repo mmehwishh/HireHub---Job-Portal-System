@@ -1,0 +1,73 @@
+﻿@model Job_Portal_System.ViewModel.JobSeekerProfileViewModel
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>My Profile</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label>Name</label>
+        <input name="FullName" class="form-control" value="@Model.FullName" />
+    </div>
+
+    <div class="form-group">
+        <label>Bio</label>
+        <textarea name="Bio" class="form-control">@Model.Bio</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" name="dob" class="form-control" value="@(Model.dob.HasValue ? Model.dob.Value.ToString("yyyy-MM-dd") : "")" />
+    </div>
+
+    <div class="form-group">
+        <label>Gender</label>
+        <select name="gender" class="form-control">
+            <option value="">Select Gender</option>
+            <option value="Male" @(Model.gender == "Male" ? "selected" : "")>Male</option>
+            <option value="Female" @(Model.gender == "Female" ? "selected" : "")>Female</option>
+            <option value="Other" @(Model.gender == "Other" ? "selected" : "")>Other</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Phone</label>
+        <input name="phone" class="form-control" value="@Model.phone" />
+    </div>
+
+    <div class="form-group">
+        <label>Address</label>
+        <input name="address" class="form-control" value="@Model.address" />
+    </div>
+
+    <div class="form-group">
+        <label>Experience Level</label>
+        <input name="experience_level" class="form-control" value="@Model.experience_level" />
+    </div>
+
+    <div class="form-group">
+        <label>Education</label>
+        <input name="education" class="form-control" value="@Model.education" />
+    </div>
+
+    <div class="form-group">
+        <label>Resume</label>
+        <input type="file" name="ResumeFile" class="form-control" />
+        @if (Model.Resume != null)
+        {
+            <p>Current: <a href="@Model.Resume">Download</a></p>
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Profile Picture</label>
+        <input type="file" name="ImageFile" class="form-control" />
+        @if (Model.ProfileImage != null)
+        {
+            <img src="@Model.ProfileImage" width="120" class="mt-2" />
+        }
+    </div>
+
+    <button class="btn btn-primary">Save Changes</button>
+</form>

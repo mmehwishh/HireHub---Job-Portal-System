@@ -1,0 +1,15 @@
+﻿@model IEnumerable<Job_Portal_System.NOTIFICATION>
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Messages / Notifications</h2>
+
+@foreach (var n in Model)
+{
+    <div class="card p-3 mb-2">
+        <p>@n.Message</p>
+        <small>@n.Date</small>
+    </div>
+}

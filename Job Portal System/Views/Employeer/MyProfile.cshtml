@@ -1,0 +1,194 @@
+﻿@model Job_Portal_System.ViewModel.EmployerProfileViewModel
+@{
+    ViewBag.Title = "My Profile";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<style>
+    /* Hero Section */
+    .profile-hero {
+        background: linear-gradient(to right, #002E7F, #004bb8);
+        padding: 60px 30px;
+        text-align: center;
+        color: white;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+    }
+
+        .profile-hero img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        }
+
+    .hero-name {
+        font-size: 28px;
+        font-weight: 800;
+        margin-top: 15px;
+    }
+
+    .hero-tagline {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+
+    /* Main Profile Card */
+    .profile-details-card {
+        max-width: 900px;
+        background: #fff;
+        margin: -40px auto 40px auto;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .info-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #002E7F;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #004bb8;
+        padding-bottom: 5px;
+    }
+
+    .info-item {
+        display: flex;
+        margin-bottom: 18px;
+        align-items: center;
+    }
+
+        .info-item i {
+            font-size: 20px;
+            color: #002E7F;
+            width: 35px;
+        }
+
+    .info-text-title {
+        font-weight: 600;
+        color: #002E7F;
+        margin-bottom: 2px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+
+    .edit-profile-btn, .btn-save, .btn-cancel {
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .btn-save {
+        background: #002E7F;
+        color: #fff;
+    }
+
+        .btn-save:hover {
+            background: #003b99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+    .btn-cancel {
+        background: #ccc;
+        color: #333;
+    }
+
+        .btn-cancel:hover {
+            background: #bbb;
+        }
+</style>
+
+<!-- HERO SECTION -->
+<div class="profile-hero">
+    <img src="@(!string.IsNullOrEmpty(Model.CompanyLogo) ? Url.Content(Model.CompanyLogo + "?" + DateTime.Now.Ticks) : Url.Content("~/Images/CompanyLogos/default-logo.webp"))" alt="Company Logo" />
+
+    <h2 class="hero-name">@Model.FullName</h2>
+    <p class="hero-tagline">@Model.CompanyName — @Model.Industry</p>
+</div>
+
+<!-- MAIN DETAILS CARD -->
+<div class="profile-details-card">
+    <div class="info-title">Company Profile</div>
+
+    @using (Html.BeginForm("MyProfile", "Employeer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <!-- Upload Logo -->
+        <div class="form-group info-item">
+            <i class="fa-solid fa-image"></i>
+            <div style="flex:1;">
+                @Html.Label("Company Logo", new { @class = "info-text-title" })
+                <input type="file" name="CompanyLogoFile" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-user"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.FullName, new { @class = "info-text-title" })
+                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-building"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.CompanyName, new { @class = "info-text-title" })
+                @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-industry"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.Industry, new { @class = "info-text-title" })
+                @Html.TextBoxFor(m => m.Industry, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-align-left"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.CompanyDescription, new { @class = "info-text-title" })
+                @Html.TextAreaFor(m => m.CompanyDescription, new { @class = "form-control", rows = 5 })
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-globe"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.Website, new { @class = "info-text-title" })
+                @Html.TextBoxFor(m => m.Website, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group info-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <div style="flex:1;">
+                @Html.LabelFor(m => m.Location, new { @class = "info-text-title" })
+                @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <input type="submit" value="Save Changes" class="btn-save" />
+            <a href="@Url.Action("Dashboard", "Employeer")" class="btn-cancel">Cancel</a>
+        </div>
+    }
+</div>

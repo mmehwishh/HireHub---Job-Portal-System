@@ -1,0 +1,188 @@
+﻿@model IEnumerable<Job_Portal_System.APPLICATION>
+@{
+    ViewBag.Title = "Applications";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<style>
+    /* Page Title */
+    .page-title {
+        color: #002E7F;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    /* Table Card */
+    .table-card {
+        max-width: 1000px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 40px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+    }
+
+    thead th {
+        background: #fff;
+        color: #002E7F;
+        text-align: left;
+        font-weight: 600;
+        margin: 5px;
+        border-bottom: 2px solid #0a2a5d; /* crisp separation */
+    }
+
+    tbody td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333;
+    }
+
+    tbody tr:hover {
+        background: #f5faff;
+    }
+
+    /* Buttons */
+    .btn-action {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-right: 5px;
+        text-decoration: none;
+        display: inline-block;
+        color: #fff;
+        transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    }
+
+    .btn-approve {
+        background: linear-gradient(to bottom, #34d058, #28a745);
+    }
+
+        .btn-approve:hover {
+            background: linear-gradient(to bottom, #28a745, #218838);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+    .btn-reject {
+        background: linear-gradient(to bottom, #e55353, #dc3545);
+    }
+
+        .btn-reject:hover {
+            background: linear-gradient(to bottom, #dc3545, #c82333);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+    .btn-download {
+        background: linear-gradient(to bottom, #38bdf8, #17a2b8);
+    }
+
+        .btn-download:hover {
+            background: linear-gradient(to bottom, #17a2b8, #138496);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        color: #fff;
+        display: inline-block;
+    }
+
+    .status-approved {
+        background: #28a745;
+    }
+
+    .status-rejected {
+        background: #dc3545;
+    }
+
+    .status-pending {
+        background: #fd7e14;
+    }
+</style>
+
+<div class="page-title">Applications for: @ViewBag.JobTitle</div>
+
+@if (!Model.Any())
+{
+    <div class="table-card text-center">
+        <p>No applicants yet.</p>
+    </div>
+}
+else
+{
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Seeker Name</th>
+                    <th>Bio</th>
+                    <th>Resume</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var app in Model)
+                {
+                    string statusClass = app.status.ToLower() == "approved" ? "status-approved"
+                                       : app.status.ToLower() == "rejected" ? "status-rejected"
+                                       : "status-pending";
+
+                    <tr>
+                        <td>@app.JOB_SEEKER_PROFILE.USER.full_name</td>
+                        <td>@app.JOB_SEEKER_PROFILE.Bio</td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(app.JOB_SEEKER_PROFILE.resume_file))
+                            {
+                                <a href="@Url.Action("DownloadResume", "Employeer", new { seekerId = app.seeker_id })"
+                                   class="btn-action btn-download">
+                                    <i class="fa-solid fa-download"></i> Resume
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-danger">No Resume</span>
+                            }
+                        </td>
+
+                        <td>@app.applied_date</td>
+                        <td>
+                            <span class="status-badge @statusClass">@app.status</span>
+                        </td>
+
+                        <td>
+                            <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "APPROVED" })"
+                               class="btn-action btn-approve">
+                                <i class="fa-solid fa-check"></i> Approve
+                            </a>
+
+                            <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "REJECTED" })"
+                               class="btn-action btn-reject">
+                                <i class="fa-solid fa-xmark"></i> Reject
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,253 @@
+﻿@model IEnumerable<Job_Portal_System.Skill>
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+    // Fetch the jobs from ViewBag
+    var recommendedJobs = ViewBag.RecommendedJobs as IEnumerable<Job_Portal_System.JOB>;
+}
+
+<div class="skills-container">
+    <div class="skills-header">
+        <h2 class="title">My Skills</h2>
+        <p class="subtitle">Add, update and manage your professional skill set.</p>
+    </div>
+
+    <div class="add-skill-box">
+        <form method="post" action="/JobSeeker/AddSkill" class="skill-form">
+            <input name="SkillName" class="skill-input" placeholder="Enter a new skill..." required />
+            <button class="skill-add-btn">Add Skill</button>
+        </form>
+    </div>
+
+    <div class="skills-section">
+        <h4 class="section-title">Your Added Skills</h4>
+        <div class="skills-tags-wrapper">
+            @foreach (var item in Model)
+            {
+                <div class="skill-tag-box">
+                    <span class="skill-text">@item.skillName</span>
+                    <a href="/JobSeeker/DeleteSkill/@item.SkillID" class="skill-delete-btn">✕</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="jobs-section">
+        <h4 class="section-title">Recommended Jobs for You</h4>
+        <p class="subtitle">Based on your current skill set</p>
+
+        <div class="jobs-grid">
+            @if (recommendedJobs != null && recommendedJobs.Any())
+            {
+                foreach (var job in recommendedJobs)
+                {
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h5 class="job-title">@job.job_title</h5>
+                            <p class="job-company"><i class="fas fa-building"></i> @job.job_description</p>
+                        </div>
+                        <a href="/Job/JobDetails/@job.job_id" class="view-job-btn">View Details</a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-jobs-alert">
+                    No matching jobs found. Try adding more skills!
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<style>
+    body {
+        font-family: "Poppins", sans-serif !important;
+    }
+
+    .skills-container {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 25px;
+    }
+
+    /* HEADER */
+    .title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #002e7f;
+    }
+
+    .subtitle {
+        margin-top: -8px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    /* ADD SKILL CARD */
+    .add-skill-box {
+        background: #ffffff;
+        border-left: 5px solid #002e7f;
+        padding: 22px;
+        border-radius: 14px;
+        margin-top: 25px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+    }
+
+    .skill-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .skill-input {
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 15px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        outline: none;
+    }
+
+        .skill-input:focus {
+            border-color: #002e7f;
+        }
+
+    .skill-add-btn {
+        background: #002e7f;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .skill-add-btn:hover {
+            background: #001e5c;
+        }
+
+    /* SECTION TITLE */
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 35px;
+        margin-bottom: 15px;
+        color: #002e7f;
+    }
+
+    /* SKILLS LIST */
+    .skills-tags-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .skill-tag-box {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #dbeafe;
+        padding: 8px 14px;
+        border-radius: 25px;
+        gap: 10px;
+        transition: 0.2s;
+    }
+
+        .skill-tag-box:hover {
+            border-color: #002e7f;
+            background: #f0f6ff;
+        }
+
+    .skill-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #002e7f;
+    }
+
+    .skill-delete-btn {
+        font-size: 13px;
+        color: #ef4444;
+        padding: 2px 6px;
+        border-radius: 50%;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+        .skill-delete-btn:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+    .jobs-section {
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .job-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        border: 1px solid #e2e8f0;
+        transition: 0.3s;
+    }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            border-color: #002e7f;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+    .job-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .job-company {
+        margin: 5px 0 0 0;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .view-job-btn {
+        background: #f0f6ff;
+        color: #002e7f;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+        .view-job-btn:hover {
+            background: #002e7f;
+            color: white;
+        }
+
+    .no-jobs-alert {
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 10px;
+        text-align: center;
+        color: #94a3b8;
+        font-style: italic;
+    }
+</style>

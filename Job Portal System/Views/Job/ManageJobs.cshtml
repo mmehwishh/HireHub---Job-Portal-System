@@ -1,0 +1,186 @@
+﻿@model List<Job_Portal_System.JOB>
+@{
+    ViewBag.Title = "Manage Jobs";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<style>
+    /* Page Title */
+    .page-title {
+        color: #002E7F;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    /* Action Button */
+    .btn-new-job {
+        background: #002E7F;
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+        .btn-new-job:hover {
+            background: #003b99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+    /* Table Card */
+    .table-card {
+        max-width: 1000px;
+        margin: auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 15px;
+    }
+
+    thead th {
+        background: #fff;
+        color: #002E7F;
+        padding: 12px 15px;
+        text-align: left;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 2px solid #0a2a5d;
+    }
+
+    tbody td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333;
+    }
+
+    tbody tr:hover {
+        background: #f5faff;
+    }
+
+    /* Action Buttons inside table */
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-right: 5px;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-block;
+        color: #fff;
+    }
+
+    .btn-action-edit {
+        background: #f0ad4e;
+    }
+
+        .btn-action-edit:hover {
+            background: #ec9f3f;
+            transform: translateY(-1px);
+        }
+
+    .btn-action-delete {
+        background: #d9534f;
+    }
+
+        .btn-action-delete:hover {
+            background: #c9302c;
+            transform: translateY(-1px);
+        }
+
+    .btn-action-view {
+        background: #002E7F;
+    }
+
+        .btn-action-view:hover {
+            background: #003b99;
+            transform: translateY(-1px);
+        }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 13px;
+        color: #fff;
+        display: inline-block;
+    }
+
+    .status-open {
+        background: #28a745;
+    }
+
+    .status-closed {
+        background: #dc3545;
+    }
+
+    .status-pending {
+        background: #fd7e14;
+    }
+</style>
+
+<div class="page-title">Manage Jobs</div>
+
+<div class="text-center">
+    <a href="@Url.Action("PostJob", "Job")" class="btn-new-job"><i class="fa-solid fa-plus"></i> Post New Job</a>
+</div>
+
+<div class="table-card">
+    <table>
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Location</th>
+                <th>Job Type</th>
+                <th>Posted On</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in Model)
+            {
+                string statusClass = job.status.ToLower() == "open" ? "status-open"
+                                   : job.status.ToLower() == "closed" ? "status-closed"
+                                   : "status-pending";
+
+                <tr>
+                    <td>@job.job_title</td>
+                    <td>@job.location</td>
+                    <td>@job.job_type</td>
+                    <td>@(job.posted_date.HasValue ? job.posted_date.Value.ToString("dd-MM-yyyy") : "-")</td>
+                    <td>@(job.expiry_date.HasValue ? job.expiry_date.Value.ToString("dd-MM-yyyy") : "-")</td>
+                    <td>
+                        <span class="status-badge @statusClass">@job.status</span>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("EditJob", "Job", new { id = job.job_id })" class="btn-action btn-action-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> 
+                        </a>
+                        <a href="@Url.Action("DeleteJob", "Job", new { id = job.job_id })" class="btn-action btn-action-delete" onclick="return confirm('Are you sure?');">
+                            <i class="fa-solid fa-trash"></i> 
+                        </a>
+                        <a href="@Url.Action("JobApplications", "Application", new { jobId = job.job_id })" class="btn-action btn-action-view">
+                            <i class="fa-solid fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

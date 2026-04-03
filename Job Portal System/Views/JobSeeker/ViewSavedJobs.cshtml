@@ -1,0 +1,16 @@
+﻿@model IEnumerable<Job_Portal_System.SAVED_JOBS>
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Saved Jobs</h2>
+
+@foreach (var s in Model)
+{
+    <div class="card p-3 mb-2">
+        <h5>@s.JOB.Title</h5>
+        <a href="/Jobs/JobDetails/@s.JobId">View</a> |
+        <a href="/SavedJobs/RemoveSavedJob/@s.SaveId" class="text-danger">Remove</a>
+    </div>
+}

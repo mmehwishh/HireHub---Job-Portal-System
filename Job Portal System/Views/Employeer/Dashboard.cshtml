@@ -1,0 +1,93 @@
+﻿@model Job_Portal_System.EMPLOYER
+@{
+    ViewBag.Title = "Employer Dashboard";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<style>
+    /* Dashboard Hero Section */
+    .dashboard-hero {
+        background: linear-gradient(to right, #002E7F, #004bb8);
+        padding: 50px 30px;
+        text-align: center;
+        color: white;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+        margin-bottom: 40px;
+    }
+
+        .dashboard-hero h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 5px 0;
+        }
+
+    /* Dashboard Card */
+    .dashboard-card {
+        max-width: 900px;
+        background: #fff;
+        margin: auto;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+        .dashboard-card h3 {
+            font-size: 24px;
+            color: #002E7F;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card p {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+            .dashboard-card p strong {
+                color: #002E7F;
+            }
+
+    .btn-edit {
+        background: #002E7F;
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .btn-edit:hover {
+            background: #003b99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+</style>
+
+<!-- HERO SECTION -->
+<div class="dashboard-hero">
+    <h2>Welcome, @Model.company_name</h2>
+    <p>@Model.industry</p>
+    <p>@Model.location</p>
+</div>
+
+<!-- DASHBOARD DETAILS CARD -->
+<div class="dashboard-card">
+    <p><strong>Website:</strong> <a href="@Model.website" target="_blank" style="color:#004bb8;">@Model.website</a></p>
+    <p><strong>Description:</strong> @Model.company_description</p>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("MyProfile", "Employeer")" class="btn-edit">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+        </a>
+    </div>
+</div>

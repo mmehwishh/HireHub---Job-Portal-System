@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Job_Portal_System.APPLICATION>
+
+@{
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>My Applications</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Job</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
+
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.JOB.job_title</td>
+            <td>@a.status</td>
+            <td>@a.applied_date</td>
+        </tr>
+    }
+</table>

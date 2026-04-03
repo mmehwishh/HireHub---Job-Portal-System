@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="12a0ab443d99423a9822e550ed75d6ef" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="JobDBModel.APPLICATION" Width="1.5" PointX="7.5" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.EMPLOYER" Width="1.5" PointX="3" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.JOB_SEEKER_PROFILE" Width="1.5" PointX="3" PointY="6.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.JOB" Width="1.5" PointX="5.25" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.NOTIFICATION" Width="1.5" PointX="3" PointY="11.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.SAVED_JOBS" Width="1.5" PointX="7.5" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.Skill" Width="1.5" PointX="3" PointY="14.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.USER_SKILLS" Width="1.5" PointX="5.25" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="JobDBModel.USER" Width="1.5" PointX="0.75" PointY="6.25" IsExpanded="true" />
+        <AssociationConnector Association="JobDBModel.FK__APPLICATI__seeke__5FB337D6" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_Application_Job" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK__JOBS__employer_i__5535A963" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_EMPLOYERS_USERS" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK__SAVED_JOB__seeke__59063A47" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK__USER_SKIL__seeke__04E4BC85" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_JOB_SEEKER_PROFILE_USERS" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_SavedJobs_Job" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_NOTIFICATIONS_USERS" ManuallyRouted="false" />
+        <AssociationConnector Association="JobDBModel.FK_USER_SKILLS_Skills" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="JobDBModel.JOB_SKILLS" Width="1.5" PointX="7.5" PointY="8.25" />
+        <AssociationConnector Association="JobDBModel.FK__JOB_SKILL__job_i__2CF2ADDF" />
+        <AssociationConnector Association="JobDBModel.FK__JOB_SKILL__skill__2DE6D218" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

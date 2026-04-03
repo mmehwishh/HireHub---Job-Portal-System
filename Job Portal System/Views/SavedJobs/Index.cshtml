@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Job_Portal_System.SAVED_JOBS>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.saved_at)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.JOB_SEEKER_PROFILE.gender)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.JOB.job_title)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.saved_at)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.JOB_SEEKER_PROFILE.gender)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.JOB.job_title)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        </td>
+    </tr>
+}
+
+</table>
