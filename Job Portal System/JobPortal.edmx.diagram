@@ -27,6 +27,8 @@
         <EntityTypeShape EntityType="JobDBModel.JOB_SKILLS" Width="1.5" PointX="7.5" PointY="8.25" />
         <AssociationConnector Association="JobDBModel.FK__JOB_SKILL__job_i__2CF2ADDF" />
         <AssociationConnector Association="JobDBModel.FK__JOB_SKILL__skill__2DE6D218" />
+        <EntityTypeShape EntityType="JobDBModel.INTERVIEW_SCHEDULES" Width="1.5" PointX="9.75" PointY="4.5" />
+        <AssociationConnector Association="JobDBModel.FK_Interview_Application" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

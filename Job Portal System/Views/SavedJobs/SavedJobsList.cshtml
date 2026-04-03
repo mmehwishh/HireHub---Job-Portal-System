@@ -206,47 +206,41 @@ else
 
 <script>
     function openNotesModal(savedJobId, currentNotes) {
-        // Debugging ke liye (Check in Browser Console)
         console.log("Job ID:", savedJobId);
         console.log("Fetched Notes:", currentNotes);
 
-        // 1. Hidden input mein ID set karein
         $('#modalSavedJobId').val(savedJobId);
 
-        // 2. Textarea mein data load karein
         if (currentNotes && currentNotes !== "null") {
             $('#modalNotesText').val(currentNotes);
         } else {
-            $('#modalNotesText').val(""); // Agar null ho toh khali dikhayein
+            $('#modalNotesText').val(""); 
         }
 
-        // 3. Modal open karein
         $('#notesModal').modal('show');
     }
 
     function saveNotes() {
         var id = $('#modalSavedJobId').val();
         var notes = $('#modalNotesText').val();
-        console.log("save notes")
+        console.log("save notes" , id)
         console.log(notes)
 
         $.ajax({
             url: '/SavedJobs/UpdateNotes',
             type: 'POST',
-            data: { job_id: id, notes: notes },
+            data: { id: id, notes: notes },
             success: function (response) {
                 if (response.success) {
                     $('#notesModal').modal('hide');
                     location.reload();
                 } else {
-                    // Agar C# mein 'return Json(new { success = false, message = "..." })' ho
                     alert("Error: " + response.message);
                 }
             },
-            // <--- YAHAN ERROR FUNCTION ADD KAREIN --->
-            error: function (xhr, status, error) {
-                console.error("Status: " + status + "\nError: " + error);
-                alert("Server Response Error: " + xhr.status + " (" + error + ")");
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                alert("Critical Error. Check console for details.");
             }
         });
     }

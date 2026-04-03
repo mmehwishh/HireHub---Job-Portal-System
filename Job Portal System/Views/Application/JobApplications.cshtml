@@ -1,118 +1,102 @@
 ﻿@model IEnumerable<Job_Portal_System.APPLICATION>
+
 @{
     ViewBag.Title = "Applications";
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
 }
 
 <style>
-    /* Page Title */
     .page-title {
         color: #002E7F;
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 700;
-        margin-bottom: 30px;
         text-align: center;
+        margin-bottom: 30px;
     }
 
-    /* Table Card */
     .table-card {
-        max-width: 1000px;
+        max-width: 1100px;
         margin: auto;
-        background: #fff;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        margin-bottom: 40px;
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 15px;
     }
 
     thead th {
-        background: #fff;
         color: #002E7F;
-        text-align: left;
-        font-weight: 600;
-        margin: 5px;
-        border-bottom: 2px solid #0a2a5d; /* crisp separation */
+        font-weight: 700;
+        padding: 14px;
+        border-bottom: 2px solid #e6edf7;
     }
 
     tbody td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #e0e0e0;
-        color: #333;
+        padding: 14px;
+        border-bottom: 1px solid #edf2f7;
     }
 
     tbody tr:hover {
-        background: #f5faff;
+        background: #f8fbff;
     }
 
-    /* Buttons */
     .btn-action {
-        padding: 5px 10px;
-        border-radius: 6px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
         font-size: 13px;
         font-weight: 600;
         margin-right: 5px;
-        text-decoration: none;
         display: inline-block;
-        color: #fff;
-        transition: 0.3s;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.12);
     }
 
     .btn-approve {
-        background: linear-gradient(to bottom, #34d058, #28a745);
+        background: #16a34a;
     }
-
-        .btn-approve:hover {
-            background: linear-gradient(to bottom, #28a745, #218838);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
 
     .btn-reject {
-        background: linear-gradient(to bottom, #e55353, #dc3545);
+        background: #dc2626;
     }
-
-        .btn-reject:hover {
-            background: linear-gradient(to bottom, #dc3545, #c82333);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
 
     .btn-download {
-        background: linear-gradient(to bottom, #38bdf8, #17a2b8);
+        background: #0891b2;
     }
 
-        .btn-download:hover {
-            background: linear-gradient(to bottom, #17a2b8, #138496);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
+    .btn-schedule {
+        background: #2563eb;
+    }
 
-    /* Status Badges */
     .status-badge {
-        padding: 3px 8px;
-        border-radius: 10px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
-        font-size: 13px;
-        color: #fff;
-        display: inline-block;
+        color: white;
     }
 
     .status-approved {
-        background: #28a745;
+        background: #16a34a;
     }
 
     .status-rejected {
-        background: #dc3545;
+        background: #dc2626;
     }
 
     .status-pending {
-        background: #fd7e14;
+        background: #f59e0b;
+    }
+
+    .modal-content {
+        border-radius: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
     }
 </style>
 
@@ -130,11 +114,10 @@ else
         <table>
             <thead>
                 <tr>
-                    <th>Seeker Name</th>
-                    <th>Bio</th>
+                    <th>Seeker</th>
                     <th>Resume</th>
-                    <th>Applied Date</th>
                     <th>Status</th>
+                    <th>Applied</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -142,43 +125,54 @@ else
             <tbody>
                 @foreach (var app in Model)
                 {
-                    string statusClass = app.status.ToLower() == "approved" ? "status-approved"
-                                       : app.status.ToLower() == "rejected" ? "status-rejected"
-                                       : "status-pending";
+                    string statusClass = "";
+                    if (app.status.ToLower() == "approved") { statusClass = "status-approved"; }
+                    else if (app.status.ToLower() == "rejected") { statusClass = "status-rejected"; }
+                    else if (app.status.ToLower() == "interview scheduled") { statusClass = "status-schedule"; } // Add this CSS class
+                    else { statusClass = "status-pending"; }
 
                     <tr>
-                        <td>@app.JOB_SEEKER_PROFILE.USER.full_name</td>
-                        <td>@app.JOB_SEEKER_PROFILE.Bio</td>
+                        <td>
+                            <strong>@app.JOB_SEEKER_PROFILE.USER.full_name</strong><br />
+                            <small>@app.JOB_SEEKER_PROFILE.Bio</small>
+                        </td>
 
                         <td>
                             @if (!string.IsNullOrEmpty(app.JOB_SEEKER_PROFILE.resume_file))
                             {
                                 <a href="@Url.Action("DownloadResume", "Employeer", new { seekerId = app.seeker_id })"
                                    class="btn-action btn-download">
-                                    <i class="fa-solid fa-download"></i> Resume
+                                    Resume
                                 </a>
                             }
                             else
                             {
-                                <span class="text-danger">No Resume</span>
+                                <span>No Resume</span>
                             }
                         </td>
 
-                        <td>@app.applied_date</td>
                         <td>
                             <span class="status-badge @statusClass">@app.status</span>
                         </td>
 
                         <td>
-                            <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "APPROVED" })"
-                               class="btn-action btn-approve">
-                                <i class="fa-solid fa-check"></i> Approve
-                            </a>
+                            @(app.applied_date.HasValue ? app.applied_date.Value.ToString("dd MMM yyyy") : "--")
+                        </td>
 
-                            <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "REJECTED" })"
-                               class="btn-action btn-reject">
-                                <i class="fa-solid fa-xmark"></i> Reject
-                            </a>
+                        <td>
+                            <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "APPROVED" })"
+                               class="btn-action btn-approve">Approve</a>
+
+                            @* <a href="@Url.Action("UpdateStatus", "Application", new { id = app.application_id, status = "REJECTED" })" class="btn-action btn-reject">Reject</a> *@
+
+                            <button type="button" class="btn-action btn-reject" onclick="rejectApplication(@app.application_id)">
+                                Reject
+                            </button>
+
+                            <button class="btn-action btn-schedule"
+                                    onclick="openScheduleModal(@app.application_id, '@app.JOB_SEEKER_PROFILE.USER.full_name')">
+                                Schedule
+                            </button>
                         </td>
                     </tr>
                 }
@@ -186,3 +180,153 @@ else
         </table>
     </div>
 }
+
+<!-- MODAL -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-3">
+
+            <div class="modal-header">
+                <h5>Schedule Interview for <span id="modalSeekerName"></span></h5>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="modalAppId" />
+
+                <div class="form-group">
+                    <label>Interview Type</label>
+                    <select id="intType" class="form-control">
+                        <option>Online</option>
+                        <option>In-Person</option>
+                        <option>Phone Call</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="intDate" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Location / Meeting Link</label>
+                    <input type="text" id="intLocation" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Interviewer Name</label>
+                    <input type="text" id="intInterviewer" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Interviewer Email</label>
+                    <input type="email" id="intEmail" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Instructions for Seeker</label>
+                    <textarea id="intNotes" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Internal Notes</label>
+                    <textarea id="internalNotes" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Interview Status</label>
+                    <select id="intStatus" class="form-control">
+                        <option>Scheduled</option>
+                        <option>Rescheduled</option>
+                        <option>Cancelled</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" onclick="submitSchedule()">Save Interview</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function rejectApplication(appId) {
+        // 1. Ask for reason
+        var reason = prompt("Please enter the reason for rejection (optional):");
+
+        // 2. If user clicks 'Cancel', stop here
+        if (reason === null) return;
+
+        // 3. Send to Controller
+        $.post('/Employeer/RejectApplication', { id: appId, feedback: reason }, function (res) {
+            if (res.success) {
+                alert("Application rejected with feedback.");
+                location.reload();
+            } else {
+                alert("Error: " + res.message);
+            }
+        });
+    }
+
+    function openScheduleModal(appId, seekerName) {
+
+        $('#modalAppId').val(appId);
+        $('#modalSeekerName').text(seekerName);
+
+        $('#intType').val('');
+        $('#intDate').val('');
+        $('#intLocation').val('');
+        $('#intInterviewer').val('');
+        $('#intEmail').val('');
+        $('#intNotes').val('');
+        $('#internalNotes').val('');
+        $('#intStatus').val('Scheduled');
+
+        $.get('/Employeer/GetInterview', { appId: appId }, function (data) {
+
+            if (data) {
+                $('#intType').val(data.interview_type);
+
+                if (data.interview_date) {
+                    let dt = data.interview_date.substring(0, 16);
+                    $('#intDate').val(dt);
+                }
+
+                $('#intLocation').val(data.location_or_link);
+                $('#intInterviewer').val(data.interviewer_name);
+                $('#intEmail').val(data.interviewer_email);
+                $('#intNotes').val(data.notes_for_seeker);
+                $('#internalNotes').val(data.internal_notes);
+                $('#intStatus').val(data.interview_status);
+            }
+
+            $('#scheduleModal').modal('show');
+        });
+    }
+
+    function submitSchedule() {
+        var data = {
+            appId: $('#modalAppId').val(),
+            type: $('#intType').val(),
+            date: $('#intDate').val(),
+            location: $('#intLocation').val(),
+            interviewer: $('#intInterviewer').val(),
+            email: $('#intEmail').val(),
+            notes: $('#intNotes').val(),
+            internalNotes: $('#internalNotes').val(),
+            status: $('#intStatus').val()
+        };
+
+        $.post('/Employeer/ScheduleInterview', data, function (res) {
+            if (res.success) {
+                alert("Interview saved successfully");
+                location.reload();
+            } else {
+                alert(res.message);
+            }
+        });
+    }
+</script>

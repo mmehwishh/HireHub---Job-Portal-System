@@ -174,6 +174,119 @@ namespace Job_Portal_System.Controllers
 
             return RedirectToAction("Dashboard");
         }
+        [HttpPost]
+        public JsonResult RejectApplication(int id, string feedback)
+        {
+            try
+            {
+                var app = db.APPLICATIONS.Find(id);
+                if (app != null)
+                {
+                    app.status = "REJECTED";
+                    // Make sure you added 'RejectionFeedback' column to your APPLICATIONS table
+                    app.RejectionFeedback = feedback;
+
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Application not found." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        public JsonResult GetInterview(int appId)
+        {
+            var interview = db.INTERVIEW_SCHEDULES
+                .Where(i => i.application_id == appId)
+                .Select(i => new
+                {
+                    i.interview_type,
+                    i.interview_date,
+                    i.location_or_link,
+                    i.interviewer_name,
+                    i.interviewer_email,
+                    i.notes_for_seeker,
+                    i.internal_notes,
+                    i.interview_status
+                })
+                .FirstOrDefault();
+
+            return Json(interview, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public JsonResult ScheduleInterview(
+            int appId,
+            string type,
+            DateTime date,
+            string location,
+            string interviewer,
+            string email,
+            string notes,
+            string internalNotes,
+            string status)
+        {
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    var app = db.APPLICATIONS.Find(appId);
+
+                    if (app == null)
+                        return Json(new { success = false, message = "Application not found" });
+
+                    app.status = "Interview Scheduled";
+
+                    var existingInterview = db.INTERVIEW_SCHEDULES
+                        .FirstOrDefault(i => i.application_id == appId);
+
+                    if (existingInterview != null)
+                    {
+                        existingInterview.interview_type = type;
+                        existingInterview.interview_date = date;
+                        existingInterview.location_or_link = location;
+                        existingInterview.interviewer_name = interviewer;
+                        existingInterview.interviewer_email = email;
+                        existingInterview.notes_for_seeker = notes;
+                        existingInterview.internal_notes = internalNotes;
+                        existingInterview.interview_status = status;
+                        existingInterview.updated_at = DateTime.Now;
+                    }
+                    else
+                    {
+                        var interview = new INTERVIEW_SCHEDULES
+                        {
+                            application_id = appId,
+                            interview_type = type,
+                            interview_date = date,
+                            location_or_link = location,
+                            interviewer_name = interviewer,
+                            interviewer_email = email,
+                            notes_for_seeker = notes,
+                            internal_notes = internalNotes,
+                            interview_status = status,
+                            created_at = DateTime.Now,
+                            updated_at = DateTime.Now
+                        };
+
+                        db.INTERVIEW_SCHEDULES.Add(interview);
+                    }
+
+                    db.SaveChanges();
+                    transaction.Commit();
+
+                    return Json(new { success = true });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
 
         // Dispose
         protected override void Dispose(bool disposing)

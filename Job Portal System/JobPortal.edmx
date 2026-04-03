@@ -14,6 +14,7 @@
           <Property Name="applied_date" Type="datetime" />
           <Property Name="status" Type="varchar" MaxLength="50" />
           <Property Name="application_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RejectionFeedback" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="EMPLOYERS">
           <Key>
@@ -26,6 +27,23 @@
           <Property Name="website" Type="varchar" MaxLength="255" />
           <Property Name="location" Type="varchar" MaxLength="255" />
           <Property Name="companyLogo" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="INTERVIEW_SCHEDULES">
+          <Key>
+            <PropertyRef Name="interview_id" />
+          </Key>
+          <Property Name="interview_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="interview_type" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="interview_date" Type="datetime" Nullable="false" />
+          <Property Name="location_or_link" Type="nvarchar(max)" />
+          <Property Name="interviewer_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="interviewer_email" Type="nvarchar" MaxLength="100" />
+          <Property Name="notes_for_seeker" Type="nvarchar(max)" />
+          <Property Name="internal_notes" Type="nvarchar(max)" />
+          <Property Name="interview_status" Type="nvarchar" MaxLength="50" />
+          <Property Name="created_at" Type="datetime" />
+          <Property Name="updated_at" Type="datetime" />
         </EntityType>
         <EntityType Name="JOB_SEEKER_PROFILE">
           <Key>
@@ -213,6 +231,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Interview_Application">
+          <End Role="APPLICATIONS" Type="Self.APPLICATIONS" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="INTERVIEW_SCHEDULES" Type="Self.INTERVIEW_SCHEDULES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="APPLICATIONS">
+              <PropertyRef Name="application_id" />
+            </Principal>
+            <Dependent Role="INTERVIEW_SCHEDULES">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_JOB_SEEKER_PROFILE_USERS">
           <End Role="USERS" Type="Self.USERS" Multiplicity="1" />
           <End Role="JOB_SEEKER_PROFILE" Type="Self.JOB_SEEKER_PROFILE" Multiplicity="0..1" />
@@ -266,6 +298,7 @@
         <EntityContainer Name="JobDBModelStoreContainer">
           <EntitySet Name="APPLICATIONS" EntityType="Self.APPLICATIONS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EMPLOYERS" EntityType="Self.EMPLOYERS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="INTERVIEW_SCHEDULES" EntityType="Self.INTERVIEW_SCHEDULES" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="JOB_SEEKER_PROFILE" EntityType="Self.JOB_SEEKER_PROFILE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="JOB_SKILLS" EntityType="Self.JOB_SKILLS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="JOBS" EntityType="Self.JOBS" Schema="dbo" store:Type="Tables" />
@@ -306,6 +339,10 @@
             <End Role="USERS" EntitySet="USERS" />
             <End Role="EMPLOYERS" EntitySet="EMPLOYERS" />
           </AssociationSet>
+          <AssociationSet Name="FK_Interview_Application" Association="Self.FK_Interview_Application">
+            <End Role="APPLICATIONS" EntitySet="APPLICATIONS" />
+            <End Role="INTERVIEW_SCHEDULES" EntitySet="INTERVIEW_SCHEDULES" />
+          </AssociationSet>
           <AssociationSet Name="FK_JOB_SEEKER_PROFILE_USERS" Association="Self.FK_JOB_SEEKER_PROFILE_USERS">
             <End Role="USERS" EntitySet="USERS" />
             <End Role="JOB_SEEKER_PROFILE" EntitySet="JOB_SEEKER_PROFILE" />
@@ -338,6 +375,8 @@
           <Property Name="application_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="JOB_SEEKER_PROFILE" Relationship="Self.FK__APPLICATI__seeke__5FB337D6" FromRole="APPLICATIONS" ToRole="JOB_SEEKER_PROFILE" />
           <NavigationProperty Name="JOB" Relationship="Self.FK_Application_Job" FromRole="APPLICATIONS" ToRole="JOBS" />
+          <NavigationProperty Name="INTERVIEW_SCHEDULES" Relationship="JobDBModel.FK_Interview_Application" FromRole="APPLICATION" ToRole="INTERVIEW_SCHEDULES" />
+          <Property Name="RejectionFeedback" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="EMPLOYER">
           <Key>
@@ -634,6 +673,11 @@
             <End Role="Skill" EntitySet="Skills" />
             <End Role="JOB_SKILLS" EntitySet="JOB_SKILLS" />
           </AssociationSet>
+          <EntitySet Name="INTERVIEW_SCHEDULES" EntityType="JobDBModel.INTERVIEW_SCHEDULES" />
+          <AssociationSet Name="FK_Interview_Application" Association="JobDBModel.FK_Interview_Application">
+            <End Role="APPLICATION" EntitySet="APPLICATIONS" />
+            <End Role="INTERVIEW_SCHEDULES" EntitySet="INTERVIEW_SCHEDULES" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="JOB_SKILLS">
           <Key>
@@ -669,6 +713,38 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="INTERVIEW_SCHEDULES">
+          <Key>
+            <PropertyRef Name="interview_id" />
+          </Key>
+          <Property Name="interview_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="interview_type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="interview_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="location_or_link" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="interviewer_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="interviewer_email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="notes_for_seeker" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="internal_notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="interview_status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="created_at" Type="DateTime" Precision="3" />
+          <Property Name="updated_at" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="APPLICATION" Relationship="JobDBModel.FK_Interview_Application" FromRole="INTERVIEW_SCHEDULES" ToRole="APPLICATION" />
+        </EntityType>
+        <Association Name="FK_Interview_Application">
+          <End Type="JobDBModel.APPLICATION" Role="APPLICATION" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="JobDBModel.INTERVIEW_SCHEDULES" Role="INTERVIEW_SCHEDULES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="APPLICATION">
+              <PropertyRef Name="application_id" />
+            </Principal>
+            <Dependent Role="INTERVIEW_SCHEDULES">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -678,6 +754,7 @@
           <EntitySetMapping Name="APPLICATIONS">
             <EntityTypeMapping TypeName="JobDBModel.APPLICATION">
               <MappingFragment StoreEntitySet="APPLICATIONS">
+                <ScalarProperty Name="RejectionFeedback" ColumnName="RejectionFeedback" />
                 <ScalarProperty Name="job_id" ColumnName="job_id" />
                 <ScalarProperty Name="seeker_id" ColumnName="seeker_id" />
                 <ScalarProperty Name="applied_date" ColumnName="applied_date" />
@@ -793,6 +870,24 @@
                 <ScalarProperty Name="skillID" ColumnName="skillID" />
                 <ScalarProperty Name="job_id" ColumnName="job_id" />
                 <ScalarProperty Name="job_skill_id" ColumnName="job_skill_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="INTERVIEW_SCHEDULES">
+            <EntityTypeMapping TypeName="JobDBModel.INTERVIEW_SCHEDULES">
+              <MappingFragment StoreEntitySet="INTERVIEW_SCHEDULES">
+                <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+                <ScalarProperty Name="created_at" ColumnName="created_at" />
+                <ScalarProperty Name="interview_status" ColumnName="interview_status" />
+                <ScalarProperty Name="internal_notes" ColumnName="internal_notes" />
+                <ScalarProperty Name="notes_for_seeker" ColumnName="notes_for_seeker" />
+                <ScalarProperty Name="interviewer_email" ColumnName="interviewer_email" />
+                <ScalarProperty Name="interviewer_name" ColumnName="interviewer_name" />
+                <ScalarProperty Name="location_or_link" ColumnName="location_or_link" />
+                <ScalarProperty Name="interview_date" ColumnName="interview_date" />
+                <ScalarProperty Name="interview_type" ColumnName="interview_type" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="interview_id" ColumnName="interview_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

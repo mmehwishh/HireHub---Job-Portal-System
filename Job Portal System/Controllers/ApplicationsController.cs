@@ -5,6 +5,7 @@ using System.Net;
 using System.Web.Mvc;
 using Job_Portal_System;
 using System.Data.Entity;
+using Job_Portal_System.ViewModel;
 
 
 namespace Job_Portal_System.Controllers
@@ -16,7 +17,7 @@ namespace Job_Portal_System.Controllers
         // -----------------------------------------
         // Job Seeker: Apply for a job
         // -----------------------------------------
-        
+
 
         // -----------------------------------------
         // Job Seeker: View my applications
@@ -27,12 +28,26 @@ namespace Job_Portal_System.Controllers
                 return RedirectToAction("Login", "Account");
 
             int seekerId = Convert.ToInt32(Session["UserId"]);
+
             var applications = db.APPLICATIONS
-                                 .Include(a => a.JOB)          // Load related JOB
-                                 .Include(a => a.JOB.EMPLOYER) // Load related EMPLOYER
-                                 .Where(a => a.seeker_id == seekerId)
-                                 .OrderByDescending(a => a.applied_date)
-                                 .ToList();
+                .Include(a => a.JOB)
+                .Include(a => a.JOB.EMPLOYER)
+                .Include(a => a.INTERVIEW_SCHEDULES)
+                .Where(a => a.seeker_id == seekerId)
+                .OrderByDescending(a => a.applied_date)
+                .Select(a => new JobSeekerApplicationViewModel
+                {
+                    ApplicationId = a.application_id,
+                    JobTitle = a.JOB.job_title,
+                    CompanyName = a.JOB.EMPLOYER.company_name,
+                    AppliedDate = a.applied_date,
+                    Status = a.status,
+                    InterviewDate = a.INTERVIEW_SCHEDULES.FirstOrDefault().interview_date,
+                    InterviewLocation = a.INTERVIEW_SCHEDULES.FirstOrDefault().location_or_link,
+                    InterviewNotes = a.INTERVIEW_SCHEDULES.FirstOrDefault().notes_for_seeker,
+                    RejectionFeedback = a.RejectionFeedback
+                })
+                .ToList();
 
             return View(applications);
         }

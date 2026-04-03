@@ -164,29 +164,32 @@ namespace Job_Portal_System.Controllers
         public JsonResult UpdateNotes(int id, string notes)
         {
             if (Session["UserId"] == null)
-                return Json(new { success = false, message = "Session expired. Please login again." });
+            {
+                Response.StatusCode = 401; 
+                return Json(new { success = false, message = "Session expired." });
+            }
+
             try
             {
-                // 1. Record dhoondne ke liye 'Where' ka istemal karein
                 int uid = Convert.ToInt32(Session["UserId"]);
+
                 var entry = db.SAVED_JOBS.FirstOrDefault(x => x.job_id == id && x.seeker_id == uid);
 
                 if (entry != null)
                 {
-                   entry.Notes = notes;
+                    entry.Notes = notes;
 
-                    // 2. Composite key tables mein state manually change karni parti hai
-                    db.Entry(entry).State = EntityState.Modified;
                     db.SaveChanges();
 
                     return Json(new { success = true });
                 }
-                return Json(new { success = false, message = "Job record not found in database." });
+
+                return Json(new { success = false, message = "Record not found." });
             }
             catch (Exception ex)
             {
-                // Agar koi error aaye (e.g. Database connection), toh ye message dikhayega
-                return Json(new { success = false, message = ex.Message });
+                Response.StatusCode = 500;
+                return Json(new { success = false, message = ex.InnerException?.Message ?? ex.Message });
             }
         }
 

@@ -152,6 +152,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="INTERVIEW_SCHEDULES.cs">
+      <DependentUpon>JobPortal.tt</DependentUpon>
+    </Compile>
     <Compile Include="JOB.cs">
       <DependentUpon>JobPortal.tt</DependentUpon>
     </Compile>
@@ -195,6 +198,7 @@
     <Compile Include="ViewModel\EmployerProfileViewModel.cs" />
     <Compile Include="ViewModel\JobDetailsViewModel.cs" />
     <Compile Include="ViewModel\JobEditViewModel.cs" />
+    <Compile Include="ViewModel\JobSeekerApplicationViewModel.cs" />
     <Compile Include="ViewModel\JobSeekerProfileViewModel.cs" />
     <Compile Include="ViewModel\JobViewModel.cs" />
     <Compile Include="ViewModel\SavedJobViewModel.cs" />
@@ -274,6 +278,7 @@
     <Folder Include="Resumes\" />
     <Folder Include="Views\JobDetailsViewModel\" />
     <Folder Include="Views\JobEditViewModel\" />
+    <Folder Include="Views\JobSeekerApplicationViewModel\" />
     <Folder Include="Views\SavedJobViewModel\" />
   </ItemGroup>
   <ItemGroup>

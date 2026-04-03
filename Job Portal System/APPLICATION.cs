@@ -14,13 +14,20 @@ namespace Job_Portal_System
     
     public partial class APPLICATION
     {
+        public APPLICATION()
+        {
+            this.INTERVIEW_SCHEDULES = new HashSet<INTERVIEW_SCHEDULES>();
+        }
+    
         public int job_id { get; set; }
         public int seeker_id { get; set; }
         public Nullable<System.DateTime> applied_date { get; set; }
         public string status { get; set; }
         public int application_id { get; set; }
+        public string RejectionFeedback { get; set; }
     
         public virtual JOB_SEEKER_PROFILE JOB_SEEKER_PROFILE { get; set; }
         public virtual JOB JOB { get; set; }
+        public virtual ICollection<INTERVIEW_SCHEDULES> INTERVIEW_SCHEDULES { get; set; }
     }
 }
