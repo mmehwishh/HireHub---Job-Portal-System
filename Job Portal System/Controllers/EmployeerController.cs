@@ -186,6 +186,22 @@ namespace Job_Portal_System.Controllers
                     // Make sure you added 'RejectionFeedback' column to your APPLICATIONS table
                     app.RejectionFeedback = feedback;
 
+                    var user_job = db.JOBS.FirstOrDefault(j => j.job_id == app.job_id);
+                    if (user_job != null)
+                    {
+                        var job_title = user_job.job_title;
+                        var userNotf = new NOTIFICATION { 
+                            user_id = app.seeker_id,
+                            message = $"Thank you for applying to {job_title}. The employer has decided to move forward with other candidates at this time.",
+                            created_at = DateTime.Now,
+                            read_status = "UNREAD",
+
+                        };
+                        db.NOTIFICATIONS.Add(userNotf);
+                        db.SaveChanges();
+
+                    }
+
                     db.SaveChanges();
                     return Json(new { success = true });
                 }
@@ -281,6 +297,24 @@ namespace Job_Portal_System.Controllers
                         };
 
                         db.INTERVIEW_SCHEDULES.Add(interview);
+                    }
+
+                    var user_job = db.JOBS.FirstOrDefault(j => j.job_id == app.job_id);
+                    int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+                    var employeerDetail = db.EMPLOYERS.FirstOrDefault(c => c.employer_id == uid);
+                    if (user_job != null)
+                    {
+                        var job_title = user_job.job_title;
+                        var userNotf = new NOTIFICATION
+                        {
+                            user_id = app.seeker_id,
+                            message = $"You’ve been invited for an interview! {employeerDetail.company_name} has scheduled a session for you on {existingInterview.created_at}.",
+                            created_at = DateTime.Now,
+                            read_status = "UNREAD",
+
+                        };
+                        db.NOTIFICATIONS.Add(userNotf);
+
                     }
 
                     db.SaveChanges();
