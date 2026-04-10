@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewBag.Title = "Inbox";
+    Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+}
+
+<div class="table-card" style="max-width: 700px;">
+    <h3 style="color:#002E7F; margin-bottom:20px;">Your Messages</h3>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <p class="text-center">No messages yet.</p>
+    }
+    else
+    {
+        foreach (var user in Model)
+        {
+            <a href="@Url.Action("Index", "Chat", new { receiverId = user.UserId })"
+               style="text-decoration:none; color:inherit;">
+                <div style="padding:15px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:15px;" class="convo-item">
+                    <div style="width:50px; height:50px; background:#e6edf7; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#002E7F; font-weight:bold;">
+                        @user.full_name.Substring(0, 1).ToUpper()
+                    </div>
+                    <div>
+                        <div style="font-weight:600;">@user.full_name</div>
+                        <small style="color:#666;">Click to view conversation</small>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+</div>
+
+<style>
+    .convo-item:hover {
+        background: #f8fbff;
+        cursor: pointer;
+    }
+</style>
+

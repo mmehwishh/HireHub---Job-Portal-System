@@ -36,5 +36,6 @@ namespace Job_Portal_System
         public virtual DbSet<USER> USERS { get; set; }
         public virtual DbSet<JOB_SKILLS> JOB_SKILLS { get; set; }
         public virtual DbSet<INTERVIEW_SCHEDULES> INTERVIEW_SCHEDULES { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
     }
 }

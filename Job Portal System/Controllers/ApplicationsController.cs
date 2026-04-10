@@ -42,6 +42,7 @@ namespace Job_Portal_System.Controllers
                     CompanyName = a.JOB.EMPLOYER.company_name,
                     AppliedDate = a.applied_date,
                     Status = a.status,
+                    EmployerId = a.JOB.employer_id,
                     InterviewDate = a.INTERVIEW_SCHEDULES.FirstOrDefault().interview_date,
                     InterviewLocation = a.INTERVIEW_SCHEDULES.FirstOrDefault().location_or_link,
                     InterviewNotes = a.INTERVIEW_SCHEDULES.FirstOrDefault().notes_for_seeker,

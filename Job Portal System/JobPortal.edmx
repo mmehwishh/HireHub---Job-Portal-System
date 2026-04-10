@@ -84,6 +84,17 @@
           <Property Name="status" Type="varchar" MaxLength="20" />
           <Property Name="job_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
+        <EntityType Name="Messages">
+          <Key>
+            <PropertyRef Name="MessageID" />
+          </Key>
+          <Property Name="MessageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SenderID" Type="int" Nullable="false" />
+          <Property Name="ReceiverID" Type="int" Nullable="false" />
+          <Property Name="MessageText" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Timestamp" Type="datetime" />
+          <Property Name="IsRead" Type="bit" />
+        </EntityType>
         <EntityType Name="NOTIFICATIONS">
           <Key>
             <PropertyRef Name="notification_id" />
@@ -302,6 +313,7 @@
           <EntitySet Name="JOB_SEEKER_PROFILE" EntityType="Self.JOB_SEEKER_PROFILE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="JOB_SKILLS" EntityType="Self.JOB_SKILLS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="JOBS" EntityType="Self.JOBS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Messages" EntityType="Self.Messages" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NOTIFICATIONS" EntityType="Self.NOTIFICATIONS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SAVED_JOBS" EntityType="Self.SAVED_JOBS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Skills" EntityType="Self.Skills" Schema="dbo" store:Type="Tables" />
@@ -678,6 +690,7 @@
             <End Role="APPLICATION" EntitySet="APPLICATIONS" />
             <End Role="INTERVIEW_SCHEDULES" EntitySet="INTERVIEW_SCHEDULES" />
           </AssociationSet>
+          <EntitySet Name="Messages" EntityType="JobDBModel.Message" />
         </EntityContainer>
         <EntityType Name="JOB_SKILLS">
           <Key>
@@ -745,6 +758,17 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Message">
+          <Key>
+            <PropertyRef Name="MessageID" />
+          </Key>
+          <Property Name="MessageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SenderID" Type="Int32" Nullable="false" />
+          <Property Name="ReceiverID" Type="Int32" Nullable="false" />
+          <Property Name="MessageText" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Timestamp" Type="DateTime" Precision="3" />
+          <Property Name="IsRead" Type="Boolean" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -888,6 +912,18 @@
                 <ScalarProperty Name="interview_type" ColumnName="interview_type" />
                 <ScalarProperty Name="application_id" ColumnName="application_id" />
                 <ScalarProperty Name="interview_id" ColumnName="interview_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Messages">
+            <EntityTypeMapping TypeName="JobDBModel.Message">
+              <MappingFragment StoreEntitySet="Messages">
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="MessageText" ColumnName="MessageText" />
+                <ScalarProperty Name="ReceiverID" ColumnName="ReceiverID" />
+                <ScalarProperty Name="SenderID" ColumnName="SenderID" />
+                <ScalarProperty Name="MessageID" ColumnName="MessageID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

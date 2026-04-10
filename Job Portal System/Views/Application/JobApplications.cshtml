@@ -173,6 +173,11 @@ else
                                     onclick="openScheduleModal(@app.application_id, '@app.JOB_SEEKER_PROFILE.USER.full_name')">
                                 Schedule
                             </button>
+
+                            <a href="@Url.Action("Index", "Chat", new { receiverId = app.seeker_id })"
+                               class="btn-action" style="background: #8b5cf6;">
+                                Message
+                            </a>
                         </td>
                     </tr>
                 }

@@ -223,6 +223,9 @@
         <a href="/Job/BrowseJobs"><i class="fa-solid fa-search"></i> Job Search</a>
         <a href="/SavedJobs/SavedJobsList"><i class="fa-solid fa-star"></i> Saved Jobs</a>
         <a href="/Application/MyApplications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
+        <a href="@Url.Action("Inbox", "Chat")">
+            <i class="fas fa-envelope"></i> <span>Messages</span>
+        </a>
         <a href="/Notification/JobSeekerNotifications"><i class="fa-solid fa-envelope"></i> Notifications</a>
     </div>
 
@@ -237,7 +240,7 @@
     <div class="footer">
         © @DateTime.Now.Year Job Portal System - All Rights Reserved
     </div>
-
+    @RenderSection("scripts", required: false)
     <!-- Scripts -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
 

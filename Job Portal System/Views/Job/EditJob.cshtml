@@ -8,11 +8,15 @@
 <h2>Edit Job</h2>
 
 <!-- ✅ MAIN EDIT JOB FORM -->
-@using (Html.BeginForm("EditJob", "Job", new { id = @Model.Job.job_id }, FormMethod.Post, null))
+@using (Html.BeginForm("Edit", "Job", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
-    @Html.HiddenFor(m => @Model.Job.job_id)
+    @* Hidden fields ko simple rakhen bina @ ke *@
+    @Html.HiddenFor(m => m.Job.job_id)
+    @Html.HiddenFor(m => m.Job.employer_id)
+    @Html.HiddenFor(m => m.Job.posted_date)
+    @Html.HiddenFor(m => m.Job.status)
 
     <div class="form-group">
         @Html.LabelFor(m => @Model.Job.job_title, "Job Title")

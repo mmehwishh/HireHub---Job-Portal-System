@@ -82,17 +82,17 @@ namespace Job_Portal_System.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include="job_id,employer_id,job_title,job_description,requirements,location,salary_range,job_type,posted_date,expiry_date,status")] JOB job)
         {
             if (ModelState.IsValid)
             {
                 db.Entry(job).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("ManageJobs");
             }
             ViewBag.employer_id = new SelectList(db.EMPLOYERS, "employer_id", "company_name", job.employer_id);
-            return View(job);
+
+            return RedirectToAction("ManageJobs");
         }
 
         // GET: /Job/Delete/5
@@ -326,7 +326,9 @@ namespace Job_Portal_System.Controllers
         // POST: Edit Job
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditJob(JOB jobData)
+        // [Bind(Prefix = "Job")] lagane se MVC ko pata chal jayega ke 
+        // form se "Job.Something" wala data pick karna hai
+        public ActionResult EditJob([Bind(Prefix = "Job")] JOB jobData)
         {
             if (Session["UserId"] == null)
                 return RedirectToAction("Login", "Account");
@@ -337,6 +339,7 @@ namespace Job_Portal_System.Controllers
                 if (job == null)
                     return HttpNotFound();
 
+                // Data Update
                 job.job_title = jobData.job_title;
                 job.job_description = jobData.job_description;
                 job.requirements = jobData.requirements;
@@ -346,9 +349,12 @@ namespace Job_Portal_System.Controllers
                 job.expiry_date = jobData.expiry_date;
 
                 db.SaveChanges();
-                return RedirectToAction("ManageJobs");
+
+                // Wapis isi page par redirect karega
+                return RedirectToAction("EditJob", new { id = jobData.job_id });
             }
 
+            // Agar model state valid nahi hai tou VM dubara populate karein
             var vm = new JobEditViewModel
             {
                 Job = jobData,

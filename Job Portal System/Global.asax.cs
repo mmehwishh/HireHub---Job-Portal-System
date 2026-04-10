@@ -13,6 +13,10 @@ namespace Job_Portal_System
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            using (var db = new JobDBEntities3())
+            {
+                db.Database.ExecuteSqlCommand("EXEC sp_UpdateExpiredJobs");
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Job_Portal_System.ViewModel
     public class JobSeekerApplicationViewModel
     {
         public int ApplicationId { get; set; }
+        public int EmployerId { get; set; }
         public string JobTitle { get; set; }
         public string CompanyName { get; set; }
         public DateTime? AppliedDate { get; set; }
