@@ -12,56 +12,78 @@
 * **Status Tracking:** Real-time updates on application status (Pending, Approved, Rejected, Interview Scheduled).
 
 
-🛠 Tech Stack & Dependencies
-Core Stack
-Backend: ASP.NET MVC 5 (C#)
+Here’s your **clean, professional GitHub README.md** with proper formatting, sections, and markdown styling 👇
 
-Database: MS SQL Server
+---
 
-Frontend: HTML5, CSS3, JavaScript, Bootstrap 4/5
+# 🛠 Tech Stack & Dependencies
 
-ORM: Entity Framework (Database First Approach)
+## 🚀 Core Stack
 
-Key Dependencies (NuGet Packages)
-Microsoft.AspNet.SignalR - Powering the real-time chat functionality.
+* **Backend:** ASP.NET MVC 5 (C#)
+* **Database:** MS SQL Server
+* **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 4/5
+* **ORM:** Entity Framework (Database First Approach)
 
-EntityFramework - For seamless database interactions.
+## 📦 Key Dependencies (NuGet Packages)
 
-Newtonsoft.Json - For handling JSON data in AJAX calls.
+* **Microsoft.AspNet.SignalR** → Real-time chat functionality
+* **EntityFramework** → Database operations
+* **Newtonsoft.Json** → JSON handling in AJAX calls
+* **jQuery** → DOM manipulation & SignalR client-side logic
 
-jQuery - For DOM manipulation and SignalR client logic.
+---
 
-💻 How to Run the Project Locally
-1. Database Setup
+# 💻 How to Run the Project Locally
+
+## 🗄️ Database Setup
+
 Since the database is locally connected, follow these steps:
 
-Open SQL Server Management Studio (SSMS).
+1. Open **SQL Server Management Studio (SSMS)**
+2. Locate the `HireHub_DB.sql` file in the repository
+3. Drag & drop the file into SSMS
+4. Click **Execute** to generate tables and sample data
 
-Locate the HireHub_DB.sql file provided in the repository.
+---
 
-Drag and drop the file into SSMS and click Execute to generate the tables and sample data.
+## 🔗 Update Connection String
 
-2. Update Connection String
-Open web.config and ensure the connection string points to your local server instance:
+Open `web.config` and update the connection string to match your local SQL Server instance:
 
-XML
-<add name="HireHubEntities" connectionString="metadata=res://*/Models.Model1.csdl...;provider=System.Data.SqlClient;provider connection string=&quot;data source=.;initial catalog=HireHub_DB;integrated security=True;App=EntityFramework&quot;" providerName="System.Data.EntityClient" />
-3. Run the Application
-Open the solution file (.sln) in Visual Studio.
+```xml
+<connectionStrings>
+  <add name="YourConnectionName" 
+       connectionString="Data Source=YOUR_SERVER;Initial Catalog=HireHub_DB;Integrated Security=True" 
+       providerName="System.Data.SqlClient" />
+</connectionStrings>
+```
 
-Restore NuGet Packages (Right-click Solution > Restore NuGet Packages).
+---
 
-Build the solution (Ctrl + Shift + B).
+## ▶️ Run the Application
 
-Press F5 to launch the application.
+1. Open the solution file (`.sln`) in **Visual Studio**
+2. Restore NuGet Packages
 
-🏗 Project Structure
-Models: Data structures and Entity Framework database entities.
+   * Right-click Solution → **Restore NuGet Packages**
+3. Build the solution
 
-ViewModels: Specialized models for handling complex View data (e.g., JobSeekerApplicationViewModel).
+   * `Ctrl + Shift + B`
+4. Press **F5** to run the project
 
-Controllers: Logic for handling user requests, chat hubs, and DB interaction.
+---
 
-Views: CSHTML files for the user interface and dashboard layouts.
+# 🏗 Project Structure
 
-Developed by: Mehwish Zehra 👩‍💻
+* **Models** → Entity Framework database entities & data structures
+* **ViewModels** → Custom models for complex views (e.g., `JobSeekerApplicationViewModel`)
+* **Controllers** → Handle user requests, business logic, and database interaction
+* **Views** → `.cshtml` UI files and dashboard layouts
+
+---
+
+# 👩‍💻 Developed By
+
+**Mehwish Zehra**
+
