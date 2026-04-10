@@ -7,6 +7,7 @@
 * **Employer Module:** Post new job openings, manage listings, and review applicant profiles.
 * **Search & Filter:** Advanced search functionality to find jobs based on categories and roles.
 * **Responsive UI:** Clean and modern interface built with Bootstrap for a seamless user experience.
+* **Real-Time Bi-Directional Chat:** Instant messaging without page refreshes using SignalR WebSockets.
 
 ## 🛠️ Tech Stack
 * **Backend:** ASP.NET MVC, C#
