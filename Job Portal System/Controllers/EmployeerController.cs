@@ -49,7 +49,26 @@ namespace Job_Portal_System.Controllers
 
             string fileName = Path.GetFileName(filePath);
 
-            return File(filePath, "application/octet-stream", fileName);
+            return File(filePath, "application/pdf");
+        }
+
+        public ActionResult ViewResume(int seekerId)
+        {
+            var seeker = db.JOB_SEEKER_PROFILE.FirstOrDefault(s => s.seeker_id == seekerId);
+
+            if (seeker == null || string.IsNullOrEmpty(seeker.resume_file))
+                return HttpNotFound("Resume not found.");
+
+            string filePath = Server.MapPath(seeker.resume_file);
+
+            if (!System.IO.File.Exists(filePath))
+                return HttpNotFound("File missing from server.");
+
+            // PDF ko browser mein 'inline' (preview) karne ka logic
+            // 'inline' batata hai browser ko ke file ko isi tab/frame mein render karo
+            Response.AppendHeader("Content-Disposition", "inline; filename=" + Path.GetFileName(filePath));
+
+            return File(filePath, "application/pdf");
         }
 
 
