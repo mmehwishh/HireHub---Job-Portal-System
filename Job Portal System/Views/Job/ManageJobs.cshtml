@@ -170,10 +170,10 @@
                     </td>
                     <td>
                         <a href="@Url.Action("EditJob", "Job", new { id = job.job_id })" class="btn-action btn-action-edit">
-                            <i class="fa-solid fa-pen-to-square"></i> 
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Job
                         </a>
                         <a href="@Url.Action("DeleteJob", "Job", new { id = job.job_id })" class="btn-action btn-action-delete" onclick="return confirm('Are you sure?');">
-                            <i class="fa-solid fa-trash"></i> 
+                            <i class="fa-solid fa-trash"></i> Delete Job
                         </a>
                         <a href="@Url.Action("JobApplications", "Application", new { jobId = job.job_id })" class="btn-action btn-action-view">
                             <i class="fa-solid fa-eye"></i> View

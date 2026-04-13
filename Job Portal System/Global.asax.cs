@@ -11,6 +11,7 @@ namespace Job_Portal_System
     {
         protected void Application_Start()
         {
+
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             using (var db = new JobDBEntities3())

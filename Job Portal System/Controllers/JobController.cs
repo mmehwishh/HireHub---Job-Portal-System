@@ -1,13 +1,18 @@
-﻿using System;
+﻿using Job_Portal_System;
+using Job_Portal_System.ViewModel;
+using Microsoft.AspNet.SignalR.Hosting;
+using Microsoft.AspNet.SignalR.Hubs;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Job_Portal_System;
-using Job_Portal_System.ViewModel;
 
 namespace Job_Portal_System.Controllers
 {
@@ -438,6 +443,41 @@ namespace Job_Portal_System.Controllers
             }
 
             return RedirectToAction("ManageJobs");
+        }
+
+        private static readonly HttpClient client = new HttpClient();
+        public async Task<ActionResult> DiscoverJobs(int page = 1)
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+
+            string appId = "d3f324d5";
+            string appKey = "fbb43e3dc7f6fd38a31a557e535bbc6f";
+            string country = "gb";
+            string url = $"https://api.adzuna.com/v1/api/jobs/{country}/search/{page}?app_id={appId}&app_key={appKey}&results_per_page=20";
+
+            HttpResponseMessage response = await client.GetAsync(url);
+
+            // Read raw bytes and manually decode — avoids ALL encoding name lookups
+            byte[] rawBytes = await response.Content.ReadAsByteArrayAsync();
+            string jsonResponse = System.Text.Encoding.UTF8.GetString(rawBytes);
+
+            AdzunaResponse data;
+            using (var sr = new System.IO.StringReader(jsonResponse))
+            using (var reader = new Newtonsoft.Json.JsonTextReader(sr))
+            {
+                var serializer = new Newtonsoft.Json.JsonSerializer();
+                data = serializer.Deserialize<AdzunaResponse>(reader);
+            }
+
+            var jobList = data?.results?.Select(r => new ExternalJob
+            {
+                Title = r.title,
+                Company = r.company?.display_name ?? "Company Undisclosed",
+                Location = r.location?.display_name ?? "Location Undisclosed",
+                RedirectUrl = r.redirect_url
+            }).ToList() ?? new List<ExternalJob>();
+
+            return View(jobList);
         }
 
 

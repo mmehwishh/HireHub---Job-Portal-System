@@ -73,6 +73,7 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -225,6 +226,7 @@
       <DependentUpon>JobPortal.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\EmployerProfileViewModel.cs" />
+    <Compile Include="ViewModel\ExternalJob.cs" />
     <Compile Include="ViewModel\JobDetailsViewModel.cs" />
     <Compile Include="ViewModel\JobEditViewModel.cs" />
     <Compile Include="ViewModel\JobSeekerApplicationViewModel.cs" />
@@ -296,6 +298,7 @@
     <Content Include="Views\SavedJobs\SavedJobsList.cshtml" />
     <Content Include="Views\Chat\Index.cshtml" />
     <Content Include="Views\Chat\Inbox.cshtml" />
+    <Content Include="Views\Job\DiscoverJobs.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -307,6 +310,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
     <Folder Include="Resumes\" />
+    <Folder Include="Views\ExternalJob\" />
     <Folder Include="Views\JobDetailsViewModel\" />
     <Folder Include="Views\JobEditViewModel\" />
     <Folder Include="Views\JobSeekerApplicationViewModel\" />
