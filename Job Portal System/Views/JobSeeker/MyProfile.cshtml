@@ -3,71 +3,881 @@
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
 }
 
-<h2>My Profile</h2>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-<form method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label>Name</label>
-        <input name="FullName" class="form-control" value="@Model.FullName" />
+    :root {
+        --primary: #00358d;
+        --accent: #e8b86d;
+        --accent-light: #f5d49a;
+        --surface: #ffffff;
+        --surface-2: #f8f6f2;
+        --border: #e8e2d9;
+        --text-main: #1a1a2e;
+        --text-muted: #7a7468;
+        --danger: #e05c5c;
+        --success: #4caf82;
+        --shadow-sm: 0 2px 8px rgba(26,26,46,0.06);
+        --shadow-md: 0 8px 32px rgba(26,26,46,0.10);
+        --shadow-lg: 0 24px 64px rgba(26,26,46,0.13);
+        --radius: 16px;
+        --radius-sm: 10px;
+        --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .profile-page-wrapper {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--surface-2);
+        min-height: 100vh;
+        padding: 40px 24px 80px;
+        animation: fadeInPage 0.6s ease forwards;
+    }
+
+    @@keyframes fadeInPage {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Page Header ── */
+    .profile-header {
+        max-width: 860px;
+        margin: 0 auto 40px;
+        display: flex;
+        align-items: flex-end;
+        gap: 18px;
+        animation: slideDown 0.5s ease 0.1s both;
+    }
+
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-icon {
+        width: 54px;
+        height: 54px;
+        background: var(--primary);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(26,26,46,0.18);
+    }
+
+    .header-icon svg { color: var(--accent); }
+
+    .header-text h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1.1;
+    }
+
+    .header-text p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+
+    /* ── Card ── */
+    .profile-card {
+        max-width: 860px;
+        margin: 0 auto;
+        background: var(--surface);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    /* ── Card Top Banner ── */
+    .card-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, #2d2d5e 100%);
+        padding: 32px 40px 28px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-banner::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(232,184,109,0.18) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .card-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -60px; left: 30%;
+        width: 160px; height: 160px;
+        background: radial-gradient(circle, rgba(232,184,109,0.10) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .banner-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(232,184,109,0.15);
+        border: 1px solid rgba(232,184,109,0.3);
+        color: var(--accent-light);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+    }
+
+    .banner-title {
+        font-family: 'Playfair Display', serif;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .banner-subtitle {
+        color: rgba(255,255,255,0.55);
+        font-size: 0.85rem;
+        margin-top: 4px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Section Nav Tabs ── */
+    .section-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid var(--border);
+        padding: 0 40px;
+        background: var(--surface);
+        overflow-x: auto;
+    }
+
+    .section-tab {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 16px 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        cursor: pointer;
+        transition: var(--transition);
+        white-space: nowrap;
+        letter-spacing: 0.02em;
+    }
+
+    .section-tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--accent);
+    }
+
+    .section-tab:hover:not(.active) {
+        color: var(--primary);
+    }
+
+    .section-tab svg {
+        width: 15px;
+        height: 15px;
+        opacity: 0.7;
+    }
+
+    /* ── Form Body ── */
+    .form-body {
+        padding: 40px 40px 0;
+    }
+
+    /* ── Sections ── */
+    .form-section {
+        display: none;
+        animation: sectionReveal 0.4s ease forwards;
+    }
+
+    .form-section.active {
+        display: block;
+    }
+
+    @@keyframes sectionReveal {
+        from { opacity: 0; transform: translateX(12px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        margin-left: 4px;
+    }
+
+    /* ── Grid ── */
+    .field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .field-grid .field-full {
+        grid-column: 1 / -1;
+    }
+
+    /* ── Field ── */
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        animation: fieldFade 0.5s ease both;
+    }
+
+    @@keyframes fieldFade {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .field-group:nth-child(1)  { animation-delay: 0.05s; }
+    .field-group:nth-child(2)  { animation-delay: 0.10s; }
+    .field-group:nth-child(3)  { animation-delay: 0.15s; }
+    .field-group:nth-child(4)  { animation-delay: 0.20s; }
+    .field-group:nth-child(5)  { animation-delay: 0.25s; }
+    .field-group:nth-child(6)  { animation-delay: 0.30s; }
+
+    .field-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .field-label svg {
+        width: 13px;
+        height: 13px;
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .field-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.93rem;
+        color: var(--text-main);
+        background: var(--surface);
+        transition: var(--transition);
+        outline: none;
+        appearance: none;
+    }
+
+    .field-input:focus {
+        border-color: var(--accent);
+        background: #fffdf8;
+        box-shadow: 0 0 0 3px rgba(232,184,109,0.18);
+        transform: translateY(-1px);
+    }
+
+    .field-input:hover:not(:focus) {
+        border-color: #c8c0b0;
+    }
+
+    textarea.field-input {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+    select.field-input {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a7468' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 40px;
+        cursor: pointer;
+    }
+
+    /* ── Upload Boxes ── */
+    .upload-area {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 28px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        background: var(--surface-2);
+    }
+
+    .upload-area:hover {
+        border-color: var(--accent);
+        background: #fffdf5;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+    .upload-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, var(--primary), #2d2d5e);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        transition: var(--transition);
+    }
+
+    .upload-area:hover .upload-icon {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(26,26,46,0.2);
+    }
+
+    .upload-icon svg {
+        color: var(--accent);
+        width: 20px;
+        height: 20px;
+    }
+
+    .upload-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 4px;
+    }
+
+    .upload-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    /* ── Current file/image indicators ── */
+    .current-file-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0faf5;
+        border: 1px solid #b2dfc7;
+        color: var(--success);
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-top: 12px;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .current-file-badge:hover {
+        background: #d8f5e8;
+        transform: translateY(-1px);
+    }
+
+    .current-file-badge svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .profile-preview-wrap {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .profile-preview-img {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent);
+        box-shadow: 0 4px 16px rgba(232,184,109,0.3);
+        transition: var(--transition);
+    }
+
+    .profile-preview-img:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 24px rgba(232,184,109,0.4);
+    }
+
+    .profile-preview-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .profile-preview-label strong {
+        display: block;
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    /* ── Form Footer ── */
+    .form-footer {
+        padding: 28px 40px 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--border);
+        margin-top: 32px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .footer-hint {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .footer-hint svg {
+        width: 14px;
+        height: 14px;
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .footer-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-reset {
+        padding: 12px 24px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: transparent;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-reset:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: #fdf5f5;
+    }
+
+    .btn-save {
+        padding: 12px 32px;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary);
+        background: linear-gradient(135deg, var(--accent) 0%, #d4a055 100%);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(232,184,109,0.35);
+        letter-spacing: 0.02em;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(232,184,109,0.5);
+        background: linear-gradient(135deg, #f0c97a 0%, #d4a055 100%);
+    }
+
+    .btn-save:active {
+        transform: translateY(0);
+    }
+
+    .btn-save svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* ── Next/Prev navigation ── */
+    .tab-nav-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 28px;
+    }
+
+    .btn-next, .btn-prev {
+        padding: 10px 22px;
+        border-radius: var(--radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+    }
+
+    .btn-next {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .btn-next:hover {
+        background: #2d2d5e;
+        transform: translateX(3px);
+    }
+
+    .btn-prev {
+        background: var(--surface-2);
+        color: var(--text-muted);
+        border: 1.5px solid var(--border);
+    }
+
+    .btn-prev:hover {
+        background: var(--border);
+        color: var(--primary);
+        transform: translateX(-3px);
+    }
+
+    /* ── Progress Indicator ── */
+    .progress-bar-wrap {
+        height: 3px;
+        background: var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #d4a055);
+        transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+        border-radius: 999px;
+    }
+
+    /* ── Responsive ── */
+    @@media (max-width: 680px) {
+        .form-body     { padding: 28px 20px 0; }
+        .form-footer   { padding: 20px; }
+        .section-tabs  { padding: 0 16px; }
+        .card-banner   { padding: 24px 20px 20px; }
+        .field-grid    { grid-template-columns: 1fr; }
+        .profile-header { flex-direction: column; align-items: flex-start; }
+        .header-text h1 { font-size: 1.5rem; }
+    }
+</style>
+
+<div class="profile-page-wrapper">
+
+    <!-- Page Header -->
+    <div class="profile-header">
+        <div class="header-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+        </div>
+        <div class="header-text">
+            <h1>My Profile</h1>
+            <p>Manage your personal information and career details</p>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>Bio</label>
-        <textarea name="Bio" class="form-control">@Model.Bio</textarea>
-    </div>
+    <form method="post" enctype="multipart/form-data">
+        <div class="profile-card">
 
-    <div class="form-group">
-        <label>Date of Birth</label>
-        <input type="date" name="dob" class="form-control" value="@(Model.dob.HasValue ? Model.dob.Value.ToString("yyyy-MM-dd") : "")" />
-    </div>
+            <!-- Banner -->
+            <div class="card-banner">
+                <div class="banner-label">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6" /></svg>
+                    Job Seeker Account
+                </div>
+                <div class="banner-title">Edit Your Professional Profile</div>
+                <div class="banner-subtitle">Keep your information updated to attract the best opportunities</div>
+            </div>
 
-    <div class="form-group">
-        <label>Gender</label>
-        <select name="gender" class="form-control">
-            <option value="">Select Gender</option>
-            <option value="Male" @(Model.gender == "Male" ? "selected" : "")>Male</option>
-            <option value="Female" @(Model.gender == "Female" ? "selected" : "")>Female</option>
-            <option value="Other" @(Model.gender == "Other" ? "selected" : "")>Other</option>
-        </select>
-    </div>
+            <!-- Progress Bar -->
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressBar" style="width: 33%"></div>
+            </div>
 
-    <div class="form-group">
-        <label>Phone</label>
-        <input name="phone" class="form-control" value="@Model.phone" />
-    </div>
+            <!-- Tabs -->
+            <div class="section-tabs">
+                <div class="section-tab active" data-tab="personal" onclick="switchTab('personal', 1)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    Personal Info
+                </div>
+                <div class="section-tab" data-tab="career" onclick="switchTab('career', 2)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg>
+                    Career Details
+                </div>
+                <div class="section-tab" data-tab="media" onclick="switchTab('media', 3)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                    Documents & Media
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label>Address</label>
-        <input name="address" class="form-control" value="@Model.address" />
-    </div>
+            <!-- Form Body -->
+            <div class="form-body">
 
-    <div class="form-group">
-        <label>Experience Level</label>
-        <input name="experience_level" class="form-control" value="@Model.experience_level" />
-    </div>
+                <!-- Section 1: Personal Info -->
+                <div class="form-section active" id="tab-personal">
+                    <div class="section-title">Basic Information</div>
+                    <div class="field-grid">
+                        <div class="field-group field-full">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                Full Name
+                            </label>
+                            <input name="FullName" class="field-input" value="@Model.FullName" placeholder="Enter your full name" />
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                                Date of Birth
+                            </label>
+                            <input type="date" name="dob" class="field-input" value="@(Model.dob.HasValue ? Model.dob.Value.ToString("yyyy-MM-dd") : "")" />
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                                Gender
+                            </label>
+                            <select name="gender" class="field-input">
+                                <option value="">Select Gender</option>
+                                <option value="Male" @(Model.gender == "Male" ? "selected" : "")>Male</option>
+                                <option value="Female" @(Model.gender == "Female" ? "selected" : "")>Female</option>
+                                <option value="Other" @(Model.gender == "Other" ? "selected" : "")>Other</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.21 3.56 2 2 0 0 1 3.18 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91A16 16 0 0 0 16 18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 24 19z" /></svg>
+                                Phone
+                            </label>
+                            <input name="phone" class="field-input" value="@Model.phone" placeholder="+92 300 0000000" />
+                        </div>
+                        <div class="field-group field-full">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                Address
+                            </label>
+                            <input name="address" class="field-input" value="@Model.address" placeholder="Your current address" />
+                        </div>
+                        <div class="field-group field-full">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                                Bio
+                            </label>
+                            <textarea name="Bio" class="field-input" placeholder="Tell employers a bit about yourself...">@Model.Bio</textarea>
+                        </div>
+                    </div>
+                    <div class="tab-nav-row">
+                        <button type="button" class="btn-next" onclick="switchTab('career', 2)">
+                            Career Details
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+                </div>
 
-    <div class="form-group">
-        <label>Education</label>
-        <input name="education" class="form-control" value="@Model.education" />
-    </div>
+                <!-- Section 2: Career Details -->
+                <div class="form-section" id="tab-career">
+                    <div class="section-title">Career & Education</div>
+                    <div class="field-grid">
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                                Experience Level
+                            </label>
+                            <input name="experience_level" class="field-input" value="@Model.experience_level" placeholder="e.g. Mid-Level, Senior" />
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
+                                Education
+                            </label>
+                            <input name="education" class="field-input" value="@Model.education" placeholder="e.g. B.S. Computer Science" />
+                        </div>
+                    </div>
+                    <div class="tab-nav-row">
+                        <button type="button" class="btn-prev" onclick="switchTab('personal', 1)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                            Personal Info
+                        </button>
+                        <button type="button" class="btn-next" onclick="switchTab('media', 3)">
+                            Documents & Media
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+                </div>
 
-    <div class="form-group">
-        <label>Resume</label>
-        <input type="file" name="ResumeFile" class="form-control" />
-        @if (Model.Resume != null)
-        {
-            <p>Current: <a href="@Model.Resume">Download</a></p>
-        }
-    </div>
+                <!-- Section 3: Documents & Media -->
+                <div class="form-section" id="tab-media">
+                    <div class="section-title">Documents & Media</div>
+                    <div class="field-grid">
+                        <!-- Resume Upload -->
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                                Resume / CV
+                            </label>
+                            <div class="upload-area">
+                                <input type="file" name="ResumeFile" accept=".pdf,.doc,.docx" />
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                                </div>
+                                <div class="upload-title">Upload Resume</div>
+                                <div class="upload-sub">PDF, DOC, DOCX — Max 5MB</div>
+                            </div>
+                            @if (Model.Resume != null)
+                            {
+                                <a href="@Model.Resume" class="current-file-badge" target="_blank">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                                    Current Resume — Download
+                                </a>
+                            }
+                        </div>
 
-    <div class="form-group">
-        <label>Profile Picture</label>
-        <input type="file" name="ImageFile" class="form-control" />
-        @if (Model.ProfileImage != null)
-        {
-            <img src="@Model.ProfileImage" width="120" class="mt-2" />
-        }
-    </div>
+                        <!-- Profile Picture Upload -->
+                        <div class="field-group">
+                            <label class="field-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                                Profile Picture
+                            </label>
+                            <div class="upload-area">
+                                <input type="file" name="ImageFile" accept="image/*" onchange="previewImage(event)" />
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                                </div>
+                                <div class="upload-title">Upload Photo</div>
+                                <div class="upload-sub">JPG, PNG, WEBP — Max 2MB</div>
+                            </div>
+                            @if (Model.ProfileImage != null)
+                            {
+                                <div class="profile-preview-wrap">
+                                    <img src="@Model.ProfileImage" class="profile-preview-img" id="profilePreview" alt="Profile" />
+                                    <div class="profile-preview-label">
+                                        <strong>Current Photo</strong>
+                                        Upload a new image to replace
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="profile-preview-wrap" id="newPreviewWrap" style="display:none;">
+                                    <img src="" class="profile-preview-img" id="profilePreview" alt="Preview" />
+                                    <div class="profile-preview-label">
+                                        <strong>New Photo Preview</strong>
+                                        Looks great!
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
 
-    <button class="btn btn-primary">Save Changes</button>
-</form>
+                    <div class="tab-nav-row">
+                        <button type="button" class="btn-prev" onclick="switchTab('career', 2)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                            Career Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="form-footer">
+                <div class="footer-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                    Changes are saved securely to your profile
+                </div>
+                <div class="footer-actions">
+                    <button type="reset" class="btn-reset">Discard</button>
+                    <button type="submit" class="btn-save">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    const tabOrder = ['personal', 'career', 'media'];
+    const progressMap = { personal: 33, career: 66, media: 100 };
+
+    function switchTab(tabId, step) {
+        // Update tabs
+        document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+        // Update sections
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`tab-${tabId}`);
+        target.classList.add('active');
+
+        // Update progress
+        document.getElementById('progressBar').style.width = progressMap[tabId] + '%';
+
+        // Scroll to top of card smoothly
+        document.querySelector('.profile-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const preview = document.getElementById('profilePreview');
+            const wrap = document.getElementById('newPreviewWrap');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            if (wrap) wrap.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Subtle field focus ripple
+    document.querySelectorAll('.field-input').forEach(input => {
+        input.addEventListener('focus', function () {
+            this.closest('.field-group').style.transform = 'translateY(-1px)';
+        });
+        input.addEventListener('blur', function () {
+            this.closest('.field-group').style.transform = '';
+        });
+    });
+</script>
