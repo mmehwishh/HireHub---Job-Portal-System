@@ -19,7 +19,7 @@
 
 <div class="hh-card" style="max-width:1100px; margin:20px auto; padding:18px;">
     <div class="hh-page-header" style="margin-bottom:14px;">
-        <h1 style="margin:0;">@job?.job_title</h1>
+        <h1 style="margin:0;">@job.job_title</h1>
         <p class="subtitle" style="margin-top:6px;">@company &nbsp;·&nbsp; @location</p>
     </div>
 
@@ -34,7 +34,7 @@
                 <div style="flex:1; min-width:0;">
                     <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
                         <div style="min-width:0;">
-                            <div style="font-weight:700; font-size:18px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@job?.job_title</div>
+                            <div style="font-weight:700; font-size:18px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@job.job_title</div>
                             <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">Posted: @postedDate</div>
                         </div>
 
@@ -107,16 +107,16 @@
                 else if (hasApplied)
                 {
                     <button class="hh-btn hh-btn-outline" disabled><i class="fa-solid fa-circle-check"></i> Already Applied</button>
-                    <a href="@Url.Action("ApplicationStatus", "Application", new { jobId = job?.job_id })" class="hh-btn hh-btn-ghost">View Application</a>
+                    <a href="@Url.Action("ApplicationStatus", "Application", new { jobId = job.job_id })" class="hh-btn hh-btn-ghost">View Application</a>
                 }
                 else
                 {
-                    <a href="@Url.Action("Apply", "Application", new { jobId = job?.job_id })" id="applyNow" class="hh-btn hh-btn-primary"><i class="fa-solid fa-paper-plane"></i> Apply Now</a>
+                    <a href="@Url.Action("Apply", "Application", new { jobId = job.job_id })" id="applyNow" class="hh-btn hh-btn-primary"><i class="fa-solid fa-paper-plane"></i> Apply Now</a>
                 }
 
                 <button type="button" class="hh-btn hh-btn-ghost btn-save-job" data-jobid="@job?.job_id" data-fallback="@saveFallback"><i class="fa-solid fa-bookmark"></i> Save</button>
 
-                <a href="@Url.Action("Index","Chat", new { receiverId = job?.EMPLOYER?.user_id })" class="hh-btn hh-btn-outline"><i class="fa-solid fa-envelope"></i> Message Employer</a>
+                <a href="@Url.Action("Index","Chat", new { receiverId = job.EMPLOYER.employer_id })" class="hh-btn hh-btn-outline"><i class="fa-solid fa-envelope"></i> Message Employer</a>
 
                 <button type="button" id="btnShare" class="hh-btn hh-btn-sm hh-btn-outline"><i class="fa-solid fa-link"></i> Copy Link</button>
             </div>
@@ -126,14 +126,14 @@
         <aside class="hh-card" style="padding:14px;">
             <div style="text-align:center;">
                 <div style="width:86px; height:86px; margin:0 auto 10px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--bg);">
-                    @Html.Raw(Model?.Employerr_detail?.companyLogo ?? "<i class='fa-solid fa-building' style='font-size:32px;color:var(--text-muted);'></i>")
+                    @Html.Raw(Model.Employerr_detail.companyLogo ?? "<i class='fa-solid fa-building' style='font-size:32px;color:var(--text-muted);'></i>")
                 </div>
 
                 <div style="font-weight:700; color:var(--text-primary); font-size:16px;">@company</div>
-                <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">@Model?.Employer?.email</div>
+                <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">@Model.Employer.email</div>
 
                 <div style="margin-top:12px;">
-                    <a href="@Url.Action("EmployerProfile","Employeer", new { id = job?.EMPLOYER?.employer_id })" class="hh-btn hh-btn-outline hh-btn-sm" style="display:inline-flex; gap:8px;"><i class="fa-solid fa-building"></i> View Company</a>
+                    <a href="@Url.Action("EmployerProfile","Employeer", new { id = job.EMPLOYER.employer_id })" class="hh-btn hh-btn-outline hh-btn-sm" style="display:inline-flex; gap:8px;"><i class="fa-solid fa-building"></i> View Company</a>
                 </div>
 
                 <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
@@ -161,7 +161,7 @@
     #reqBlock.collapsed { max-height: 0; opacity: 0; padding: 0; margin: 0; }
     #reqBlock.expanded { max-height: 2000px; opacity: 1; }
 
-    @media (max-width:920px) {
+    @@media (max-width:920px) {
         div[style*="grid-template-columns: 2fr 360px"] { grid-template-columns: 1fr; }
     }
 </style>

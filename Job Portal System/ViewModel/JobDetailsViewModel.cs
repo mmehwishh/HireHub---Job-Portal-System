@@ -10,6 +10,7 @@ namespace Job_Portal_System.ViewModel
         public JOB Job { get; set; }
         public USER Employer { get; set; }
         public EMPLOYER Employerr_detail { get; set; }
+        public List<string> Skills { get; set; }
         public List<JOB> RecommendedJobs { get; set; }
     }
 

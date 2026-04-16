@@ -170,17 +170,24 @@ namespace Job_Portal_System.Controllers
         {
             if (Session["UserId"] == null)
                 return RedirectToAction("Login", "Account");
+            db.Configuration.ProxyCreationEnabled = false;
 
             int seekerId = Convert.ToInt32(Session["UserId"]);
-            var job_data = db.JOBS.FirstOrDefault(j => j.job_id == id);
+            var job_data = db.JOBS
+                     .Include(j => j.EMPLOYER)
+                     .FirstOrDefault(j => j.job_id == id);
             if (job_data == null) return HttpNotFound();
             var employer_data = db.USERS.FirstOrDefault(u => u.UserId == job_data.employer_id);
             var employer_complete = db.EMPLOYERS.FirstOrDefault(e => e.employer_id == employer_data.UserId);
-
+            var skillNames = (from js in db.JOB_SKILLS
+                              join s in db.Skills on js.skillID equals s.SkillID
+                              where js.job_id == id
+                              select s.skillName).ToList();
             var myViewModel = new JobDetailsViewModel { 
                     Job = job_data,
                     Employer = employer_data,
-                    Employerr_detail = employer_complete
+                    Employerr_detail = employer_complete,
+                Skills = skillNames
             };
     
 
