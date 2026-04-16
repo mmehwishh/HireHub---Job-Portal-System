@@ -3,250 +3,1051 @@
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>@ViewBag.Title - Job Seeker Dashboard</title>
 
-    <!-- Fonts & Icons -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - HireHub</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Bootstrap -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <style>
-        body {
-            font-family: 'Poppins', Arial, sans-serif;
-            background: #f4f6f8;
+        @@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alegreya:ital,wght@0,400..900;1,400..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Fjalla+One&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Gravitas+One&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Public+Sans:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&family=Roboto+Condensed:ital,wght@0,561;1,561&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+        /* ========== RESET & BASE ========== */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+            --navy:        #002147;
+            --navy-mid:    #0d3272;
+            --blue:        #1d4ed8;
+            --blue-light:  #3b82f6;
+            --blue-pale:   #eff6ff;
+            --blue-border: #bfdbfe;
+            --surface:     #ffffff;
+            --bg:          #f1f5f9;
+            --border:      #e2e8f0;
+            --text-primary: #0f172a;
+            --text-second:  #475569;
+            --text-muted:   #94a3b8;
+            --green:        #16a34a;
+            --green-pale:   #f0fdf4;
+            --amber:        #d97706;
+            --amber-pale:   #fffbeb;
+            --red:          #dc2626;
+            --red-pale:     #fef2f2;
+            --radius-sm:    6px;
+            --radius-md:    10px;
+            --radius-lg:    14px;
+            --sidebar-w:    228px;
+            --topbar-h:     60px;
+            --transition:   0.18s ease;
+        }
+
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER */
-        .navbar {
-            background: #002e7f;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 8px 16px;
-        }
-
-        .navbar-brand {
-            font-weight: 600;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .navbar-nav .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-        }
-
-        .navbar-brand img {
-            width: 120px;
-            height: auto;
-            max-height: 30px;
-            object-fit: cover;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            height: 100vh;
-            width: 200px;
-            background: #fff;
+        /* ========== TOPBAR ========== */
+        .hh-topbar {
             position: fixed;
-            top: 56px;
+            top: 0;
             left: 0;
-            padding-top: 20px;
-            border-right: 1px solid #e0e0e0;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-            .sidebar a {
-                color: #0047b3;
-                padding: 12px 15px;
-                display: flex;
-                align-items: center;
-                text-decoration: none;
-                font-size: 14px;
-                border-radius: 8px;
-                margin: 5px 10px;
-                transition: 0.3s;
-            }
-
-                .sidebar a i {
-                    margin-right: 10px;
-                    font-size: 16px;
-                }
-
-                .sidebar a:hover {
-                    background: #0047b3;
-                    color: #fff;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                }
-
-        /* CONTENT AREA */
-        .content-area {
-            margin-left: 200px;
-            margin-top: 70px;
-            padding: 25px;
+        /* Logo */
+        .hh-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+            width: var(--sidebar-w);
         }
 
-        .content-card {
-            background: #fff;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            color: #0047b3;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        /* FOOTER */
-        .footer {
-            background: #002e7f;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            position: fixed;
-            width: calc(100% - 200px);
-            bottom: 0;
-            left: 200px;
-            box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
-            border-radius: 10px 0 0 0;
-            font-size: 10px;
-        }
-
-        /* BUTTONS */
-        .btn {
+        .hh-logo-mark {
+            width: 34px;
+            height: 34px;
+            background: var(--blue-light);
             border-radius: 8px;
-            font-weight: 500;
-            padding: 6px 12px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        .btn-primary {
-            background: linear-gradient(145deg, #0066cc, #0047b3);
+        .hh-logo-mark svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+        }
+
+        .hh-logo-name {
+            font-size: 18px;
+            font-weight: 700;
             color: #fff;
-            border: none;
+            letter-spacing: -0.3px;
         }
 
-            .btn-primary:hover {
-                background: linear-gradient(145deg, #0047b3, #003366);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            }
+        .hh-logo-name span {
+            color: var(--blue-light);
+        }
 
-        .btn-success {
-            background: linear-gradient(145deg, #34d058, #28a745);
+        /* Search bar */
+        .hh-search {
+            flex: 1;
+            max-width: 480px;
+            margin: 0 24px;
+        }
+
+        .hh-search-inner {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            height: 38px;
+            transition: border-color var(--transition), background var(--transition);
+        }
+
+        .hh-search-inner:focus-within {
+            background: rgba(255,255,255,0.13);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .hh-search-inner i {
+            color: rgba(255,255,255,0.45);
+            font-size: 13px;
+            margin-right: 9px;
+            flex-shrink: 0;
+        }
+
+        .hh-search-inner input {
+            background: transparent;
+            border: none;
+            outline: none;
             color: #fff;
-            border: none;
-        }
-
-            .btn-success:hover {
-                background: linear-gradient(145deg, #28a745, #218838);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            }
-
-        .btn-danger {
-            background: linear-gradient(145deg, #e55353, #dc3545);
-            color: #fff;
-            border: none;
-        }
-
-            .btn-danger:hover {
-                background: linear-gradient(145deg, #dc3545, #c82333);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            }
-
-        .btn-info {
-            background: linear-gradient(145deg, #38bdf8, #1da1f2);
-            color: #fff;
-            border: none;
-        }
-
-            .btn-info:hover {
-                background: linear-gradient(145deg, #1da1f2, #0d8ddb);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            }
-
-        table {
+            font-size: 13px;
+            font-family: inherit;
             width: 100%;
         }
 
-            table th {
-                background: #0047b3;
-                color: #fff;
-                font-weight: 600;
-                padding: 10px;
-                border-radius: 8px;
+        .hh-search-inner input::placeholder {
+            color: rgba(255,255,255,0.38);
+        }
+
+        /* Topbar right */
+        .hh-topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hh-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .hh-icon-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .hh-icon-btn .badge-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid var(--navy);
+        }
+
+        /* Avatar / dropdown */
+        .hh-avatar-wrap {
+            position: relative;
+        }
+
+        .hh-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue-light), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: border-color var(--transition);
+            user-select: none;
+        }
+
+        .hh-avatar:hover {
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .hh-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 200px;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 6px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-6px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 999;
+        }
+
+        .hh-avatar-wrap:focus-within .hh-dropdown,
+        .hh-avatar-wrap.open .hh-dropdown {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .hh-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            text-decoration: none;
+            transition: background var(--transition);
+        }
+
+        .hh-dropdown a:hover {
+            background: var(--bg);
+        }
+
+        .hh-dropdown a i {
+            width: 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .hh-dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 5px 0;
+        }
+
+        .hh-dropdown .logout-link {
+            color: var(--red);
+        }
+
+        .hh-dropdown .logout-link i {
+            color: var(--red);
+        }
+
+        /* ========== SIDEBAR ========== */
+        .hh-sidebar {
+            position: fixed;
+            top: var(--topbar-h);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 16px 10px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 900;
+            scrollbar-width: none;
+        }
+
+        .hh-sidebar::-webkit-scrollbar { display: none; }
+
+        .hh-nav-section {
+            margin-bottom: 6px;
+        }
+
+        .hh-nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 8px 10px 5px;
+        }
+
+        .hh-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 11px;
+            border-radius: var(--radius-md);
+            color: var(--text-second);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 400;
+            transition: background var(--transition), color var(--transition);
+            position: relative;
+            margin: 1px 0;
+        }
+
+        .hh-nav-link i {
+            width: 17px;
+            text-align: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            color: var(--text-muted);
+            transition: color var(--transition);
+        }
+
+        .hh-nav-link:hover {
+            background: var(--blue-pale);
+            color: var(--blue);
+        }
+
+        .hh-nav-link:hover i {
+            color: var(--blue);
+        }
+
+        .hh-nav-link.active {
+            background: var(--blue-pale);
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        .hh-nav-link.active i {
+            color: var(--blue);
+        }
+
+        .hh-nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 6px;
+            bottom: 6px;
+            width: 3px;
+            background: var(--blue);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .hh-nav-badge {
+            margin-left: auto;
+            background: var(--blue);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 20px;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .hh-nav-badge.red {
+            background: var(--red);
+        }
+
+        .hh-sidebar-footer {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .hh-content {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            min-height: calc(100vh - var(--topbar-h));
+            padding: 28px 28px 80px;
+        }
+
+        /* ========== PAGE COMPONENTS ========== */
+
+        /* Page header */
+        .hh-page-header {
+            margin-bottom: 24px;
+        }
+
+        .hh-page-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .hh-page-header p {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            margin: 0;
+        }
+
+        /* Cards */
+        .hh-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+
+        .hh-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 18px;
+        }
+
+        /* Buttons */
+        .hh-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+            border: 1px solid transparent;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .hh-btn-primary {
+            background: var(--blue);
+            color: #fff;
+            border-color: var(--blue);
+        }
+
+        .hh-btn-primary:hover {
+            background: #1a44c2;
+            border-color: #1a44c2;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29,78,216,0.3);
+        }
+
+        .hh-btn-outline {
+            background: transparent;
+            color: var(--blue);
+            border-color: var(--blue-border);
+        }
+
+        .hh-btn-outline:hover {
+            background: var(--blue-pale);
+            color: var(--blue);
+        }
+
+        .hh-btn-ghost {
+            background: transparent;
+            color: var(--text-second);
+            border-color: var(--border);
+        }
+
+        .hh-btn-ghost:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .hh-btn-danger {
+            background: var(--red);
+            color: #fff;
+            border-color: var(--red);
+        }
+
+        .hh-btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .hh-btn-success {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
+        }
+
+        .hh-btn-success:hover {
+            background: #15803d;
+            border-color: #15803d;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .hh-btn-sm {
+            padding: 5px 12px;
+            font-size: 12.5px;
+        }
+
+        .hh-btn-lg {
+            padding: 11px 24px;
+            font-size: 15px;
+        }
+
+        /* Badges / Tags */
+        .hh-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .hh-badge-blue  { background: var(--blue-pale);  color: var(--blue); }
+        .hh-badge-green { background: var(--green-pale); color: var(--green); }
+        .hh-badge-amber { background: var(--amber-pale); color: var(--amber); }
+        .hh-badge-red   { background: var(--red-pale);   color: var(--red); }
+        .hh-badge-gray  { background: var(--bg);         color: var(--text-second); border: 1px solid var(--border); }
+
+        /* Tables */
+        .hh-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .hh-table thead th {
+            background: var(--bg);
+            color: var(--text-second);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 10px 14px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hh-table thead th:first-child {
+            border-left: 1px solid var(--border);
+            border-radius: var(--radius-sm) 0 0 0;
+        }
+
+        .hh-table thead th:last-child {
+            border-right: 1px solid var(--border);
+            border-radius: 0 var(--radius-sm) 0 0;
+        }
+
+        .hh-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 13.5px;
+            vertical-align: middle;
+        }
+
+        .hh-table tbody tr:last-child td:first-child { border-left: 1px solid var(--border); border-radius: 0 0 0 var(--radius-sm); }
+        .hh-table tbody tr:last-child td:last-child  { border-right: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) 0; }
+        .hh-table tbody td:first-child { border-left: 1px solid var(--border); }
+        .hh-table tbody td:last-child  { border-right: 1px solid var(--border); }
+
+        .hh-table tbody tr {
+            transition: background var(--transition);
+        }
+
+        .hh-table tbody tr:hover {
+            background: var(--blue-pale);
+        }
+
+        /* Form elements */
+        .hh-form-group {
+            margin-bottom: 18px;
+        }
+
+        .hh-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-second);
+            margin-bottom: 6px;
+        }
+
+        .hh-input, .hh-select, .hh-textarea {
+            width: 100%;
+            height: 40px;
+            padding: 0 13px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+        }
+
+        .hh-textarea {
+            height: auto;
+            padding: 10px 13px;
+            resize: vertical;
+        }
+
+        .hh-input:focus, .hh-select:focus, .hh-textarea:focus {
+            border-color: var(--blue-light);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+
+        .hh-input::placeholder { color: var(--text-muted); }
+
+        /* Alerts */
+        .hh-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            margin-bottom: 16px;
+            border: 1px solid transparent;
+        }
+
+        .hh-alert i { margin-top: 1px; flex-shrink: 0; }
+
+        .hh-alert-info    { background: var(--blue-pale);  color: var(--blue);  border-color: var(--blue-border); }
+        .hh-alert-success { background: var(--green-pale); color: var(--green); border-color: #bbf7d0; }
+        .hh-alert-warning { background: var(--amber-pale); color: var(--amber); border-color: #fde68a; }
+        .hh-alert-danger  { background: var(--red-pale);   color: var(--red);   border-color: #fecaca; }
+
+        /* Empty state */
+        .hh-empty {
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .hh-empty-icon {
+            font-size: 36px;
+            color: var(--border);
+            margin-bottom: 14px;
+        }
+
+        .hh-empty h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+
+        .hh-empty p {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            margin: 0 0 20px;
+        }
+
+        /* Stat row */
+        .hh-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .hh-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+        }
+
+        .hh-stat-label {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .hh-stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .hh-stat-meta {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Profile snippet in sidebar bottom */
+        .hh-sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            transition: background var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .hh-sidebar-profile:hover { background: var(--bg); }
+
+        .hh-sidebar-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue-light), var(--blue));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .hh-sidebar-user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .hh-sidebar-user-role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ========== FOOTER ========== */
+        .hh-footer {
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 44px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            z-index: 800;
+        }
+
+        .hh-footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .hh-footer a:hover { color: var(--blue); }
+
+        /* ========== MOBILE SIDEBAR TOGGLE ========== */
+        .hh-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 10px 0 0;
+        }
+
+        /* ========== BREADCRUMB ========== */
+        .hh-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .hh-breadcrumb a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .hh-breadcrumb a:hover { text-decoration: underline; }
+
+        .hh-breadcrumb span { color: var(--text-muted); }
+
+        /* ========== SIDEBAR OVERLAY (MOBILE) ========== */
+        .hh-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 850;
+            backdrop-filter: blur(2px);
+        }
+
+        /* ========== DIVIDER ========== */
+        .hh-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @@media (max-width: 900px) {
+            .hh-menu-toggle { display: flex; }
+
+            .hh-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.22s ease;
+                z-index: 1001;
             }
 
-            table td {
-                padding: 10px;
-                vertical-align: middle;
+            .hh-sidebar.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.12);
             }
 
-            table tr:hover {
-                background: #f1f7ff;
+            .hh-overlay.open { display: block; }
+
+            .hh-content {
+                margin-left: 0;
             }
+
+            .hh-footer {
+                left: 0;
+            }
+
+            .hh-search {
+                display: none;
+            }
+        }
+
+        @@media (max-width: 600px) {
+            .hh-content { padding: 16px 14px 70px; }
+            .hh-stats-row { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- HEADER / TOP NAVBAR -->
-    <nav class="navbar navbar-expand navbar-dark fixed-top">
-        <a class="navbar-brand" href="#">
-            <img src="@Url.Content("~/Images/CompanyLogos/HireHub.png")" alt="HireHub Logo" />
+    <!-- ===== TOPBAR ===== -->
+    <header class="hh-topbar">
+        <button class="hh-menu-toggle" id="menuToggle" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <a class="hh-logo" href="/JobSeeker/Dashboard">
+            <div class="hh-logo-mark">
+                <!-- Briefcase icon SVG -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-10-2h4v2h-4V5zm2 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm6-4H6v-1l2-2h8l2 2v1z" />
+                </svg>
+            </div>
+            <span class="hh-logo-name">Hire<span>Hub</span></span>
         </a>
 
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/Account/Logout">Logout</a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <a href="/JobSeeker/ViewProfile"><i class="fa-solid fa-user"></i> My Profile</a>
-        <a href="/JobSeeker/ManageSkills"><i class="fa-solid fa-gear"></i> My Skills</a>
-        <a href="/Job/BrowseJobs"><i class="fa-solid fa-search"></i> Job Search</a>
-        <a href="/SavedJobs/SavedJobsList"><i class="fa-solid fa-star"></i> Saved Jobs</a>
-        <a href="/Application/MyApplications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
-        <a href="/Job/DiscoverJobs"><i class="fa-solid fa-file-alt"></i>Discover</a>
-        <a href="@Url.Action("Inbox", "Chat")">
-            <i class="fas fa-envelope"></i> <span>Messages</span>
-        </a>
-        <a href="/Notification/JobSeekerNotifications"><i class="fa-solid fa-envelope"></i> Notifications</a>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="content-area">
-        <div class="content-card">
-            @RenderBody()
+        <div class="hh-search">
+            <div class="hh-search-inner">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" placeholder="Search jobs, companies, skills..." />
+            </div>
         </div>
-    </div>
 
-    <!-- FOOTER -->
-    <div class="footer">
-        © @DateTime.Now.Year Job Portal System - All Rights Reserved
-    </div>
+        <div class="hh-topbar-right">
+            <a href="/Chat/Inbox" class="hh-icon-btn" title="Messages">
+                <i class="fa-solid fa-envelope"></i>
+                <span class="badge-dot"></span>
+            </a>
+            <a href="/Notification/JobSeekerNotifications" class="hh-icon-btn" title="Notifications">
+                <i class="fa-solid fa-bell"></i>
+                <span class="badge-dot"></span>
+            </a>
+
+            <!-- Avatar Dropdown -->
+            <div class="hh-avatar-wrap" id="avatarWrap">
+                <div class="hh-avatar" id="avatarBtn">AS</div>
+                <div class="hh-dropdown" id="avatarDropdown">
+                    <a href="/JobSeeker/ViewProfile">
+                        <i class="fa-solid fa-user"></i> My Profile
+                    </a>
+                    <a href="/JobSeeker/ManageSkills">
+                        <i class="fa-solid fa-gear"></i> Settings
+                    </a>
+                    <div class="hh-dropdown-divider"></div>
+                    <a href="/Account/Logout" class="logout-link">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== SIDEBAR OVERLAY (Mobile) ===== -->
+    <div class="hh-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="hh-sidebar" id="sidebar">
+
+        <nav>
+            <div class="hh-nav-section">
+                <div class="hh-nav-label">Account</div>
+                <a href="/JobSeeker/ViewProfile" class="hh-nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    My Profile
+                </a>
+                <a href="/JobSeeker/ManageSkills" class="hh-nav-link">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    My Skills
+                </a>
+            </div>
+
+            <div class="hh-nav-section">
+                <div class="hh-nav-label">Jobs</div>
+                <a href="/Job/BrowseJobs" class="hh-nav-link">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Browse Jobs
+                </a>
+                <a href="/Job/DiscoverJobs" class="hh-nav-link">
+                    <i class="fa-solid fa-compass"></i>
+                    Discover
+                </a>
+                <a href="/SavedJobs/SavedJobsList" class="hh-nav-link">
+                    <i class="fa-solid fa-bookmark"></i>
+                    Saved Jobs
+                </a>
+                <a href="/Application/MyApplications" class="hh-nav-link">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                    My Applications
+                </a>
+            </div>
+
+            <div class="hh-nav-section">
+                <div class="hh-nav-label">Communication</div>
+                <a href="@Url.Action("Inbox", "Chat")" class="hh-nav-link">
+                    <i class="fa-solid fa-envelope"></i>
+                    Messages
+                    <span class="hh-nav-badge">3</span>
+                </a>
+                <a href="/Notification/JobSeekerNotifications" class="hh-nav-link">
+                    <i class="fa-solid fa-bell"></i>
+                    Notifications
+                    <span class="hh-nav-badge red">5</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Sidebar Bottom Profile -->
+        <div class="hh-sidebar-footer">
+            <a href="/JobSeeker/ViewProfile" class="hh-sidebar-profile">
+                <div class="hh-sidebar-avatar">AS</div>
+                <div>
+                    <div class="hh-sidebar-user-name">Ali Shah</div>
+                    <div class="hh-sidebar-user-role">Job Seeker</div>
+                </div>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="hh-content">
+        @RenderBody()
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="hh-footer">
+        &copy; @DateTime.Now.Year HireHub &nbsp;·&nbsp;
+        <a href="#">Privacy</a> &nbsp;·&nbsp;
+        <a href="#">Terms</a> &nbsp;·&nbsp;
+        <a href="#">Help</a>
+    </footer>
+
     @RenderSection("scripts", required: false)
+
     <!-- Scripts -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- <script src="~/Scripts/modernizr-2.6.2.js"></script>-->
+    <script>
+        // ---- Avatar dropdown ----
+        const avatarWrap = document.getElementById('avatarWrap');
+        const avatarBtn = document.getElementById('avatarBtn');
+
+        avatarBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            avatarWrap.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function () {
+            avatarWrap.classList.remove('open');
+        });
+
+        // ---- Mobile sidebar ----
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // ---- Active nav link ----
+        const currentPath = window.location.pathname.toLowerCase();
+        document.querySelectorAll('.hh-nav-link').forEach(function (link) {
+            const href = link.getAttribute('href');
+            if (href && currentPath.startsWith(href.toLowerCase())) {
+                link.classList.add('active');
+            }
+        });
+    </script>
 </body>
-    </html>
+</html>
