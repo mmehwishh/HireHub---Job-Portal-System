@@ -6,233 +6,234 @@
 
     var userId = Session["UserId"] != null ? (int)Session["UserId"] : 0;
     var hasApplied = ViewBag.HasApplied != null && (bool)ViewBag.HasApplied;
+
+    var job = Model.Job;
+    var company = job.EMPLOYER.company_name ?? Model.Employerr_detail.company_name ?? "";
+    var postedDate = job.posted_date.HasValue == true ? job.posted_date.Value.ToString("dd MMM yyyy") : "";
+    var salary = job.salary_range ?? "—";
+    var jtype = job.job_type ?? "—";
+    var location = job.location ?? "—";
+    var detailsUrl = Url.Action("JobDetails", "Job", new { id = job.job_id });
+    var saveFallback = Url.Action("Create", "SavedJobs", new { job_id = job.job_id });
 }
 
-<div class="job-details-container">
+<div class="hh-card" style="max-width:1100px; margin:20px auto; padding:18px;">
+    <div class="hh-page-header" style="margin-bottom:14px;">
+        <h1 style="margin:0;">@job?.job_title</h1>
+        <p class="subtitle" style="margin-top:6px;">@company &nbsp;·&nbsp; @location</p>
+    </div>
 
-    <h2 class="job-title">@Model.Job.job_title</h2>
-    <p class="job-subtitle">Explore job insights, requirements and apply instantly.</p>
+    <div style="display:grid; grid-template-columns: 2fr 360px; gap:18px; align-items:start;">
+        <!-- Left: Job content -->
+        <main class="hh-card" style="padding:16px;">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:64px; height:64px; border-radius:10px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
 
-    <div class="main-content-grid">
-        <div class="job-details-card">
-            <div class="details-section">
-                <h4 class="section-heading">Job Description</h4>
-                <p class="description-text">@Model.Job.job_description</p>
+                <div style="flex:1; min-width:0;">
+                    <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                        <div style="min-width:0;">
+                            <div style="font-weight:700; font-size:18px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@job?.job_title</div>
+                            <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">Posted: @postedDate</div>
+                        </div>
 
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="detail-label">Location:</span>
-                        <span class="detail-value">@Model.Job.location</span>
+                        <div style="text-align:right;">
+                            <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center;">
+                                <span class="hh-badge hh-badge-gray">@jtype</span>
+                                <span class="hh-badge hh-badge-blue">@salary</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <span class="detail-label">Salary:</span>
-                        <span class="detail-value">@Model.Job.salary_range</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="detail-label">Job Type:</span>
-                        <span class="detail-value">@Model.Job.job_type</span>
+
+                    <!-- short summary -->
+                    <div style="margin-top:12px; color:var(--text-second); font-size:14px; line-height:1.45;">
+                        @((job.job_description ?? "").Length > 300 ? ((job.job_description ?? "").Substring(0, 297) + "...") : (job.job_description ?? ""))
                     </div>
                 </div>
             </div>
 
-            <hr class="divider" />
+            <div class="hh-divider" style="margin:16px 0;"></div>
 
-            <div class="job-actions">
-                @if (hasApplied)
+            <!-- Requirements & Responsibilities -->
+            <section>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 class="hh-card-title" style="margin:0;">Role & Requirements</h3>
+                    <button id="toggleReq" class="hh-btn hh-btn-outline hh-btn-sm" type="button"><i class="fa-solid fa-chevron-down"></i> Toggle</button>
+                </div>
+
+                <div id="reqBlock" style="margin-top:12px; color:var(--text-second);">
+                    @if (!string.IsNullOrWhiteSpace(Model.Job.requirements))
+                    {
+                        <div style="margin-bottom:8px;"><strong>Requirements:</strong></div>
+                        <div style="white-space:pre-wrap;">@Model.Job.requirements</div>
+                    }
+                    @*@if (!string.IsNullOrWhiteSpace(Model.Job.responsibilities))
+                    {
+                        <div style="margin-top:12px;"><strong>Responsibilities:</strong></div>
+                        <div style="white-space:pre-wrap;">@Model.Job.responsibilities</div>
+                    }*@
+                </div>
+            </section>
+
+            <div class="hh-divider"></div>
+
+            <!-- Skills / Tags -->
+            <section>
+                <h4 class="hh-card-title" style="margin:0 0 8px 0;">Skills & Tags</h4>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    @if (Model.Skills != null && Model.Skills.Any())
+                    {
+                        foreach (var s in Model.Skills)
+                        {
+                            <span class="hh-badge hh-badge-gray" style="padding:6px 10px; font-weight:600;">@s</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="hh-badge hh-badge-gray">No tags</span>
+                    }
+                </div>
+            </section>
+
+            <div class="hh-divider"></div>
+
+            <!-- Apply flow & extra actions -->
+            <div style="display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap;">
+                @if (userId == 0)
                 {
-                    <button class="btn-disabled" disabled>Already Applied</button>
-                    <a class="save-btn" href="@Url.Action("SaveJob", "SavedJobs", new { jobId = Model.Job.job_id })">Save Job</a>
+                    <a href="@Url.Action("Login", "Account")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login to Apply</a>
+                }
+                else if (hasApplied)
+                {
+                    <button class="hh-btn hh-btn-outline" disabled><i class="fa-solid fa-circle-check"></i> Already Applied</button>
+                    <a href="@Url.Action("ApplicationStatus", "Application", new { jobId = job?.job_id })" class="hh-btn hh-btn-ghost">View Application</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Apply", "Application", new { jobId = job?.job_id })" id="applyNow" class="hh-btn hh-btn-primary"><i class="fa-solid fa-paper-plane"></i> Apply Now</a>
                 }
 
-                @if (userId > 0 && !hasApplied)
-                {
-                    <a class="apply-btn" href="@Url.Action("Apply", "Application", new { jobId = Model.Job.job_id })">Apply Now</a>
-                    <a class="save-btn" href="@Url.Action("SaveJob", "SavedJobs", new { jobId = Model.Job.job_id })">Save Job</a>
-                }
-            </div>
-        </div>
+                <button type="button" class="hh-btn hh-btn-ghost btn-save-job" data-jobid="@job?.job_id" data-fallback="@saveFallback"><i class="fa-solid fa-bookmark"></i> Save</button>
 
-        <div class="employer-card">
-            <h4 class="employer-title">About Employer</h4>
-            <div class="employer-details">
-                <div class="employer-avatar">
-                    @Model.Employerr_detail.companyLogo
+                <a href="@Url.Action("Index","Chat", new { receiverId = job?.EMPLOYER?.user_id })" class="hh-btn hh-btn-outline"><i class="fa-solid fa-envelope"></i> Message Employer</a>
+
+                <button type="button" id="btnShare" class="hh-btn hh-btn-sm hh-btn-outline"><i class="fa-solid fa-link"></i> Copy Link</button>
+            </div>
+        </main>
+
+        <!-- Right: Employer card -->
+        <aside class="hh-card" style="padding:14px;">
+            <div style="text-align:center;">
+                <div style="width:86px; height:86px; margin:0 auto 10px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--bg);">
+                    @Html.Raw(Model?.Employerr_detail?.companyLogo ?? "<i class='fa-solid fa-building' style='font-size:32px;color:var(--text-muted);'></i>")
                 </div>
-                <div class="employer-text">
-                    <p class="emp-name">@Model.Employerr_detail.company_name</p>
-                    <p class="emp-email">@Model.Employer.email</p>
+
+                <div style="font-weight:700; color:var(--text-primary); font-size:16px;">@company</div>
+                <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">@Model?.Employer?.email</div>
+
+                <div style="margin-top:12px;">
+                    <a href="@Url.Action("EmployerProfile","Employeer", new { id = job?.EMPLOYER?.employer_id })" class="hh-btn hh-btn-outline hh-btn-sm" style="display:inline-flex; gap:8px;"><i class="fa-solid fa-building"></i> View Company</a>
+                </div>
+
+                <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+                    <span class="hh-badge hh-badge-blue">Verified</span>
+                    <span class="hh-badge hh-badge-gray">@jtype</span>
+                </div>
+
+                <div class="hh-divider" style="margin:14px 0;"></div>
+
+                <div style="text-align:left; color:var(--text-muted); font-size:13px;">
+                    <div><strong>Location</strong></div>
+                    <div>@location</div>
+                    <div style="margin-top:8px;"><strong>Posted</strong></div>
+                    <div>@postedDate</div>
                 </div>
             </div>
-            <p class="trust-badge"><i class="fas fa-check-circle"></i> Verified Employer</p>
-        </div>
+        </aside>
     </div>
 </div>
 
 <style>
-    body {
-        font-family: "Poppins", sans-serif !important;
-        background-color: #f8fafc;
-    }
+    /* view-specific tweaks; main theme lives in Content/HireHub.DarkBlue.css */
+    .job-subtitle { color:var(--text-muted); }
+    #reqBlock { transition: max-height .18s ease, opacity .18s ease; overflow: hidden; }
+    #reqBlock.collapsed { max-height: 0; opacity: 0; padding: 0; margin: 0; }
+    #reqBlock.expanded { max-height: 2000px; opacity: 1; }
 
-    .job-details-container {
-        max-width: 1100px;
-        margin: auto;
-        padding: 30px;
-    }
-
-    .main-content-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 25px;
-    }
-
-    .job-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #002e7f;
-        margin-bottom: 5px;
-    }
-
-    .job-subtitle {
-        color: #64748b;
-        font-size: 14px;
-        margin-bottom: 30px;
-    }
-
-    /* MAIN CARD */
-    .job-details-card {
-        background: #ffffff;
-        padding: 35px;
-        border-radius: 20px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
-    }
-
-    .section-heading {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin-bottom: 15px;
-    }
-
-    .description-text {
-        line-height: 1.7;
-        color: #475569;
-        margin-bottom: 25px;
-        font-size: 15px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
-
-    .detail-label {
-        font-weight: 600;
-        color: #002e7f;
-        display: block;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .detail-value {
-        color: #334155;
-        font-size: 16px;
-    }
-
-    /* EMPLOYER CARD */
-    .employer-card {
-        background: white;
-        padding: 25px;
-        border-radius: 20px;
-        border: 1px solid #e2e8f0;
-        align-self: start;
-        text-align: center;
-    }
-
-    .employer-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 20px;
-    }
-
-    .employer-avatar {
-        width: 60px;
-        height: 60px;
-        background: #002e7f;
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 15px;
-        font-weight: 700;
-        font-size: 20px;
-    }
-
-    .emp-name {
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 2px;
-    }
-
-    .emp-email {
-        font-size: 13px;
-        color: #64748b;
-    }
-
-    .trust-badge {
-        margin-top: 20px;
-        font-size: 12px;
-        color: #10b981;
-        font-weight: 600;
-    }
-
-    /* ACTIONS */
-    .job-actions {
-        display: flex;
-        gap: 15px;
-        margin-top: 10px;
-    }
-
-    .apply-btn {
-        background: #002e7f;
-        padding: 14px 30px;
-        border-radius: 12px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        transition: 0.3s;
-        flex: 1;
-        text-align: center;
-    }
-
-        .apply-btn:hover {
-            background: #001e5c;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,46,127,0.3);
-        }
-
-    .save-btn {
-        background: #f1f5f9;
-        padding: 14px 25px;
-        border-radius: 12px;
-        color: #002e7f;
-        font-weight: 600;
-        text-decoration: none;
-        transition: 0.3s;
-    }
-
-        .save-btn:hover {
-            background: #e2e8f0;
-        }
-
-    .divider {
-        margin: 30px 0;
-        border: 0;
-        border-top: 1px solid #f1f5f9;
+    @media (max-width:920px) {
+        div[style*="grid-template-columns: 2fr 360px"] { grid-template-columns: 1fr; }
     }
 </style>
+
+@section scripts {
+    <script>
+    (function ($) {
+        function toast(msg, type) {
+            var $t = $('<div class="hh-alert" style="position:fixed; top:90px; right:18px; z-index:1400;"></div>');
+            $t.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-success');
+            $t.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + msg + '</div>');
+            $('body').append($t);
+            setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 2000);
+        }
+
+        // Toggle requirements
+        var $req = $('#reqBlock');
+        $req.addClass('expanded');
+        $('#toggleReq').on('click', function () {
+            $req.toggleClass('collapsed expanded');
+            var $btn = $(this);
+            $btn.find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        });
+
+        // Copy job link
+        $('#btnShare').on('click', function () {
+            var url = window.location.href;
+            navigator.clipboard?.writeText(url).then(function () {
+                toast('Link copied to clipboard', 'success');
+            }).catch(function () {
+                // fallback
+                var $temp = $('<input>');
+                $('body').append($temp);
+                $temp.val(url).select();
+                document.execCommand('copy');
+                $temp.remove();
+                toast('Link copied to clipboard', 'success');
+            });
+        });
+
+        // Save job via AJAX with fallback
+        $('.btn-save-job').on('click', function () {
+            var $btn = $(this);
+            var jobId = $btn.data('jobid');
+            var fallback = $btn.data('fallback');
+            $btn.prop('disabled', true);
+            $.post('@Url.Action("SaveJob","SavedJobs")', { jobId: jobId })
+                .done(function (res) {
+                    try {
+                        if (res && (res.success === true || res.saved === true || res === true)) {
+                            $btn.removeClass('hh-btn-ghost').addClass('hh-btn-success').html('<i class="fa-solid fa-check"></i> Saved');
+                            toast('Job saved', 'success');
+                            return;
+                        }
+                    } catch (e) {}
+                    $btn.removeClass('hh-btn-ghost').addClass('hh-btn-success').html('<i class="fa-solid fa-check"></i> Saved');
+                    toast('Job saved', 'success');
+                })
+                .fail(function () {
+                    window.location = fallback;
+                })
+                .always(function () { $btn.prop('disabled', false); });
+        });
+
+        // Apply button small enhancement: show confirmation before leaving
+        $('#applyNow').on('click', function (e) {
+            // Let default navigation happen; optionally we could POST via AJAX if server supports it.
+            // Add subtle UX: show loading state briefly
+            var $a = $(this);
+            $a.addClass('disabled');
+            setTimeout(function () { $a.removeClass('disabled'); }, 1000);
+        });
+    })(jQuery);
+    </script>
+}

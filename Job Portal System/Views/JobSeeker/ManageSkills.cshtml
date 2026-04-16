@@ -2,51 +2,100 @@
 
 @{
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
-    // Fetch the jobs from ViewBag
     var recommendedJobs = ViewBag.RecommendedJobs as IEnumerable<Job_Portal_System.JOB>;
 }
 
-<div class="skills-container">
-    <div class="skills-header">
-        <h2 class="title">My Skills</h2>
+<div class="hh-card" style="max-width:950px; margin:0 auto; padding:22px;">
+    <div class="hh-page-header">
+        <h1>My Skills</h1>
         <p class="subtitle">Add, update and manage your professional skill set.</p>
     </div>
 
-    <div class="add-skill-box">
-        <form method="post" action="/JobSeeker/AddSkill" class="skill-form">
-            <input name="SkillName" class="skill-input" placeholder="Enter a new skill..." required />
-            <button class="skill-add-btn">Add Skill</button>
+    <div class="add-skill-box hh-card" style="padding:16px 18px; display:flex; gap:12px; align-items:center;">
+        <form id="addSkillForm" method="post" action="/JobSeeker/AddSkill" style="flex:1; display:flex; gap:10px; align-items:center;">
+            <input name="SkillName" id="skillInput" class="hh-input" placeholder="Add a skill (e.g. C#, ASP.NET, SQL)" autocomplete="off" required list="skillSuggestions" />
+            <datalist id="skillSuggestions">
+                <option value="C#"></option>
+                <option value="ASP.NET MVC"></option>
+                <option value="SQL"></option>
+                <option value="JavaScript"></option>
+                <option value="React"></option>
+                <option value="Azure"></option>
+                <option value="Docker"></option>
+            </datalist>
+            <button type="submit" class="hh-btn hh-btn-primary" id="addSkillBtn"><i class="fa-solid fa-plus"></i> Add Skill</button>
         </form>
+
+        <div id="skillFeedback" style="min-width:220px; text-align:right;"></div>
     </div>
 
-    <div class="skills-section">
+    <div style="margin-top:20px;">
         <h4 class="section-title">Your Added Skills</h4>
-        <div class="skills-tags-wrapper">
+        <div id="skillsWrapper" class="skills-tags-wrapper" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px;">
             @foreach (var item in Model)
             {
-                <div class="skill-tag-box">
-                    <span class="skill-text">@item.skillName</span>
-                    <a href="/JobSeeker/DeleteSkill/@item.SkillID" class="skill-delete-btn">✕</a>
+                <div class="skill-tag-box hh-badge-gray" data-skill-id="@item.SkillID" style="display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:999px;">
+                    <span class="skill-text" style="color:var(--text-primary); font-weight:600;">@item.skillName</span>
+                    <a href="/JobSeeker/DeleteSkill/@item.SkillID" class="skill-delete-btn" title="Remove skill" style="color:#ef4444; text-decoration:none; font-weight:700; padding:4px 6px; border-radius:50%;">✕</a>
                 </div>
             }
         </div>
     </div>
 
-    <div class="jobs-section">
+    <div class="jobs-section" style="margin-top:34px; padding-top:18px; border-top:1px dashed var(--border);">
         <h4 class="section-title">Recommended Jobs for You</h4>
         <p class="subtitle">Based on your current skill set</p>
 
-        <div class="jobs-grid">
+        <div class="jobs-grid" style="margin-top:18px; display:grid; gap:12px;">
             @if (recommendedJobs != null && recommendedJobs.Any())
             {
                 foreach (var job in recommendedJobs)
                 {
-                    <div class="job-card">
-                        <div class="job-info">
-                            <h5 class="job-title">@job.job_title</h5>
-                            <p class="job-company"><i class="fas fa-building"></i> @job.job_description</p>
+                    <!-- Updated job card structure for stronger visual hierarchy -->
+                    <div class="job-card hh-card">
+                        <div class="job-left">
+                            <div class="company-logo" aria-hidden="true">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+
+                            <div class="job-meta">
+                                <h5 class="job-title">@job.job_title</h5>
+
+                                <!-- Try to show company/name snippet if available, else fall back to description short label -->
+                                <div class="job-company">
+                                    <i class="fa-solid fa-building"></i>
+                                    @{
+                                        // Prefer a company/organization property if present; otherwise show a short excerpt.
+                                        var companyText = "";
+                                        if (job.GetType().GetProperty("company") != null)
+                                        {
+                                            companyText = (job.GetType().GetProperty("company").GetValue(job) ?? "").ToString();
+                                        }
+                                        if (string.IsNullOrWhiteSpace(companyText))
+                                        {
+                                            companyText = (job.job_description ?? "").Split(new[] { '.', '\n' }, 2)[0];
+                                        }
+                                    }
+                                    @companyText
+                                </div>
+
+                                <p class="job-desc">@((job.job_description ?? "").Length > 160 ? ((job.job_description ?? "").Substring(0, 157) + "...") : (job.job_description ?? ""))</p>
+
+                                <div class="job-tags" aria-hidden="true">
+                                    <!-- lightweight tags to suggest relevance -->
+                                    <span class="hh-badge hh-badge-blue">Remote</span>
+                                    <span class="hh-badge hh-badge-gray">Full-time</span>
+                                </div>
+                            </div>
                         </div>
-                        <a href="/Job/JobDetails/@job.job_id" class="view-job-btn">View Details</a>
+
+                        <div class="job-actions">
+                            <div class="job-meta-right">
+                                <div class="job-cta">
+                                    <a href="/Job/JobDetails/@job.job_id" class="hh-btn hh-btn-outline view-job-btn"><i class="fa-solid fa-eye"></i> View Details</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 }
             }
@@ -60,194 +109,211 @@
     </div>
 </div>
 
-
+<!-- Small page-specific styles (keeps theme centralized, only minimal view tweaks here) -->
 <style>
-    body {
-        font-family: "Poppins", sans-serif !important;
-    }
-
-    .skills-container {
-        max-width: 850px;
-        margin: 0 auto;
-        padding: 25px;
-    }
-
-    /* HEADER */
-    .title {
-        font-size: 30px;
+    .hh-page-header h1 {
+        margin: 0;
+        font-size: 24px;
         font-weight: 700;
-        color: #002e7f;
+        color: var(--text-primary);
     }
 
     .subtitle {
-        margin-top: -8px;
-        color: #64748b;
-        font-size: 14px;
-    }
-
-    /* ADD SKILL CARD */
-    .add-skill-box {
-        background: #ffffff;
-        border-left: 5px solid #002e7f;
-        padding: 22px;
-        border-radius: 14px;
-        margin-top: 25px;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-    }
-
-    .skill-form {
-        display: flex;
-        gap: 10px;
-    }
-
-    .skill-input {
-        flex: 1;
-        padding: 12px 16px;
-        font-size: 15px;
-        border-radius: 10px;
-        border: 1px solid #cbd5e1;
-        outline: none;
-    }
-
-        .skill-input:focus {
-            border-color: #002e7f;
-        }
-
-    .skill-add-btn {
-        background: #002e7f;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-        .skill-add-btn:hover {
-            background: #001e5c;
-        }
-
-    /* SECTION TITLE */
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-top: 35px;
-        margin-bottom: 15px;
-        color: #002e7f;
-    }
-
-    /* SKILLS LIST */
-    .skills-tags-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
+        margin-top: 6px;
+        color: var(--text-muted);
     }
 
     .skill-tag-box {
-        display: flex;
-        align-items: center;
-        background: white;
-        border: 1px solid #dbeafe;
-        padding: 8px 14px;
-        border-radius: 25px;
-        gap: 10px;
-        transition: 0.2s;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        transition: transform 160ms ease, box-shadow 160ms ease;
     }
 
         .skill-tag-box:hover {
-            border-color: #002e7f;
-            background: #f0f6ff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(2,33,71,0.06);
         }
 
-    .skill-text {
-        font-size: 14px;
-        font-weight: 500;
-        color: #002e7f;
-    }
-
     .skill-delete-btn {
-        font-size: 13px;
-        color: #ef4444;
-        padding: 2px 6px;
-        border-radius: 50%;
-        text-decoration: none;
-        font-weight: bold;
-        transition: 0.2s;
+        transition: background 120ms ease, color 120ms ease;
     }
 
         .skill-delete-btn:hover {
-            background: #fee2e2;
+            background: #fff0f0;
             color: #b91c1c;
         }
 
-    .jobs-section {
-        margin-top: 50px;
-        padding-top: 20px;
-        border-top: 1px dashed #cbd5e1;
-    }
-
-    .jobs-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px;
-        margin-top: 20px;
-    }
-
+    /* Job card improvements */
     .job-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        border: 1px solid #e2e8f0;
-        transition: 0.3s;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        border: 1px solid var(--border);
+        background: var(--surface);
     }
 
-        .job-card:hover {
-            transform: translateY(-2px);
-            border-color: #002e7f;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
+    .job-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(2,33,71,0.06);
+        border-color: rgba(29,78,216,0.12);
+    }
 
-    .job-title {
+    .job-left {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        max-width: 78%;
+    }
+
+    .company-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--blue-light), var(--blue));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+    }
+    .company-logo i { font-size:18px; }
+
+    .job-meta .job-title {
         margin: 0;
-        font-size: 17px;
-        font-weight: 600;
-        color: #1e293b;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
     }
 
     .job-company {
-        margin: 5px 0 0 0;
+        margin-top: 6px;
+        color: var(--text-muted);
         font-size: 13px;
-        color: #64748b;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .job-company i { color: var(--text-muted); font-size:12px; }
+
+    .job-desc {
+        margin: 8px 0 0;
+        color: var(--text-second);
+        font-size: 13px;
+        line-height: 1.35;
+        max-height: 3.9em; /* roughly 3 lines */
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .view-job-btn {
-        background: #f0f6ff;
-        color: #002e7f;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        transition: 0.2s;
+    .job-tags { margin-top: 10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .job-tags .hh-badge { padding:6px 8px; font-size:12px; border-radius:8px; }
+
+    .job-actions { display:flex; align-items:center; gap:12px; justify-content:flex-end; min-width:140px; }
+    .job-cta .view-job-btn { white-space:nowrap; }
+
+    /* small toast */
+    .skill-toast {
+        position: fixed;
+        top: 80px;
+        right: 22px;
+        z-index: 1200;
+        min-width: 220px;
     }
 
-        .view-job-btn:hover {
-            background: #002e7f;
-            color: white;
-        }
-
-    .no-jobs-alert {
-        padding: 20px;
-        background: #f8fafc;
-        border-radius: 10px;
-        text-align: center;
-        color: #94a3b8;
-        font-style: italic;
+    /* responsive tweaks */
+    @@media (max-width: 720px) {
+        .job-left { max-width: 100%; }
+        .job-card { flex-direction: column; align-items: stretch; gap:12px; }
+        .job-actions { justify-content: flex-start; }
+        .company-logo { width: 48px; height:48px; }
     }
 </style>
+
+<!-- Scripts: uses jQuery already included by layout. Progressive enhancement: form/link still work without JS -->
+@section scripts {
+    <script>
+    (function ($) {
+            // Utility: show temporary toast notification
+            function showToast(message, type) {
+                var $toast = $('<div class="hh-alert skill-toast"></div>');
+                $toast.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-success');
+                $toast.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + message + '</div>');
+                $('body').append($toast);
+                setTimeout(function () { $toast.fadeOut(300, function () { $toast.remove(); }); }, 2600);
+            }
+
+            // Add skill via AJAX (progressive enhancement)
+            $('#addSkillForm').on('submit', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var action = $form.attr('action');
+                var skill = $.trim($form.find('input[name=SkillName]').val());
+                if (!skill) {
+                    showToast('Please enter a skill name.', 'error');
+                    return;
+                }
+
+                var $btn = $('#addSkillBtn');
+                $btn.prop('disabled', true);
+
+                $.post(action, { SkillName: skill })
+                    .done(function (response) {
+                        // Optimistic UI: append new tag (the server response may redirect; we preserve progressive fallback)
+                        var id = 'new-' + Date.now();
+                        var $tag = $('<div/>', { 'class': 'skill-tag-box hh-badge-gray', 'data-skill-id': id }).css({ display: 'none', padding: '8px 12px', 'border-radius': '999px', gap: '10px' });
+                        $tag.append($('<span/>', { 'class': 'skill-text', text: skill }).css('font-weight', 600));
+                        $tag.append($('<a/>', { href: '#', 'class': 'skill-delete-btn', title: 'Remove skill', html: '✕' }).css({ color: '#ef4444', 'text-decoration': 'none', padding: '4px 6px', 'border-radius': '50%' }));
+                        $('#skillsWrapper').prepend($tag);
+                        $tag.slideDown(180);
+
+                        showToast('Skill added', 'success');
+                        $form[0].reset();
+                    })
+                    .fail(function () {
+                        showToast('Unable to add skill. Server error or network issue.', 'error');
+                    })
+                    .always(function () {
+                        $btn.prop('disabled', false);
+                    });
+            });
+
+            // Delete skill via AJAX (progressive: anchor still works without JS)
+            $(document).on('click', '.skill-delete-btn', function (e) {
+                var $link = $(this);
+                var href = $link.attr('href');
+                // if href is # (AJAX-added tag), just remove it locally
+                if (!href || href === '#') {
+                    e.preventDefault();
+                    $link.closest('.skill-tag-box').slideUp(160, function () { $(this).remove(); });
+                    return;
+                }
+
+                e.preventDefault();
+                if (!confirm('Remove this skill?')) return;
+
+                // optimistic UI remove
+                var $box = $link.closest('.skill-tag-box');
+                $.get(href)
+                    .done(function () {
+                        $box.slideUp(160, function () { $(this).remove(); });
+                        showToast('Skill removed', 'success');
+                    })
+                    .fail(function () {
+                        showToast('Could not remove skill.', 'error');
+                    });
+            });
+
+            // minor UX: press Enter in input triggers form
+            $('#skillInput').on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#addSkillForm').submit();
+                }
+            });
+        })(jQuery);</script>
+}

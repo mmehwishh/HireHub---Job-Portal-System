@@ -1,117 +1,201 @@
-﻿@model IEnumerable<Job_Portal_System.NOTIFICATION>
+﻿\JobSeekerNotifications.cshtml
+@model IEnumerable<Job_Portal_System.NOTIFICATION>
+
 @{
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+
+    Func<Job_Portal_System.NOTIFICATION, bool> IsUnread = (n) =>
+    {
+        if (n == null) return false;
+        var s = (n.read_status ?? "").ToString();
+        return s.Equals("UNREAD", StringComparison.OrdinalIgnoreCase) || s.Equals("false", StringComparison.OrdinalIgnoreCase) == false && (s == "0" || s.ToLower().Contains("unread")) || s.Equals("0");
+    };
+
+    Func<Job_Portal_System.NOTIFICATION, string> MessageText = (n) => n.message ?? "";
+    Func<Job_Portal_System.NOTIFICATION, DateTime?> CreatedAt = (n) =>
+    {
+        if (n == null) return null;
+        return n.created_at;
+    };
+
+    var notes = Model ?? Enumerable.Empty<Job_Portal_System.NOTIFICATION>();
+    var sorted = notes.OrderByDescending(n => IsUnread(n)).ThenByDescending(n => CreatedAt(n) ?? DateTime.MinValue);
 }
 
-<style>
-    .notif-container {
-        max-width: 850px;
-        margin: auto;
-    }
+<div class="hh-card" style="max-width:980px; margin:18px auto; padding:18px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+            <h1 style="margin:0;">Notifications</h1>
+            <p class="subtitle" style="margin-top:6px;">Recent system messages and updates — unread items highlighted.</p>
+        </div>
 
-    .notif-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 15px 18px;
-        margin-bottom: 10px;
-        border-radius: 12px;
-        background: #ffffff;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        transition: 0.2s;
-    }
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button id="btnMarkAll" class="hh-btn hh-btn-outline hh-btn-sm" type="button"><i class="fa-solid fa-check-double"></i> Mark all read</button>
+            <a href="@Url.Action("Index","Notification")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
+        </div>
+    </div>
 
-        .notif-item.unread {
-            border-left: 6px solid #002E7F;
-            background: #F0F5FF;
-        }
-
-        .notif-item:hover {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-    .notif-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background: #002E7F;
-        color: white;
-        font-size: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-
-    .notif-body {
-        flex-grow: 1;
-    }
-
-    .notif-message {
-        font-size: 16px;
-        font-weight: 600;
-        color: #002E7F;
-    }
-
-    .notif-time {
-        font-size: 13px;
-        color: #666;
-        margin-top: 3px;
-    }
-
-    .notif-action button {
-        background: #002E7F;
-        padding: 6px 12px;
-        border-radius: 8px;
-        color: white;
-        border: none;
-        font-size: 13px;
-        cursor: pointer;
-    }
-
-        .notif-action button:hover {
-            opacity: 0.8;
-        }
-</style>
-
-
-
-<h2 style="color:#002E7F;font-weight:700;margin-bottom:20px;">My Notifications</h2>
-
-@if (!Model.Any())
-{
-    <p>No notifications yet.</p>
-}
-else
-{
-    <div class="notif-container">
-        @foreach (var note in Model)
+    <div style="margin-top:14px; display:grid; gap:10px;">
+        @if (!sorted.Any())
         {
-            <div class="notif-item @(note.read_status == "UNREAD" ? "unread" : "read")">
-
-                <div class="notif-icon">
-                    <i class="fa-solid fa-bell"></i>
-                </div>
-
-
-                <div class="notif-body">
-                    <div class="notif-message">@note.message</div>
-                    <div class="notif-time">
-                        @(note.created_at)
-                    </div>
-                </div>
-
-                <div class="notif-action">
-                    @if (note.read_status == "UNREAD")
-                    {
-                        using (Html.BeginForm("JobSeekerMarkAsRead", "Notification", FormMethod.Post))
-                        {
-                            @Html.Hidden("id", note.notification_id)
-                            <button type="submit">Mark as Read</button>
-                        }
-                    }
-                </div>
-
+            <div class="hh-empty" style="padding:28px;">
+                <div class="hh-empty-icon"><i class="fa-solid fa-bell"></i></div>
+                <h3>No notifications</h3>
+                <p class="subtitle">You have no notifications at the moment.</p>
             </div>
         }
+        else
+        {
+            foreach (var note in sorted)
+            {
+                var unread = IsUnread(note);
+                var created = CreatedAt(note);
+                <div class="notif-row hh-card" data-id="@note.notification_id" style="display:flex; gap:12px; align-items:flex-start; padding:12px 14px; transition:transform .12s ease;">
+                    <div style="width:56px; height:56px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+                                background:@(unread ? "linear-gradient(135deg,var(--blue-light),var(--blue))" : "var(--bg)"); color:@(unread ? "#fff" : "var(--text-muted)"); font-size:18px;">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; color:var(--text-primary); line-height:1.25; white-space:pre-wrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @MessageText(note)
+                                </div>
+                                <div style="margin-top:6px; color:var(--text-muted); font-size:13px;">
+                                    @(created.HasValue ? created.Value.ToString("dd MMM yyyy, HH:mm") : "--")
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                @* Progressive fallback form (works without JS) *@
+                                @using (Html.BeginForm("JobSeekerMarkAsRead", "Notification", FormMethod.Post, new { @class = "mark-read-form", style = "display:inline-block;" }))
+                                {
+                                    @Html.Hidden("id", note.notification_id)
+                                    if (unread)
+                                    {
+                                        <button type="submit" class="hh-btn hh-btn-primary hh-btn-sm mark-read-btn"><i class="fa-solid fa-check"></i> Mark read</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="hh-btn hh-btn-outline hh-btn-sm mark-unread-btn" data-id="@note.notification_id"><i class="fa-solid fa-rotate-left"></i> Mark unread</button>
+                                    }
+                                }
+
+                                <a href="@Url.Action("Details","Notification", new { id = note.notification_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+
+                                @* show delete link that falls back to scaffolded delete view; JS will intercept to confirm *@
+                                <a href="@Url.Action("Delete","Notification", new { id = note.notification_id })" class="hh-btn hh-btn-danger hh-btn-sm delete-notif" data-id="@note.notification_id"><i class="fa-solid fa-trash"></i> Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
     </div>
+</div>
+
+<style>
+    /* Per-view tweaks, main variables in Content/HireHub.DarkBlue.css */
+    .notif-row:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(2,33,71,0.04); }
+    .mark-read-btn i, .mark-unread-btn i, .delete-notif i { margin-right:6px; }
+
+    /* Mobile responsive: stack action buttons */
+    @@media (max-width:720px) {
+        .notif-row { flex-direction:column; align-items:stretch; gap:10px; }
+        .notif-row .hh-btn { width:100%; justify-content:center; }
+        .notif-row > div > div > div:last-child { display:flex; gap:8px; flex-wrap:wrap; }
+    }
+</style>
+
+@section scripts {
+    <script>
+        (function ($) {
+            // small toast helper using theme alerts
+            function showToast(message, type) {
+                var $t = $('<div class="hh-alert" style="position:fixed; top:90px; right:18px; z-index:1400;"></div>');
+                $t.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-info');
+                $t.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + message + '</div>');
+                $('body').append($t);
+                setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 2500);
+            }
+
+            // AJAX mark as read
+            $(document).on('submit', '.mark-read-form', function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                var id = $form.find('input[name="id"]').val();
+                $.post('@Url.Action("JobSeekerMarkAsRead","Notification")', { id: id })
+                    .done(function (res) {
+                        // optimistic update
+                        var $row = $('.notif-row[data-id="' + id + '"]');
+                        $row.find('.hh-btn.hh-btn-primary').replaceWith('<button type="button" class="hh-btn hh-btn-outline hh-btn-sm mark-unread-btn" data-id="' + id + '"><i class="fa-solid fa-rotate-left"></i> Mark unread</button>');
+                        $row.find('div[style*="background:linear-gradient"]').css('background', 'var(--bg)').css('color', 'var(--text-muted)');
+                        showToast('Marked as read', 'info');
+                    })
+                    .fail(function () {
+                        showToast('Unable to mark read. Try again.', 'error');
+                    });
+            });
+
+            // mark unread (AJAX toggle to server endpoint if exists)
+            $(document).on('click', '.mark-unread-btn', function (e) {
+                var id = $(this).data('id');
+                // If server supports toggling unread, call an endpoint; otherwise simply update UI
+                $.post('@Url.Action("JobSeekerMarkAsUnread","Notification")', { id: id })
+                    .done(function () {
+                        var $row = $('.notif-row[data-id="' + id + '"]');
+                        $row.find('.mark-unread-btn').replaceWith('<form class="mark-read-form" style="display:inline-block;"><input type="hidden" name="id" value="' + id + '"/><button type="submit" class="hh-btn hh-btn-primary hh-btn-sm mark-read-btn"><i class="fa-solid fa-check"></i> Mark read</button></form>');
+                        $row.find('div[style*="background:var(--bg)"]').css('background', 'linear-gradient(135deg,var(--blue-light),var(--blue))').css('color', '#fff');
+                        showToast('Marked as unread', 'info');
+                    })
+                    .fail(function () {
+                        // fallback: perform no-op but notify
+                        showToast('Could not mark unread. Server not available.', 'error');
+                    });
+            });
+
+            // Delete (confirm then redirect to scaffolded delete page for final confirmation)
+            $(document).on('click', '.delete-notif', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                if (!confirm('Delete this notification? This cannot be undone.')) return;
+                // attempt AJAX delete endpoint if available, else fallback to navigate
+                var id = $(this).data('id');
+                $.post('@Url.Action("DeleteConfirmed","Notification")', { id: id })
+                    .done(function (res) {
+                        // if server returned success flag, remove row
+                        try {
+                            var payload = (typeof res === 'object') ? res : JSON.parse(res || '{}');
+                            if (payload && payload.success) {
+                                $('.notif-row[data-id="' + id + '"]').slideUp(180, function () { $(this).remove(); });
+                                showToast('Notification deleted', 'info');
+                                return;
+                            }
+                        } catch (e) { /* ignore parse errors */ }
+                        // fallback: navigate to delete page
+                        window.location = url;
+                    })
+                    .fail(function () {
+                        // fallback navigate to scaffolded delete confirm page
+                        window.location = url;
+                    });
+            });
+
+            // Mark all read
+            $('#btnMarkAll').on('click', function () {
+                if (!confirm('Mark all notifications as read?')) return;
+                $.post('@Url.Action("JobSeekerMarkAllRead","Notification")')
+                    .done(function () {
+                        $('.notif-row').each(function () {
+                            var $row = $(this);
+                            $row.find('.mark-read-btn, .mark-unread-btn').remove();
+                            $row.find('div[style*="background:linear-gradient"]').css('background', 'var(--bg)').css('color', 'var(--text-muted)');
+                        });
+                        showToast('All notifications marked read', 'info');
+                    })
+                    .fail(function () { showToast('Could not mark all read.', 'error'); });
+            });
+        })(jQuery);
+    </script>
 }

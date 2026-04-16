@@ -2,163 +2,180 @@
 
 @{
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+    var jobs = Model ?? Enumerable.Empty<Job_Portal_System.JOB>();
 }
 
-<div class="jobsearch-container">
-
-    <div class="header-section">
-        <h2 class="page-title">Job Search</h2>
-        <p class="page-subtitle">Find jobs that match your skills, experience and passion.</p>
+<div class="hh-card" style="max-width:1100px; margin:18px auto; padding:18px;">
+    <div class="hh-page-header">
+        <h1>Browse Jobs</h1>
+        <p class="subtitle">Find jobs that match your skills, experience and interests. Use search and quick filters to refine results.</p>
     </div>
 
-    <!-- Search Bar -->
-    <form method="get" class="search-bar">
-        <input name="search" class="search-input" placeholder="Job title, keyword..." />
+    <form id="jobSearchForm" method="get" class="hh-card" style="display:flex; gap:10px; align-items:center; padding:12px;">
+        <input name="search" id="searchInput" class="hh-input" placeholder="Job title, keywords (e.g. C#, Angular)" />
+        <input name="location" id="locationInput" class="hh-input" placeholder="Location (city)" style="max-width:220px;" />
+        <select name="job_type" id="typeSelect" class="hh-select" style="max-width:180px;">
+            <option value="">Any type</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Contract</option>
+            <option>Remote</option>
+        </select>
 
-        <input name="location" class="search-input" placeholder="Location" />
-
-        <input name="company" class="search-input" placeholder="Company name" />
-
-        <button type="submit" class="search-btn">Search</button>
+        <button type="submit" class="hh-btn hh-btn-primary" style="white-space:nowrap;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        <button type="button" id="clearFilters" class="hh-btn hh-btn-ghost hh-btn-sm">Clear</button>
     </form>
-    
-    <!-- Job Cards Section -->
-    <div class="jobs-wrapper">
 
-        @foreach (var j in Model)
-        {
-            <div class="job-card">
-
-                <div class="job-info">
-                    <h3 class="job-title">@j.job_title</h3>
-                    <p class="job-desc">@j.job_description</p>
-                </div>
-
-                <div class="job-actions">
-                    <a href="/Job/JobDetails/@j.job_id" class="view-btn">View Details</a>
-                </div>
-
-            </div>
-        }
-
+    <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="color:var(--text-muted);">Showing <strong>@jobs.Count()</strong> result(s)</div>
+        <div style="display:flex; gap:8px;">
+            <button id="filterToggle" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-filter"></i> Quick Filter</button>
+            <a href="@Url.Action("BrowseJobs","Job")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
+        </div>
     </div>
 
+    <div id="jobsGrid" style="margin-top:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:14px;">
+        @foreach (var j in jobs)
+        {
+            var company = j.EMPLOYER.company_name ?? "";
+            var posted = (j.posted_date.HasValue ? j.posted_date.Value.ToString("dd MMM yyyy") : "");
+            <article class="hh-card job-item" data-title="@((j.job_title ?? "").ToLowerInvariant())" data-company="@((company ?? "").ToLowerInvariant())" data-desc="@((j.job_description ?? "").ToLowerInvariant())" data-type="@((j.job_type ?? "").ToLowerInvariant())" style="padding:14px; display:flex; flex-direction:column; gap:12px;">
+                <header style="display:flex; gap:12px; align-items:flex-start;">
+                    <div style="width:56px; height:56px; border-radius:10px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                            <div style="min-width:0;">
+                                <h2 style="margin:0; font-size:16px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @j.job_title
+                                </h2>
+                                <div style="color:var(--text-muted); font-size:13px; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @company &nbsp;·&nbsp; @(j.location ?? "—")
+                                </div>
+                            </div>
+
+                            <div style="text-align:right;">
+                                <div style="color:var(--text-muted); font-size:13px;">Posted: @posted</div>
+                                <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
+                                    <span class="hh-badge hh-badge-gray" style="font-weight:600;">@((j.job_type ?? "—"))</span>
+                                    @if (!string.IsNullOrEmpty(j.salary_range))
+                                    {
+                                        <span class="hh-badge hh-badge-blue" style="font-weight:600;">@j.salary_range</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div style="color:var(--text-second); font-size:14px; line-height:1.35; max-height:5.4em; overflow:hidden; text-overflow:ellipsis;">
+                    @((j.job_description ?? "").Length > 320 ? ((j.job_description ?? "").Substring(0, 317) + "...") : (j.job_description ?? ""))
+                </div>
+
+                <footer style="display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:auto;">
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <a href="@Url.Action("JobDetails","Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> View</a>
+
+                        <a href="@Url.Action("Apply","Job", new { id = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm"><i class="fa-solid fa-paper-plane"></i> Apply</a>
+
+                        <button type="button" class="hh-btn hh-btn-ghost hh-btn-sm btn-save-job" data-jobid="@j.job_id" data-fallback="@Url.Action("Create","SavedJobs", new { job_id = j.job_id })"><i class="fa-solid fa-bookmark"></i> Save</button>
+                    </div>
+
+                    <div style="color:var(--text-muted); font-size:13px;">@((j.EMPLOYER.company_name ?? ""))</div>
+                </footer>
+            </article>
+        }
+    </div>
 </div>
 
-
 <style>
-    body {
-        font-family: "Poppins", sans-serif !important;
+    /* Small per-view tweaks; main theme in Content/HireHub.DarkBlue.css */
+    .page-title { font-size:22px; margin:0; }
+    .subtitle { margin-top:6px; color:var(--text-muted); }
+
+    /* small hover */
+    .job-item { transition: transform .12s ease, box-shadow .12s ease; }
+    .job-item:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(2,33,71,0.04); }
+
+    /* responsive adjustments */
+    @@media (max-width:880px) {
+        #jobSearchForm { flex-direction:column; align-items:stretch; }
+        #jobSearchForm > * { width:100%!important; }
+        footer[style*="justify-content:space-between"] { flex-direction:column; align-items:stretch; gap:8px; }
+        .job-item { padding:12px; }
     }
-
-    .jobsearch-container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 25px;
-    }
-
-    /* HEADER */
-    .page-title {
-        font-size: 30px;
-        font-weight: 700;
-        color: #002e7f;
-    }
-
-    .page-subtitle {
-        color: #64748b;
-        font-size: 14px;
-        margin-top: -8px;
-        margin-bottom: 25px;
-    }
-
-    /* SEARCH BAR */
-    .search-bar {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-    }
-
-    .search-input {
-        flex: 1;
-        padding: 14px 18px;
-        font-size: 15px;
-        border-radius: 10px;
-        border: 1px solid #cbd5e1;
-    }
-
-        .search-input:focus {
-            border-color: #002e7f;
-            outline: none;
-        }
-
-    .search-btn {
-        background: #002e7f;
-        color: #fff;
-        border: none;
-        padding: 12px 22px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-        .search-btn:hover {
-            background: #001e5c;
-        }
-
-    /* JOB CARDS */
-    .jobs-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
-
-    .job-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        padding: 22px;
-        border-radius: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        box-shadow: 0px 3px 6px rgba(0,0,0,0.06);
-        transition: 0.2s;
-    }
-
-        .job-card:hover {
-            border-color: #002e7f;
-            box-shadow: 0px 5px 14px rgba(0,0,0,0.08);
-            transform: translateY(-3px);
-        }
-
-    .job-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #002e7f;
-        margin-bottom: 4px;
-    }
-
-    .job-desc {
-        font-size: 14px;
-        color: #475569;
-        margin-bottom: 10px;
-        max-width: 500px;
-    }
-
-    /* BUTTON */
-    .view-btn {
-        background: #002e7f;
-        color: white;
-        text-decoration: none;
-        padding: 10px 18px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-
-        .view-btn:hover {
-            background: #001e5c;
-            transform: translateY(-2px);
-        }
 </style>
+
+@section scripts {
+    <script>
+    (function ($) {
+        function toast(message, type) {
+            var $t = $('<div class="hh-alert" style="position:fixed; top:90px; right:18px; z-index:1400;"></div>');
+            $t.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-info');
+            $t.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + message + '</div>');
+            $('body').append($t);
+            setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 2000);
+        }
+
+        // Client-side quick filtering (works on currently loaded jobs)
+        var $search = $('#searchInput'), $loc = $('#locationInput'), $type = $('#typeSelect');
+        function applyClientFilter() {
+            var q = $search.val().toLowerCase().trim();
+            var loc = $loc.val().toLowerCase().trim();
+            var type = $type.val().toLowerCase().trim();
+            $('.job-item').each(function () {
+                var $it = $(this);
+                var title = $it.data('title') || '';
+                var company = $it.data('company') || '';
+                var desc = $it.data('desc') || '';
+                var jtype = $it.data('type') || '';
+                var matches = true;
+                if (q) matches = (title.indexOf(q) >= 0) || (company.indexOf(q) >= 0) || (desc.indexOf(q) >= 0);
+                if (matches && loc) matches = ($it.text().toLowerCase().indexOf(loc) >= 0);
+                if (matches && type) matches = (jtype.indexOf(type) >= 0);
+                $it.toggle(matches);
+            });
+        }
+
+        $search.on('input', function () { applyClientFilter(); });
+        $loc.on('input', function () { applyClientFilter(); });
+        $type.on('change', function () { applyClientFilter(); });
+
+        $('#clearFilters').on('click', function () {
+            $search.val(''); $loc.val(''); $type.val('');
+            applyClientFilter();
+        });
+
+        // Save job via AJAX with fallback to create page
+        $(document).on('click', '.btn-save-job', function () {
+            var $btn = $(this);
+            var jobId = $btn.data('jobid');
+            var fallback = $btn.data('fallback');
+            $btn.prop('disabled', true);
+            $.post('@Url.Action("SaveJob", "SavedJobs")', { jobId: jobId })
+                .done(function (res) {
+                    // optimistic UI: if server returns success flag or any truthy response
+                    try {
+                        if (res && (res.success === true || res.saved === true || res === true)) {
+                            $btn.removeClass('hh-btn-ghost').addClass('hh-btn-success').html('<i class="fa-solid fa-check"></i> Saved');
+                            toast('Job saved', 'info');
+                            return;
+                        }
+                    } catch (e) { /* ignore parse errors */ }
+                    // fallback: assume saved
+                    $btn.removeClass('hh-btn-ghost').addClass('hh-btn-success').html('<i class="fa-solid fa-check"></i> Saved');
+                    toast('Job saved', 'info');
+                })
+                .fail(function () {
+                    // fallback: open create page so server side can handle save
+                    window.location = fallback;
+                })
+                .always(function () {
+                    $btn.prop('disabled', false);
+                });
+        });
+    })(jQuery);
+    </script>
+}

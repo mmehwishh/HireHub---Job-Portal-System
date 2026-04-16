@@ -1,247 +1,165 @@
-﻿@model List<Job_Portal_System.ViewModel.SavedJobViewModel>
+﻿@model IEnumerable<Job_Portal_System.ViewModel.SavedJobViewModel>
+
 @{
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+    var jobs = Model ?? Enumerable.Empty<Job_Portal_System.ViewModel.SavedJobViewModel>();
 }
 
-<style>
-    .page-title {
-        color: #002E7F;
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 20px;
-    }
-
-    .table-modern {
-        width: 100%;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        border-collapse: collapse;
-    }
-
-        .table-modern th {
-            background: #002E7F;
-            color: white;
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
-        }
-
-        .table-modern td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-    /* Professional Status Badges */
-    .badge-status {
-        padding: 6px 10px;
-        border-radius: 50px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .status-saved {
-        background: #e3f2fd;
-        color: #0d47a1;
-    }
-    /* Blue */
-    .status-applied {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-    /* Orange */
-    .status-interview {
-        background: #f3e5f5;
-        color: #7b1fa2;
-    }
-    /* Purple */
-    .status-expired {
-        background: #ffebee;
-        color: #c62828;
-    }
-    /* Red */
-
-    .btn-action {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 13px;
-        margin-right: 5px;
-        transition: 0.3s;
-    }
-
-    .btn-view {
-        background: #002E7F;
-        color: white;
-        border: none;
-    }
-
-        .btn-view:hover {
-            background: #001f54;
-            color: white;
-        }
-
-    .btn-notes {
-        background: #f8f9fa;
-        color: #333;
-        border: 1px solid #ddd;
-    }
-
-        .btn-notes:hover {
-            background: #e9ecef;
-        }
-
-    .btn-remove {
-        background: #FF4B4B;
-        color: white;
-        border: none;
-    }
-
-        .btn-remove:hover {
-            background: #d43f3f;
-            color: white;
-        }
-
-    .text-muted-small {
-        color: #888;
-        font-size: 12px;
-        display: block;
-    }
-</style>
-<h2 class="page-title">My Job Tracker</h2>
-
-@if (Model == null || !Model.Any())
-{
-    <div class="alert alert-info" style="border-radius: 10px;">
-        <strong>No saved jobs!</strong> Start exploring and save jobs you're interested in.
-    </div>
-}
-else
-{
-    <table class="table-modern">
-        <thead>
-            <tr>
-                <th>Job & Company</th>
-                <th>Status</th>
-                <th>Saved Date</th>
-                <th>Deadline</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr style="@(item.IsExpired ? "opacity: 0.7; background-color: #fafafa;" : "")">
-                    <td>
-                        <span style="font-weight: 700; color: #333; font-size: 16px;">@item.JobTitle</span><br />
-                        <span class="text-muted-small" style="font-size: 12px; color: #777;">@item.CompanyName • @item.Location</span>
-                    </td>
-                    <td>
-                        @if (item.IsExpired)
-                        {<span class="badge-status status-expired">Expired</span> }
-                        else if (item.Status == 2)
-                        { <span class="badge-status status-applied">Applied</span> }
-                        else if (item.Status == 3)
-                        { <span class="badge-status status-interview">Interviewing</span> }
-                        else
-                        { <span class="badge-status status-saved">Saved</span>}
-                    </td>
-                    <td style="color: #666; font-size: 14px;">@item.SavedAt.ToString("MMM dd, yyyy")</td>
-                    <td style="font-size: 14px;">@(item.Deadline.HasValue ? item.Deadline.Value.ToString("MMM dd, yyyy") : "N/A")</td>
-                    <td>
-                        <div style="display: flex; gap: 8px;">
-                            <a href="@Url.Action("JobDetails", "Job", new { id = item.JobID })" class="btn-action btn-view">Details</a>
-
-                            <button type="button" class="btn-action"
-                                    style="background: #f0f4ff; color: #002E7F; border: 1px solid #002E7F; border-radius: 5px; padding: 5px 10px;"
-                                    onclick="openNotesModal(@item.JobID, this.getAttribute('data-notes'))" data-notes="@item.Notes">View Notes
-                                <i class="fa fa-sticky-note"></i>
-                            </button>
-
-                            <a href="@Url.Action("RemoveSavedJob", "SavedJobs", new { jobId = item.JobID })"
-                               class="btn-action btn-remove"
-                               style="color: red;"
-                               onclick="return confirm('Remove this job from your list?')">Remove</a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <div class="modal fade" id="notesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 15px; border: none;">
-                <div class="modal-header" style="background: #002E7F; color: white; border-radius: 15px 15px 0 0;">
-                    <h5 class="modal-title">Job Application Notes</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="modalSavedJobId" />
-
-                    <input type="hidden" id="modalSavedSeekerId" value="@Session["UserId"]" />
-
-                    <label class="mb-2" style="font-weight: 600; color: #333;">Personal Remarks / Interview Details:</label>
-                    <textarea id="modalNotesText" class="form-control" rows="5"
-                              placeholder="Example: Interview on 10th April..."
-                              style="border-radius: 10px; border: 1px solid #ddd;"></textarea>
-                </div>
-                <div class="modal-footer" style="border-top: none;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveNotes()"
-                            style="background: #002E7F; border: none; padding: 8px 25px;">
-                        Save Note
-                    </button>
-                </div>
+<div class="hh-card" style="max-width:980px; margin:18px auto; padding:18px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+            <h1 style="margin:0;">Saved Jobs</h1>
+            <p class="subtitle" style="margin-top:6px;">Your bookmarked jobs — keep notes, apply, or remove saved listings.</p>
+            <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">
+                Showing @jobs.Count() saved job(s)
             </div>
         </div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+            <a href="@Url.Action("SavedJobsList","SavedJobs")" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
+        </div>
     </div>
-}
 
-<script>
-    function openNotesModal(savedJobId, currentNotes) {
-        console.log("Job ID:", savedJobId);
-        console.log("Fetched Notes:", currentNotes);
-
-        $('#modalSavedJobId').val(savedJobId);
-
-        if (currentNotes && currentNotes !== "null") {
-            $('#modalNotesText').val(currentNotes);
-        } else {
-            $('#modalNotesText').val(""); 
+    <div style="margin-top:12px; display:grid; gap:12px;">
+        @if (!jobs.Any())
+        {
+            <div class="hh-empty" style="padding:36px;">
+                <div class="hh-empty-icon"><i class="fa-solid fa-bookmark"></i></div>
+                <h3>No saved jobs</h3>
+                <p class="subtitle">Save interesting jobs and they'll appear here for quick access.</p>
+            </div>
         }
+        else
+        {
+            foreach (var j in jobs)
+            {
+                var expired = j.Deadline.HasValue && j.Deadline.Value < DateTime.Now;
+                <div class="hh-card saved-job-row" data-jobid="@j.JobID" style="display:flex; gap:14px; align-items:flex-start; padding:14px;">
+                    <div style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px;">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
 
-        $('#notesModal').modal('show');
-    }
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; color:var(--text-primary); font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @j.JobTitle
+                                </div>
+                                <div style="color:var(--text-muted); font-size:13px; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @j.CompanyName &nbsp;·&nbsp; @j.Location
+                                </div>
 
-    function saveNotes() {
-        var id = $('#modalSavedJobId').val();
-        var notes = $('#modalNotesText').val();
-        console.log("save notes" , id)
-        console.log(notes)
+                                <div style="margin-top:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                    <span class="hh-badge @(expired ? "hh-badge-red" : "hh-badge-blue")" style="font-weight:700;">
+                                        @(expired ? "Expired" : "Saved")
+                                    </span>
 
-        $.ajax({
-            url: '/SavedJobs/UpdateNotes',
-            type: 'POST',
-            data: { id: id, notes: notes },
-            success: function (response) {
-                if (response.success) {
-                    $('#notesModal').modal('hide');
-                    location.reload();
-                } else {
-                    alert("Error: " + response.message);
-                }
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
-                alert("Critical Error. Check console for details.");
+                                    @if (j.Deadline.HasValue)
+                                    {
+                                        <div style="font-size:13px; color:var(--text-muted);">Deadline: @j.Deadline.Value.ToString("dd MMM yyyy")</div>
+                                    }
+
+                                    <div style="font-size:13px; color:var(--text-muted);">Saved: @j.SavedAt.ToString("dd MMM yyyy")</div>
+                                </div>
+                            </div>
+
+                            <div style="text-align:right; display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+                                <div style="display:flex; gap:8px;">
+                                    <a href="@Url.Action("JobDetails","Job", new { id = j.JobID })" class="hh-btn hh-btn-outline hh-btn-sm" title="View job">
+                                        <i class="fa-solid fa-eye"></i> View
+                                    </a>
+
+                                    <a href="/Job/Apply/@j.JobID" class="hh-btn hh-btn-primary hh-btn-sm" title="Apply for job">
+                                        <i class="fa-solid fa-paper-plane"></i> Apply
+                                    </a>
+
+                                    <button type="button" class="hh-btn hh-btn-danger hh-btn-sm btn-remove-saved" data-jobid="@j.JobID" title="Remove saved job">
+                                        <i class="fa-solid fa-trash"></i> Remove
+                                    </button>
+                                </div>
+
+                                <div style="width:100%; display:flex; gap:8px; align-items:center;">
+                                    <textarea class="saved-notes hh-textarea" data-jobid="@j.JobID" placeholder="Personal notes (e.g. why you saved this, follow-up steps)">@j.Notes</textarea>
+                                    <button type="button" class="hh-btn hh-btn-primary hh-btn-sm btn-save-notes" data-jobid="@j.JobID" style="white-space:nowrap;">
+                                        <i class="fa-solid fa-floppy-disk"></i> Save Note
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
-        });
+        }
+    </div>
+</div>
+
+<style>
+    /* View-specific adjustments; core theme in Content/HireHub.DarkBlue.css */
+    .saved-notes { min-height:44px; resize:vertical; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-primary); width:100%; }
+    .saved-job-row { transition: transform .12s ease, box-shadow .12s ease; }
+    .saved-job-row:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(2,33,71,0.04); }
+    .btn-remove-saved i, .btn-save-notes i { margin-right:6px; }
+
+    @@media (max-width:840px) {
+        .saved-job-row { flex-direction:column; align-items:stretch; }
+        .saved-job-row > div[style*="text-align:right"] { align-items:flex-start; text-align:left; }
+        .saved-job-row .saved-notes { width:100%; }
+        .saved-job-row .btn-save-notes { width:100%; }
     }
-</script>
+</style>
+
+@section scripts {
+    <script>
+        (function ($) {
+            function toast(message, type) {
+                var $t = $('<div class="hh-alert" style="position:fixed; top:90px; right:18px; z-index:1400;"></div>');
+                $t.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-success');
+                $t.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + message + '</div>');
+                $('body').append($t);
+                setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 2200);
+            }
+
+            // Save notes (AJAX)
+            $(document).on('click', '.btn-save-notes', function () {
+                var id = $(this).data('jobid');
+                var $textarea = $('.saved-notes[data-jobid="' + id + '"]');
+                var notes = $textarea.val();
+                var $btn = $(this);
+                $btn.prop('disabled', true);
+
+                $.post('@Url.Action("UpdateNotes","SavedJobs")', { id: id, notes: notes })
+                    .done(function (res) {
+                        if (res && res.success) {
+                            toast('Notes saved', 'success');
+                        } else {
+                            toast((res && res.message) || 'Could not save notes', 'error');
+                        }
+                    })
+                    .fail(function () {
+                        toast('Server error. Try again.', 'error');
+                    })
+                    .always(function () {
+                        $btn.prop('disabled', false);
+                    });
+            });
+
+            // Remove saved (AJAX with fallback)
+            $(document).on('click', '.btn-remove-saved', function () {
+                var jobId = $(this).data('jobid');
+                if (!confirm('Remove this job from your saved list?')) return;
+
+                var $row = $('.saved-job-row[data-jobid="' + jobId + '"]');
+
+                $.get('/SavedJobs/RemoveSavedJob', { jobId: jobId })
+                    .done(function () {
+                        $row.slideUp(180, function () { $(this).remove(); });
+                        toast('Removed from saved jobs', 'success');
+                    })
+                    .fail(function () {
+                        // fallback: navigate to the RemoveSavedJob page
+                        window.location = '/SavedJobs/RemoveSavedJob?jobId=' + jobId;
+                    });
+            });
+        })(jQuery);
+    </script>
+}

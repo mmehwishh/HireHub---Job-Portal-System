@@ -3,273 +3,194 @@
 @{
     ViewBag.Title = "My Applications";
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+
+    Func<dynamic, string> StatusBadgeClass = (s) =>
+    {
+        var st = (s.Status ?? "").ToString().ToLowerInvariant();
+        if (st.Contains("approved") || st.Contains("accepted") || st.Contains("hired")) return "hh-badge hh-badge-green";
+        if (st.Contains("interview") || st.Contains("scheduled")) return "hh-badge hh-badge-blue";
+        if (st.Contains("rejected") || st.Contains("declined")) return "hh-badge hh-badge-red";
+        if (st.Contains("pending")) return "hh-badge hh-badge-amber";
+        return "hh-badge hh-badge-gray";
+    };
 }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<div class="hh-card" style="max-width:980px; margin:20px auto; padding:18px;">
+    <div class="hh-page-header">
+        <h1>My Applications</h1>
+        <p class="subtitle">Track your applications, interview details and employer feedback — withdraw or message employers as needed.</p>
+    </div>
+
+    <div style="margin-top:14px; display:grid; gap:12px;">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="hh-empty" style="padding:36px;">
+                <div class="hh-empty-icon"><i class="fa-solid fa-briefcase"></i></div>
+                <h3>No applications yet</h3>
+                <p class="subtitle">Apply to jobs and they will appear here with status and actions.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var app in Model)
+            {
+                var badgeClass = StatusBadgeClass(app);
+                <div class="hh-card app-row" data-app-id="@app.ApplicationId" style="display:flex; gap:14px; align-items:flex-start; padding:14px;">
+                    <div style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px;">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; color:var(--text-primary); font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @app.JobTitle
+                                </div>
+                                <div style="color:var(--text-muted); font-size:13px; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    @app.CompanyName
+                                </div>
+                                <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">
+                                    Applied: @(app.AppliedDate.HasValue ? app.AppliedDate.Value.ToString("dd MMM yyyy") : "--")
+                                </div>
+                            </div>
+
+                            <div style="text-align:right; display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+                                <span class="@badgeClass" style="font-weight:700; padding:6px 10px;">@app.Status</span>
+
+                                <div style="display:flex; gap:8px; margin-top:6px;">
+                                    <a href="@Url.Action("JobDetails","Job", new { id = app.JobId })" class="hh-btn hh-btn-outline hh-btn-sm" title="View job">
+                                        <i class="fa-solid fa-eye"></i> View
+                                    </a>
+
+                                    <a href="@Url.Action("Index","Chat", new { receiverId = app.EmployerId })" class="hh-btn hh-btn-primary hh-btn-sm" title="Message employer">
+                                        <i class="fa-solid fa-envelope"></i> Message
+                                    </a>
+
+                                    @if (app.Status != null && app.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <button type="button" class="hh-btn hh-btn-danger hh-btn-sm btn-withdraw" data-id="@app.ApplicationId">
+                                            <i class="fa-solid fa-ban"></i> Withdraw
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Interview block (shows only when present) *@
+                        @if (app.Status != null && app.Status.IndexOf("Interview", StringComparison.OrdinalIgnoreCase) >= 0 && app.InterviewDate.HasValue)
+                        {
+                            <div style="margin-top:12px; background:var(--blue-pale); border-left:4px solid var(--blue); padding:12px; border-radius:8px;">
+                                <div style="font-weight:700; color:var(--blue); margin-bottom:6px;"><i class="fa-solid fa-calendar-check"></i> Interview Details</div>
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:8px; font-size:13px; color:var(--text-primary);">
+                                    <div><strong>Date &amp; Time</strong><div>@app.InterviewDate.Value.ToString("dd MMM yyyy, hh:mm tt")</div></div>
+                                    <div>
+                                        <strong>Location / Link</strong>
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(app.InterviewLocation) && app.InterviewLocation.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <a href="@app.InterviewLocation" target="_blank">Join meeting</a>
+                                            }
+                                            else
+                                            {
+                                                @(!string.IsNullOrEmpty(app.InterviewLocation) ? app.InterviewLocation : "—")
+                                            }
+                                        </div>
+                                    </div>
+                                    <div><strong>Notes</strong><div style="color:var(--text-muted);">@(string.IsNullOrEmpty(app.InterviewNotes) ? "No instructions." : app.InterviewNotes)</div></div>
+                                </div>
+                            </div>
+                        }
+
+                        @* Rejection feedback *@
+                        @if (!string.IsNullOrEmpty(app.RejectionFeedback) && (app.Status ?? "").IndexOf("reject", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            <div style="margin-top:12px; background:var(--red-pale); border-left:4px solid var(--red); padding:12px; border-radius:8px;">
+                                <div style="font-weight:700; color:var(--red); margin-bottom:6px;"><i class="fa-solid fa-comment-dots"></i> Employer Feedback</div>
+                                <div style="color:var(--text-primary); font-size:13px;">@app.RejectionFeedback</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
 
 <style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background: #f5f7fb;
+    /* small view-specific adjustments; core theme lives in Content/HireHub.DarkBlue.css */
+    .hh-page-header h1 {
+        margin: 0;
+        font-size: 22px;
     }
 
-    .page-title {
-        text-align: center;
-        font-size: 30px;
-        font-weight: 700;
-        color: #1a73e8;
-        margin-bottom: 30px;
-    }
-
-    .apps-container {
-        max-width: 1100px;
-        margin: auto;
-    }
-
-    .app-card {
-        background: white;
-        border-radius: 18px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        padding: 22px;
-        margin-bottom: 20px;
-        transition: 0.3s;
-    }
-
-        .app-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-        }
-
-    .app-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .job-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #222;
-    }
-
-    .company-name {
-        color: #666;
-        font-size: 14px;
-        margin-top: 4px;
-    }
-
-    .applied-date {
-        font-size: 13px;
-        color: #888;
+    .subtitle {
         margin-top: 6px;
+        color: var(--text-muted);
     }
 
-    .status-badge {
-        padding: 7px 14px;
-        border-radius: 25px;
-        font-size: 12px;
-        font-weight: 600;
+    .app-row:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 30px rgba(2,33,71,0.05);
     }
 
-    .status-approved {
-        background: #E3F7EF;
-        color: #0B7A48;
-    }
-
-    .status-pending {
-        background: #FFF7E0;
-        color: #C48A00;
-    }
-
-    .status-rejected {
-        background: #FDEAEA;
-        color: #C62828;
-    }
-
-    .interview-section {
-        margin-top: 18px;
-        background: #f8fbff;
-        border-left: 4px solid #1a73e8;
-        border-radius: 12px;
-        padding: 14px 16px;
-    }
-
-    .interview-title {
-        font-weight: 600;
-        color: #1a73e8;
-        margin-bottom: 10px;
-    }
-
-    .interview-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-        gap: 12px;
-        font-size: 13px;
-    }
-
-    .interview-item strong {
-        display: block;
-        color: #333;
-        margin-bottom: 3px;
-    }
-
-    .btn-row {
-        margin-top: 18px;
-        text-align: right;
-    }
-
-    .btn-withdraw {
-        padding: 8px 16px;
-        border-radius: 8px;
-        background: #fff0f0;
-        color: #d32f2f !important;
-        border: 1px solid #d32f2f;
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-        .btn-withdraw:hover {
-            background: #d32f2f;
-            color: white !important;
+    /* Mobile stack */
+    @@media (max-width:800px) {
+        .app-row {
+            flex-direction: column;
+            align-items: stretch;
         }
 
-    .no-apps {
-        background: white;
-        text-align: center;
-        padding: 60px;
-        border-radius: 18px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    }
+            .app-row > div[style*="text-align:right"] {
+                align-items: flex-start;
+                text-align: left;
+            }
 
-        .no-apps img {
-            width: 90px;
-            margin-bottom: 15px;
-        }
-
-    .feedback-section {
-        margin-top: 15px;
-        background: #fff5f5;
-        border-left: 4px solid #c62828;
-        border-radius: 12px;
-        padding: 14px 16px;
-    }
-
-    .feedback-title {
-        font-weight: 600;
-        color: #c62828;
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
-
-    .feedback-text {
-        font-size: 13px;
-        color: #444;
-        font-style: italic;
+            .app-row .hh-btn {
+                width: 100%;
+                justify-content: center;
+            }
     }
 </style>
 
-<h2 class="page-title">My Applications</h2>
-
-@if (!Model.Any())
-{
-    <div class="no-apps">
-        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076508.png" />
-        <p>You have not applied to any jobs yet.</p>
-    </div>
-}
-else
-{
-    <div class="apps-container">
-
-        @foreach (var app in Model)
-        {
-            string statusClass = "";
-            if (app.Status == "Approved")
-            {
-                statusClass = "status-approved";
-            }
-            else if (app.Status == "REJECTED")
-            {
-                statusClass = "status-rejected";
-            }
-            else
-            {
-                statusClass = "status-pending";
+@section scripts {
+    <script>
+        (function ($) {
+            function showToast(message, type) {
+                var $t = $('<div class="hh-alert" style="position:fixed; top:90px; right:18px; z-index:1400;"></div>');
+                $t.addClass(type === 'error' ? 'hh-alert-danger' : 'hh-alert-success');
+                $t.html('<i class="fa-solid fa-circle-info"></i><div style="margin-left:8px;">' + message + '</div>');
+                $('body').append($t);
+                setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 2200);
             }
 
-            <div class="app-card">
-                <div class="app-top">
-                    <div>
-                        <div class="job-title">@app.JobTitle</div>
-                        <div class="company-name">@app.CompanyName</div>
-                        <div class="applied-date">
-                            Applied on @(app.AppliedDate.HasValue ? app.AppliedDate.Value.ToString("dd MMM yyyy") : "--")
-                        </div>
-                    </div>
-                    <span class="status-badge @statusClass">@app.Status</span>
-                </div>
+            // Withdraw via AJAX with progressive fallback
+            $(document).on('click', '.btn-withdraw', function () {
+                var id = $(this).data('id');
+                if (!id) return;
+                if (!confirm('Withdraw this application? You can re-apply later.')) return;
 
-                @* --- CASE 1: Interview Scheduled (Sirf tab dikhayein jab data ho) --- *@
-                @if (app.Status == "Interview Scheduled" && app.InterviewDate.HasValue)
-                {
-                    <div class="interview-section">
-                        <div class="interview-title"><i class="fas fa-calendar-check"></i> Interview Scheduled</div>
-                        <div class="interview-grid">
-                            <div class="interview-item">
-                                <strong>Date & Time</strong>
-                                @app.InterviewDate.Value.ToString("dd MMM yyyy hh:mm tt")
-                            </div>
-                            <div class="interview-item">
-                                <strong>Location / Link</strong>
-                                @if (app.InterviewLocation.StartsWith("http"))
-                                {
-                                    <a href="@app.InterviewLocation" target="_blank">Join Meeting</a>
-                                }
-                                else
-                                {
-                                    @app.InterviewLocation
-                                }
-                            </div>
-                            <div class="interview-item">
-                                <strong>Instructions</strong>
-                                @(string.IsNullOrEmpty(app.InterviewNotes) ? "No special instructions." : app.InterviewNotes)
-                            </div>
-                        </div>
-                    </div>
-                }
+                var $btn = $(this);
+                $btn.prop('disabled', true);
 
-                @* --- CASE 2: Rejected with Feedback --- *@
-                @if (app.Status != null && app.Status.Equals("REJECTED", StringComparison.OrdinalIgnoreCase))
-                {
-                    <div class="feedback-section">
-                        <div class="feedback-title">Employer Feedback</div>
-                        <div class="feedback-text">
-                            @(string.IsNullOrEmpty(app.RejectionFeedback) ? "Thank you for your interest. Unfortunately, the company has decided to move forward with other candidates." : app.RejectionFeedback)
-                        </div>
-                    </div>
-                }
+                $.post('@Url.Action("Withdraw","Application")', { id: id })
+                    .done(function (res) {
+                        try {
+                            var payload = (typeof res === 'object') ? res : JSON.parse(res || '{}');
+                            if (payload && payload.success) {
+                                $('.app-row[data-app-id="' + id + '"]').slideUp(180, function () { $(this).remove(); });
+                                showToast('Application withdrawn', 'success');
+                                return;
+                            }
+                        } catch (e) { /* ignore */ }
 
-                <div class="btn-row">
-                    @if (app.Status == "Pending")
-                    {
-                        <a class="btn-withdraw"
-                           href="@Url.Action("Withdraw", "Application", new { id = app.ApplicationId })"
-                           onclick="return confirm('Are you sure you want to withdraw this application?')">
-                            Withdraw Application
-                        </a>
-
-
-                    }
-                </div>
-                <a href="@Url.Action("Index", "Chat", new { receiverId = app.EmployerId })"
-                   class="btn-action" style="background: #1a73e8; color:white; padding: 8px 16px; border-radius: 8px; text-decoration:none;">
-                    Chat with Employer
-                </a>
-            </div>
-        }
-
-    </div>
+                        // fallback: reload page
+                        location.reload();
+                    })
+                    .fail(function () {
+                        showToast('Could not withdraw application. Try again.', 'error');
+                        $btn.prop('disabled', false);
+                    });
+            });
+        })(jQuery);
+    </script>
 }

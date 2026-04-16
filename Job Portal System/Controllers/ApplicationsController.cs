@@ -39,6 +39,7 @@ namespace Job_Portal_System.Controllers
                 {
                     ApplicationId = a.application_id,
                     JobTitle = a.JOB.job_title,
+                    JobId = a.job_id,
                     CompanyName = a.JOB.EMPLOYER.company_name,
                     AppliedDate = a.applied_date,
                     Status = a.status,
