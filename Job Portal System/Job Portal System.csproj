@@ -297,9 +297,11 @@
     <Content Include="Views\Application\MyApplications.cshtml" />
     <Content Include="Views\Application\JobApplications.cshtml" />
     <Content Include="Views\SavedJobs\SavedJobsList.cshtml" />
-    <Content Include="Views\Chat\Index.cshtml" />
-    <Content Include="Views\Chat\Inbox.cshtml" />
+    <Content Include="Views\Chat\JobSeekerIndex.cshtml" />
+    <Content Include="Views\Chat\EmployerInbox.cshtml" />
     <Content Include="Views\Job\DiscoverJobs.cshtml" />
+    <Content Include="Views\Chat\JobSeekerInbox.cshtml" />
+    <Content Include="Views\Chat\EmployerIndex.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

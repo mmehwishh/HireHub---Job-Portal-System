@@ -14,6 +14,7 @@ namespace Job_Portal_System.Controllers
             if (Session["UserId"] == null) return RedirectToAction("Login", "Account");
 
             int senderId = (int)Session["UserId"];
+            string userRole = (Session["UserRole"] as string) ?? string.Empty;
 
             // History load karna taake purani baatein nazar aayein
             var history = db.Messages
@@ -27,13 +28,35 @@ namespace Job_Portal_System.Controllers
             ViewBag.ReceiverName = receiver.full_name;
             ViewBag.ReceiverID = receiverId;
 
-            return View(history);
+            if (userRole.Equals("Employer", StringComparison.OrdinalIgnoreCase))
+            {
+                return View("~/Views/Chat/EmployerIndex.cshtml", history);
+            }
+            else
+            {
+                // Default to job seeker inbox for any non-employer role
+                return View("~/Views/Chat/JobSeekerIndex.cshtml", history);
+            }
         }
 
         public ActionResult Inbox()
         {
             if (Session["UserId"] == null) return RedirectToAction("Login", "Account");
             int currentUserId = (int)Session["UserId"];
+
+            // Ensure we read the correct session key: AccountController stores role in "UserRole"
+            string userRole = (Session["UserRole"] as string) ?? string.Empty;
+
+            // If session didn't contain role, try to fetch from DB and cache it
+            if (string.IsNullOrWhiteSpace(userRole))
+            {
+                var user = db.USERS.Find(currentUserId);
+                if (user != null)
+                {
+                    userRole = user.role ?? string.Empty;
+                    Session["UserRole"] = userRole;
+                }
+            }
 
             // Un logon ki IDs nikalna jinse baat hui hai
             var userIds = db.Messages
@@ -47,7 +70,16 @@ namespace Job_Portal_System.Controllers
                 .Where(u => userIds.Contains(u.UserId))
                 .ToList();
 
-            return View(conversations);
+            // Decide view based on actual role string saved at login
+            if (userRole.Equals("Employer", StringComparison.OrdinalIgnoreCase))
+            {
+                return View("~/Views/Chat/EmployerInbox.cshtml", conversations);
+            }
+            else
+            {
+                // Default to job seeker inbox for any non-employer role
+                return View("~/Views/Chat/JobSeekerInbox.cshtml", conversations);
+            }
         }
 
     }

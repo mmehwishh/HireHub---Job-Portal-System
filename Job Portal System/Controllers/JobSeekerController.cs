@@ -24,11 +24,54 @@ namespace Job_Portal_System.Controllers
         // ---------- OVERRIDE ON ACTION EXECUTION ----------
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            // Redirect if not logged in (existing)
             if (!IsLoggedIn())
             {
                 filterContext.Result = RedirectToAction("Login", "Account");
                 return;
             }
+
+            // Populate common ViewBag items used by the Job Seeker layout
+            try
+            {
+                if (Session["UserId"] != null)
+                {
+                    int currentUserId = Convert.ToInt32(Session["UserId"]);
+
+                    // USER record (may be null in edge cases)
+                    var user = db.USERS.Find(currentUserId);
+                    var displayName = user != null ? (user.full_name ?? user.username) : (Session["UserName"] as string ?? "User");
+
+                    // Derive initials if you want (first letters of first two name parts)
+                    string initials = "";
+                    if (!string.IsNullOrWhiteSpace(displayName))
+                    {
+                        var parts = displayName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        initials = parts.Length == 0 ? "AS" : (parts.Length == 1 ? parts[0].Substring(0, 1) : (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)));
+                        initials = initials.ToUpperInvariant();
+                    }
+
+                    filterContext.Controller.ViewBag.UserName = displayName;
+                    filterContext.Controller.ViewBag.UserInitials = initials;
+
+                    // Unread message count (if you have a read flag replace this with unread-only filter)
+                    var incomingCount = db.Messages.Count(m => m.ReceiverID == currentUserId);
+                    filterContext.Controller.ViewBag.UnreadMessages = incomingCount;
+
+                    // Unread notifications — your code uses read_status == "UNREAD"
+                    var unreadNotifs = db.NOTIFICATIONS.Count(n => n.user_id == currentUserId && ((n.read_status ?? "").ToUpper() == "UNREAD"));
+                    filterContext.Controller.ViewBag.UnreadNotifications = unreadNotifs;
+                }
+            }
+            catch
+            {
+                // avoid throwing from layout population; fall back to defaults
+                filterContext.Controller.ViewBag.UserName = filterContext.Controller.ViewBag.UserName ?? "User";
+                filterContext.Controller.ViewBag.UserInitials = filterContext.Controller.ViewBag.UserInitials ?? "AS";
+                filterContext.Controller.ViewBag.UnreadMessages = filterContext.Controller.ViewBag.UnreadMessages ?? 0;
+                filterContext.Controller.ViewBag.UnreadNotifications = filterContext.Controller.ViewBag.UnreadNotifications ?? 0;
+            }
+
             base.OnActionExecuting(filterContext);
         }
 

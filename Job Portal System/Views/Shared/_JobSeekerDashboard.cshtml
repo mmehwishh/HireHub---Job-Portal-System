@@ -1,14 +1,15 @@
 ﻿@{
     Layout = null;
     var initials = ViewBag.UserInitials as string ?? "";
-    var userName = ViewBag.UserName as string ?? "User";
+    var userName = Session["UserName"] ?? "User";
     var unreadMessages = ViewBag.UnreadMessages ?? 0;
     var unreadNotifications = ViewBag.UnreadNotifications ?? 0;
 
     if (string.IsNullOrWhiteSpace(initials))
     {
         // derive initials from name (simple)
-        var parts = (userName ?? "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        // (string) laga kar computer ko batayein ke ye string hi hai
+        var parts = ((userName.ToString()) ?? "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); 
         initials = parts.Length == 0 ? "AS" : (parts.Length == 1 ? parts[0].Substring(0, 1) : (parts[0].Substring(0, 1) + parts[1].Substring(0, 1))).ToUpper();
     }
 }

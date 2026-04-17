@@ -128,21 +128,14 @@ namespace Job_Portal_System.Controllers
 
         public ActionResult BrowseJobs(string search, string location, string company, int? page)
         {
-            // 1. Use a View Model to avoid passing the raw Database Entity to the View
-            // 2. Set up pagination parameters
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-
             var jobsQuery = db.JOBS
-                .Include(j => j.EMPLOYER) // Eager loading: avoids N+1 query issues
+                .Include(j => j.EMPLOYER)
                 .AsQueryable();
 
-            // 3. Efficient Filtering
             if (!string.IsNullOrWhiteSpace(search))
             {
-                // Trim() handles accidental spaces in search inputs
                 string term = search.Trim();
-                jobsQuery = jobsQuery.Where(x => x.job_title.Contains(term));
+                jobsQuery = jobsQuery.Where(x => x.job_title.Contains(term) || x.job_description.Contains(term));
             }
 
             if (!string.IsNullOrWhiteSpace(location))
@@ -155,14 +148,11 @@ namespace Job_Portal_System.Controllers
                 jobsQuery = jobsQuery.Where(x => x.EMPLOYER.company_name.Contains(company.Trim()));
             }
 
-            // 4. Always Order before Paging
+            // Return all matching results ordered by posted date (no Skip/Take)
             var results = jobsQuery
                 .OrderByDescending(x => x.posted_date)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
                 .ToList();
 
-            // Return the list along with any metadata needed for the UI
             return View(results);
         }
 

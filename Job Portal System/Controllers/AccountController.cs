@@ -43,7 +43,7 @@ namespace Job_Portal_System.Controllers
             {
                 // Set session variables
                 Session["UserId"] = user.UserId;
-                Session["UserName"] = user.username;
+                Session["UserName"] = user.full_name;
                 Session["Email"] = user.email;
                 Session["UserRole"] = user.role;
 
