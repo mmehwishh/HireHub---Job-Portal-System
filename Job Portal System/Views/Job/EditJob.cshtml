@@ -5,141 +5,121 @@
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
 }
 
-<h2>Edit Job</h2>
-
-<!-- ✅ MAIN EDIT JOB FORM -->
-@using (Html.BeginForm("Edit", "Job", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-
-    @* Hidden fields ko simple rakhen bina @ ke *@
-    @Html.HiddenFor(m => m.Job.job_id)
-    @Html.HiddenFor(m => m.Job.employer_id)
-    @Html.HiddenFor(m => m.Job.posted_date)
-    @Html.HiddenFor(m => m.Job.status)
-
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.job_title, "Job Title")
-        @Html.TextBoxFor(m => @Model.Job.job_title, new { @class = "form-control", placeholder = "Enter Job Title" })
-        @Html.ValidationMessageFor(m => @Model.Job.job_title, "", new { @class = "text-danger" })
+<div class="hh-card" style="max-width:980px; margin:18px auto; padding:18px;">
+    <div class="hh-page-header" style="margin-bottom:12px;">
+        <h1 style="margin:0 0 6px 0;">Edit Job</h1>
+        <p class="subtitle" style="margin:0; color:var(--text-muted);">Update your job post. Keep fields clear and concise so applicants understand the role.</p>
     </div>
 
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.job_description, "Job Description")
-        @Html.TextAreaFor(m => @Model.Job.job_description, new { @class = "form-control", rows = 4, placeholder = "Enter Job Description" })
-        @Html.ValidationMessageFor(m => @Model.Job.job_description, "", new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.requirements, "Job Requirments")
-        @Html.TextAreaFor(m => @Model.Job.requirements, new { @class = "form-control", rows = 3, placeholder = "Enter Requirements" })
-        @Html.ValidationMessageFor(m => @Model.Job.requirements, "", new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.location, "Job Location")
-        @Html.TextBoxFor(m => @Model.Job.location, new { @class = "form-control", placeholder = "Location" })
-        @Html.ValidationMessageFor(m => @Model.Job.location, "", new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.salary_range, "Salary Range")
-        @Html.TextBoxFor(m => @Model.Job.salary_range, new { @class = "form-control", placeholder = "Salary (e.g., 50k-70k)" })
-        @Html.ValidationMessageFor(m => m.Job.salary_range, "", new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.job_type, "Job Type")
-        @Html.DropDownListFor(m => m.Job.job_type,
-        new SelectList(new[]
+    <div class="form-card" style="padding:18px; border-radius:12px;">
+        @using (Html.BeginForm("EditJob", "Job", FormMethod.Post, new { @class = "hh-form" }))
         {
-            new { Value = "Full-Time", Text = "Full-Time" },
-            new { Value = "Part-Time", Text = "Part-Time" },
-            new { Value = "Remote", Text = "Remote" },
-            new { Value = "Internship", Text = "Internship" }
-        }, "Value", "Text", Model.Job.job_type),
-        "--- Select Job Type ---",
-        new { @class = "form-control" })
-        @Html.ValidationMessageFor(m => @Model.Job.job_type, "", new { @class = "text-danger" })
-    </div>
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="form-group">
-        @Html.LabelFor(m => @Model.Job.expiry_date, "Last Date to Apply")
-        @Html.TextBoxFor(m => @Model.Job.expiry_date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
-        @Html.ValidationMessageFor(m => @Model.Job.expiry_date, "", new { @class = "text-danger" })
-    </div>
+            @* Hidden fields: ensure prefix "Job" so controller Bind(Prefix="Job") picks them up *@
+            @Html.HiddenFor(m => m.Job.job_id)
+            @Html.HiddenFor(m => m.Job.employer_id)
+            @Html.HiddenFor(m => m.Job.posted_date)
+            @Html.HiddenFor(m => m.Job.status)
 
-    <!-- ❌ REMOVE ADD SKILL FORM FROM HERE -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.Label("Job Title", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Job.job_title, new { @class = "hh-input", placeholder = "e.g. Senior .NET Developer" })
+                    @Html.ValidationMessageFor(m => m.Job.job_title, "", new { @class = "text-danger" })
+                </div>
 
-    <button type="submit" class="btn btn-primary">Update Job</button>
-    <a href="@Url.Action("ManageJobs", "Employeer")" class="btn btn-secondary">Cancel</a>
-}
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.Label("Job Type", htmlAttributes: new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Job.job_type,
+                             new SelectList(new[] {
+                            new { Value = "Full-Time", Text = "Full-Time" },
+                            new { Value = "Part-Time", Text = "Part-Time" },
+                            new { Value = "Remote", Text = "Remote" },
+                            new { Value = "Internship", Text = "Internship" }
+                         }, "Value", "Text", Model.Job.job_type),
+                             "--- Select Job Type ---",
+                             new { @class = "hh-input" })
+                    @Html.ValidationMessageFor(m => m.Job.job_type, "", new { @class = "text-danger" })
+                </div>
 
-<!-- ✅ ADD SKILL FORM (NOW SEPARATE - OUTSIDE MAIN FORM) -->
-<div class="add-skill-box">
-    @using (Html.BeginForm("AddSkill", "Job", FormMethod.Post, new { @class = "skill-form" }))
-    {
-        <input name="SkillName" class="skill-input" placeholder="Enter a new skill..." required />
-        <input type="hidden" name="current_job_id" value="@Model.Job.job_id" />
-        <button class="skill-add-btn" type="submit">Add Skill</button>
-    }
-</div>
+                <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+                    @Html.Label("Job Description", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.Job.job_description, 6, 60, new { @class = "hh-textarea", placeholder = "Describe the role, responsibilities and expectations" })
+                    @Html.ValidationMessageFor(m => m.Job.job_description, "", new { @class = "text-danger" })
+                </div>
 
-<!-- ✅ SKILLS DISPLAY -->
-<div class="skills-section">
-    <h4 class="section-title">Your Added Skills</h4>
-    <div class="skills-tags-wrapper">
-        @foreach (var item in Model.Emp_job_skills)
-        {
-            <div class="skill-tag-box">
-                <span class="skill-text">@item.skillName</span>
-                <a href="/Job/DeleteSkill?skillId=@item.SkillID&jobId=@Model.Job.job_id" class="skill-delete-btn">✕</a>
+                <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+                    @Html.Label("Requirements", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.Job.requirements, 4, 60, new { @class = "hh-textarea", placeholder = "Key requirements, years of experience, qualifications" })
+                    @Html.ValidationMessageFor(m => m.Job.requirements, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.Label("Location", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Job.location, new { @class = "hh-input", placeholder = "City, region or Remote" })
+                    @Html.ValidationMessageFor(m => m.Job.location, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.Label("Salary Range", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Job.salary_range, new { @class = "hh-input", placeholder = "e.g. $40k - $60k or Market rate" })
+                    @Html.ValidationMessageFor(m => m.Job.salary_range, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.Label("Expiry Date", htmlAttributes: new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Job.expiry_date, "{0:yyyy-MM-dd}", new { @class = "hh-input", type = "date" })
+                    @Html.ValidationMessageFor(m => m.Job.expiry_date, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+                <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost" role="button">Cancel</a>
+                <button type="submit" class="hh-btn hh-btn-primary" style="min-width:140px;"><i class="fa-solid fa-paper-plane"></i> Update Job</button>
             </div>
         }
+    </div>
+
+    @* --- Skills area (separate forms) --- *@
+    <div style="margin-top:18px; display:grid; gap:12px; max-width:980px;">
+        <div class="hh-card" style="padding:12px;">
+            <h4 style="margin:0 0 8px 0;">Manage Job Skills</h4>
+
+            @using (Html.BeginForm("AddSkill", "Job", FormMethod.Post, new { @class = "skill-form", style = "display:flex; gap:8px; align-items:center; flex-wrap:wrap;" }))
+            {
+                <input name="SkillName" class="hh-input" placeholder="Enter a new skill (e.g. Angular)" style="flex:1; min-width:180px;" />
+                <input type="hidden" name="current_job_id" value="@Model.Job.job_id" />
+                <button class="hh-btn hh-btn-primary hh-btn-sm" type="submit"><i class="fa-solid fa-plus"></i> Add Skill</button>
+            }
+
+            <div style="margin-top:12px;">
+                <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                    @if (Model.Emp_job_skills != null && Model.Emp_job_skills.Any())
+                    {
+                        foreach (var s in Model.Emp_job_skills)
+                        {
+                            <div class="hh-chip" style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(2,46,127,0.06); color:var(--text-primary); font-weight:600;">
+                                <span>@s.skillName</span>
+                                <a href="@Url.Action("DeleteSkill", "Job", new { skillId = s.SkillID, jobId = Model.Job.job_id })" class="hh-chip-remove" style="color:#d9534f; text-decoration:none; margin-left:6px;">✕</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted">No skills added yet.</div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
-    .skills-tags-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
+    /* small responsive tweaks to match HireHub style */
+    @@media (max-width:780px) {
+        .form-card { padding:14px; }
+        .hh-page-header h1 { font-size:20px; }
     }
-
-    .skill-tag-box {
-        display: flex;
-        align-items: center;
-        background: white;
-        border: 1px solid #dbeafe;
-        padding: 8px 14px;
-        border-radius: 25px;
-        gap: 10px;
-        transition: 0.2s;
-    }
-
-        .skill-tag-box:hover {
-            border-color: #002e7f;
-            background: #f0f6ff;
-        }
-
-    .skill-text {
-        font-size: 14px;
-        font-weight: 500;
-        color: #002e7f;
-    }
-
-    .skill-delete-btn {
-        font-size: 13px;
-        color: #ef4444;
-        padding: 2px 6px;
-        border-radius: 50%;
-        text-decoration: none;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-
-        .skill-delete-btn:hover {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
 </style>

@@ -284,12 +284,23 @@ namespace Job_Portal_System.Controllers
                 return RedirectToAction("Login", "Account");
 
             int uid = Convert.ToInt32(Session["UserId"]);
-            var jobs = db.JOBS
-                         .Where(j => j.employer_id == uid)
-                         .OrderByDescending(j => j.posted_date)
-                         .ToList();
+            //var jobs = db.JOBS
+            //             .Where(j => j.employer_id == uid)
+            //             .OrderByDescending(j => j.posted_date)
+            //             .ToList();
+            var jobsWithEmployer = (from j in db.JOBS
+                                    join e in db.EMPLOYERS on j.employer_id equals e.employer_id
+                                    where j.employer_id == uid
+                                    orderby j.posted_date descending
+                                    select new JobEmployerViewModel
+                                    { // Nayi class yahan use karein
+                                        JobData = j,
+                                        EmpData = e
+                                    }).ToList();
 
-            return View(jobs);
+            return View(jobsWithEmployer);
+
+            return View(jobsWithEmployer);
         }
 
         public ActionResult EditJob(int id)

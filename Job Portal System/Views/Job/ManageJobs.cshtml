@@ -1,186 +1,114 @@
-﻿@model List<Job_Portal_System.JOB>
+﻿@model IEnumerable<Job_Portal_System.ViewModel.JobEmployerViewModel>
+
 @{
     ViewBag.Title = "Manage Jobs";
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+    var jobs = Model ?? Enumerable.Empty<Job_Portal_System.ViewModel.JobEmployerViewModel>();
 }
 
-<style>
-    /* Page Title */
-    .page-title {
-        color: #002E7F;
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 30px;
-        text-align: center;
+<div class="hh-card" style="max-width:1100px; margin:18px auto; padding:18px;">
+    <div class="hh-page-header">
+        <h1>Manage Jobs</h1>
+        <p class="subtitle">Your active and past job postings. Use quick actions to edit, view applicants or delete a job.</p>
+    </div>
+
+    @if (!jobs.Any())
+    {
+        <div class="p-4 text-center text-muted">
+            <p class="mb-0">You have not posted any jobs yet.</p>
+            <p class="mt-2"><a href="@Url.Action("PostJob","Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-plus"></i> Post your first job</a></p>
+        </div>
     }
+    else
+    {
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+            <div style="color:var(--text-muted);">Showing <strong>@jobs.Count()</strong> job(s)</div>
+            <div style="display:flex; gap:8px;">
+                <a href="@Url.Action("PostJob","Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-plus"></i> Post New Job</a>
+                <a href="@Url.Action("ManageJobs","Job")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
+            </div>
+        </div>
 
-    /* Action Button */
-    .btn-new-job {
-        background: #002E7F;
-        color: #fff;
-        padding: 12px 28px;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: 0.3s;
-        display: inline-block;
-        margin-bottom: 20px;
-    }
-
-        .btn-new-job:hover {
-            background: #003b99;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-    /* Table Card */
-    .table-card {
-        max-width: 1000px;
-        margin: auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 15px;
-    }
-
-    thead th {
-        background: #fff;
-        color: #002E7F;
-        padding: 12px 15px;
-        text-align: left;
-        border-radius: 10px 10px 0 0;
-        border-bottom: 2px solid #0a2a5d;
-    }
-
-    tbody td {
-        padding: 12px 15px;
-        border-bottom: 1px solid #e0e0e0;
-        color: #333;
-    }
-
-    tbody tr:hover {
-        background: #f5faff;
-    }
-
-    /* Action Buttons inside table */
-    .btn-action {
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 600;
-        margin-right: 5px;
-        text-decoration: none;
-        transition: 0.2s;
-        display: inline-block;
-        color: #fff;
-    }
-
-    .btn-action-edit {
-        background: #f0ad4e;
-    }
-
-        .btn-action-edit:hover {
-            background: #ec9f3f;
-            transform: translateY(-1px);
-        }
-
-    .btn-action-delete {
-        background: #d9534f;
-    }
-
-        .btn-action-delete:hover {
-            background: #c9302c;
-            transform: translateY(-1px);
-        }
-
-    .btn-action-view {
-        background: #002E7F;
-    }
-
-        .btn-action-view:hover {
-            background: #003b99;
-            transform: translateY(-1px);
-        }
-
-    /* Status Badges */
-    .status-badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 13px;
-        color: #fff;
-        display: inline-block;
-    }
-
-    .status-open {
-        background: #28a745;
-    }
-
-    .status-closed {
-        background: #dc3545;
-    }
-
-    .status-pending {
-        background: #fd7e14;
-    }
-</style>
-
-<div class="page-title">Manage Jobs</div>
-
-<div class="text-center">
-    <a href="@Url.Action("PostJob", "Job")" class="btn-new-job"><i class="fa-solid fa-plus"></i> Post New Job</a>
-</div>
-
-<div class="table-card">
-    <table>
-        <thead>
-            <tr>
-                <th>Job Title</th>
-                <th>Location</th>
-                <th>Job Type</th>
-                <th>Posted On</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var job in Model)
+        <div id="manageJobsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:14px;">
+            @foreach (var item in jobs)
             {
-                string statusClass = job.status.ToLower() == "open" ? "status-open"
-                                   : job.status.ToLower() == "closed" ? "status-closed"
-                                   : "status-pending";
+                var job = item.JobData;
+                var employer = item.EmpData;
+                var posted = job.posted_date.HasValue == true ? job.posted_date.Value.ToString("dd MMM yyyy") : "";
+                <article class="hh-card job-item" style="padding:14px; display:flex; flex-direction:column; gap:12px;">
+                    <header style="display:flex; gap:12px; align-items:flex-start;">
+                        <div style="width:56px; height:56px; border-radius:10px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
 
-                <tr>
-                    <td>@job.job_title</td>
-                    <td>@job.location</td>
-                    <td>@job.job_type</td>
-                    <td>@(job.posted_date.HasValue ? job.posted_date.Value.ToString("dd-MM-yyyy") : "-")</td>
-                    <td>@(job.expiry_date.HasValue ? job.expiry_date.Value.ToString("dd-MM-yyyy") : "-")</td>
-                    <td>
-                        <span class="status-badge @statusClass">@job.status</span>
-                    </td>
-                    <td>
-                        <a href="@Url.Action("EditJob", "Job", new { id = job.job_id })" class="btn-action btn-action-edit">
-                            <i class="fa-solid fa-pen-to-square"></i> Edit Job
-                        </a>
-                        <a href="@Url.Action("DeleteJob", "Job", new { id = job.job_id })" class="btn-action btn-action-delete" onclick="return confirm('Are you sure?');">
-                            <i class="fa-solid fa-trash"></i> Delete Job
-                        </a>
-                        <a href="@Url.Action("JobApplications", "Application", new { jobId = job.job_id })" class="btn-action btn-action-view">
-                            <i class="fa-solid fa-eye"></i> View
-                        </a>
-                    </td>
-                </tr>
+                        <div style="flex:1; min-width:0;">
+                            <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                                <div style="min-width:0;">
+                                    <h2 style="margin:0; font-size:16px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        @(job.job_title ?? "-")
+                                    </h2>
+                                    <div style="color:var(--text-muted); font-size:13px; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        @(employer.company_name ?? "") &nbsp;·&nbsp; @(job.location ?? "—")
+                                    </div>
+                                </div>
+
+                                <div style="text-align:right;">
+                                    <div style="color:var(--text-muted); font-size:13px;">Posted: @posted</div>
+                                    <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
+                                        <span class="hh-badge hh-badge-gray" style="font-weight:600;">@((job.job_type ?? "—"))</span>
+                                        @if (!string.IsNullOrEmpty(job.salary_range))
+                                        {
+                                            <span class="hh-badge hh-badge-blue" style="font-weight:600;">@job.salary_range</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div style="color:var(--text-second); font-size:14px; line-height:1.35; max-height:5.4em; overflow:hidden; text-overflow:ellipsis;">
+                        @((job.job_description ?? "").Length > 320 ? ((job.job_description ?? "").Substring(0, 317) + "...") : (job.job_description ?? ""))
+                    </div>
+
+                    <footer style="display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:auto;">
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <a href="@Url.Action("EditJob","Job", new { id = job.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+
+                            <a href="@Url.Action("JobApplications","Application", new { jobId = job.job_id })" class="hh-btn hh-btn-primary hh-btn-sm"><i class="fa-solid fa-users"></i> Applicants</a>
+
+                            <a href="@Url.Action("DeleteJob","Job", new { id = job.job_id })" onclick="return confirm('Are you sure you want to delete this job?');" class="hh-btn hh-btn-danger hh-btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                        </div>
+
+                        <div style="color:var(--text-muted); font-size:13px;">
+                            Status:
+                            @{
+                                var status = (job.status ?? "-").ToString();
+                                var sClass = status != null && status.ToLower().Contains("open") ? "hh-badge hh-badge-success"
+                                          : status != null && status.ToLower().Contains("closed") ? "hh-badge hh-badge-danger"
+                                          : "hh-badge hh-badge-warning";
+                            }
+                            <span class="@sClass" style="margin-left:8px; font-weight:700; padding:6px 10px;">@status</span>
+                        </div>
+                    </footer>
+                </article>
             }
-        </tbody>
-    </table>
+        </div>
+    }
 </div>
+
+@section scripts {
+    <script>
+        (function () {
+            // small UX: highlight card on action with brief focus animation
+            document.querySelectorAll('.job-item a').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    const card = el.closest('.job-item');
+                    if (!card) return;
+                    card.style.transition = 'box-shadow .12s ease, transform .12s ease';
+                    card.style.transform = 'translateY(-4px)';
+                    setTimeout(function () { card.style.transform = ''; }, 180);
+                });
+            });
+        })();
+    </script>
+}

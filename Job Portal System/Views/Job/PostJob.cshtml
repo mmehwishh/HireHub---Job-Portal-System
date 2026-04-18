@@ -1,165 +1,170 @@
-﻿@model Job_Portal_System.ViewModel.JobViewModel
+﻿html
+@model Job_Portal_System.ViewModel.JobViewModel
 @{
     ViewBag.Title = "Post a Job";
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
 }
 
-<style>
-    /* Page Title */
-    .page-title {
-        color: #002E7F;
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 30px;
-        text-align: center;
-    }
+<div class="hh-card" style="max-width:980px; margin:18px auto; padding:20px;">
+    <div class="hh-page-header" style="margin-bottom:12px;">
+        <h1 style="margin:0 0 6px 0;">Post a Job</h1>
+        <p class="subtitle" style="margin:0; color:var(--text-muted);">Create a clear, concise job post — use comma separated skills. Design and colors follow HireHub theme.</p>
+    </div>
 
-    .form-group .hint {
-        display: block;
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-        flex-basis: 100%;
-        margin-left: 180px; /* Label ki width ke barabar */
-    }
+    <div class="form-card" style="padding:18px; border-radius:12px;">
+        @using (Html.BeginForm("PostJob", "Job", FormMethod.Post, new { @class = "hh-form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    .skills-container {
-        display: flex;
-        flex-wrap: wrap;
-        flex: 1;
-    }
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.JobTitle, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.JobTitle, new { @class = "hh-input", placeholder = "e.g. Senior .NET Developer" })
+                    @Html.ValidationMessageFor(m => m.JobTitle, "", new { @class = "text-danger" })
+                </div>
 
-    /* Form Card */
-    .form-card {
-        max-width: 900px;
-        background: #fff;
-        margin: auto;
-        padding: 35px;
-        border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.JobType, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.JobType, new { @class = "hh-input", placeholder = "Full-time / Part-time / Contract / Remote" })
+                    @Html.ValidationMessageFor(m => m.JobType, "", new { @class = "text-danger" })
+                </div>
 
-    .form-group {
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-    }
+                <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.JobDescription, new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.JobDescription, 6, 60, new { @class = "hh-textarea", placeholder = "Describe the role, responsibilities and expectations" })
+                    @Html.ValidationMessageFor(m => m.JobDescription, "", new { @class = "text-danger" })
+                </div>
 
-        .form-group label {
-            width: 180px;
-            font-weight: 600;
-            color: #002E7F;
-        }
+                <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.Requirements, new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.Requirements, 4, 60, new { @class = "hh-textarea", placeholder = "Key requirements, years of experience, qualifications" })
+                    @Html.ValidationMessageFor(m => m.Requirements, "", new { @class = "text-danger" })
+                </div>
 
-        .form-group .form-control {
-            flex: 1;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            padding: 10px 15px;
-            font-size: 15px;
-        }
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.Location, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Location, new { @class = "hh-input", placeholder = "City, region or Remote" })
+                    @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
+                </div>
 
-        .form-group textarea.form-control {
-            resize: vertical;
-        }
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.SalaryRange, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.SalaryRange, new { @class = "hh-input", placeholder = "e.g. $40k - $60k or Market rate" })
+                    @Html.ValidationMessageFor(m => m.SalaryRange, "", new { @class = "text-danger" })
+                </div>
 
-    .btn-submit, .btn-cancel {
-        padding: 12px 28px;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 10px;
-        transition: 0.3s;
-    }
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    @Html.LabelFor(m => m.ExpiryDate, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "hh-input", type = "date" })
+                    @Html.ValidationMessageFor(m => m.ExpiryDate, "", new { @class = "text-danger" })
+                </div>
 
-    .btn-submit {
-        background: #002E7F;
-        color: #fff;
-    }
+                <div class="form-group" style="display:flex; flex-direction:column;">
+                    <label class="form-label">Required Skills</label>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        @* visible input used for datalist/autocomplete and also to capture typed skills; posted value is in hidden input below *@
+                        <input id="skillInput" class="hh-input" list="skillsList" placeholder="e.g. C#, SQL, React" style="flex:1;" />
+                        <button type="button" id="addSkillBtn" class="hh-btn hh-btn-outline hh-btn-sm" title="Add skill"><i class="fa-solid fa-plus"></i></button>
+                    </div>
 
-        .btn-submit:hover {
-            background: #003b99;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-    .btn-cancel {
-        background: #ccc;
-        color: #333;
-    }
-
-        .btn-cancel:hover {
-            background: #bbb;
-        }
-</style>
-
-<div class="page-title">Post a Job</div>
-
-<div class="form-card">
-    @using (Html.BeginForm("PostJob", "Job", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.JobTitle)
-            @Html.TextBoxFor(m => m.JobTitle, new { @class = "form-control" })
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.JobDescription)
-            @Html.TextAreaFor(m => m.JobDescription, new { @class = "form-control", rows = 5 })
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.Requirements)
-            @Html.TextAreaFor(m => m.Requirements, new { @class = "form-control", rows = 3 })
-        </div>
-
-        @* --- Naya Skills Section --- *@
-        <div class="form-group" style="flex-wrap: wrap;">
-            <label>Required Skills</label>
-            <div class="skills-container">
-                @Html.TextBoxFor(m => m.RequiredSkills, new { @class = "form-control", list = "skillsList", placeholder = "e.g. C#, SQL, Python" })
-                <datalist id="skillsList">
-                    @* Agar aapke pas ViewBag mein skills hain toh yahan show hongi *@
-                    @if (ViewBag.ExistingSkills != null)
-                    {
-                        foreach (var skill in ViewBag.ExistingSkills)
+                    <datalist id="skillsList">
+                        @if (ViewBag.ExistingSkills != null)
                         {
-                            <option value="@skill"></option>
+                            foreach (var skill in ViewBag.ExistingSkills as IEnumerable<string>)
+                            {
+                                <option value="@skill"></option>
+                            }
                         }
-                    }
-                </datalist>
+                    </datalist>
+
+                    <div id="skillsPreview" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+
+                    @* Hidden field that actually posts the comma-separated skill string expected by controller *@
+                    @Html.TextBoxFor(m => m.RequiredSkills, new { @class = "hh-hidden", id = "RequiredSkills", type = "hidden" })
+
+                    <small class="hint" style="color:var(--text-muted); display:block; margin-top:8px;">Separate multiple skills with commas. New skills will be created automatically on save.</small>
+                </div>
             </div>
-            <span class="hint">Separate multiple skills with commas (,). New skills will be added automatically.</span>
-        </div>
-        @* --------------------------- *@
 
-        <div class="form-group">
-            @Html.LabelFor(m => m.Location)
-            @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.SalaryRange)
-            @Html.TextBoxFor(m => m.SalaryRange, new { @class = "form-control" })
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.JobType)
-            @Html.TextBoxFor(m => m.JobType, new { @class = "form-control" })
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(m => m.ExpiryDate)
-            @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
-        </div>
-
-        <div class="text-center mt-4">
-            <input type="submit" value="Post Job" class="btn-submit" />
-            <a href="@Url.Action("ManageJobs", "Job")" class="btn-cancel">Cancel</a>
-        </div>
-    }
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+                <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost" role="button">Cancel</a>
+                <button type="submit" class="hh-btn hh-btn-primary" style="min-width:140px;"><i class="fa-solid fa-paper-plane"></i> Post Job</button>
+            </div>
+        }
+    </div>
 </div>
+
+@section scripts {
+    <script>(function () {
+            // Skills chip UI: keeps hidden RequiredSkills in sync (comma-separated)
+            var input = document.getElementById('skillInput');
+            var addBtn = document.getElementById('addSkillBtn');
+            var preview = document.getElementById('skillsPreview');
+            var hidden = document.getElementById('RequiredSkills');
+
+            function normalizeList(str) {
+                return str.split(',')
+                    .map(function (s) { return s.trim(); })
+                    .filter(function (s) { return s.length > 0; })
+                    .reduce(function (unique, item) {
+                        if (unique.indexOf(item) === -1) unique.push(item);
+                        return unique;
+                    }, []);
+            }
+
+            function renderChips() {
+                preview.innerHTML = '';
+                var values = normalizeList(hidden.value || '');
+                values.forEach(function (v) {
+                    var chip = document.createElement('span');
+                    chip.className = 'hh-chip';
+                    chip.style.display = 'inline-flex';
+                    chip.style.alignItems = 'center';
+                    chip.style.gap = '8px';
+                    chip.style.padding = '6px 10px';
+                    chip.style.borderRadius = '999px';
+                    chip.style.background = 'var(--chip-bg, rgba(2,46,127,0.08))';
+                    chip.style.color = 'var(--text-primary)';
+                    chip.style.fontWeight = '600';
+                    chip.textContent = v;
+                    var rem = document.createElement('button');
+                    rem.className = 'hh-chip-remove';
+                    rem.type = 'button';
+                    rem.style.border = 'none';
+                    rem.style.background = 'transparent';
+                    rem.style.cursor = 'pointer';
+                    rem.style.marginLeft = '6px';
+                    rem.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    rem.addEventListener('click', function () {
+                        var newVals = normalizeList(hidden.value || '').filter(function (x) { return x !== v; });
+                        hidden.value = newVals.join(', ');
+                        renderChips();
+                    });
+                    chip.appendChild(rem);
+                    preview.appendChild(chip);
+                });
+            }
+
+            addBtn.addEventListener('click', function () {
+                var v = (input.value || '').trim();
+                if (!v) return;
+                // support comma separated paste
+                var existing = hidden.value || '';
+                var merged = existing ? existing + ',' + v : v;
+                hidden.value = normalizeList(merged).join(', ');
+                input.value = '';
+                renderChips();
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addBtn.click();
+                }
+            });
+
+            // init from model value if present
+            renderChips();
+        })();</script>
+}

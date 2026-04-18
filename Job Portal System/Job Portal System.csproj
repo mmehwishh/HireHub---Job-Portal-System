@@ -226,10 +226,12 @@
     <Compile Include="USER_SKILLS.cs">
       <DependentUpon>JobPortal.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\EmployerDashboardViewModel.cs" />
     <Compile Include="ViewModel\EmployerProfileViewModel.cs" />
     <Compile Include="ViewModel\ExternalJob.cs" />
     <Compile Include="ViewModel\JobDetailsViewModel.cs" />
     <Compile Include="ViewModel\JobEditViewModel.cs" />
+    <Compile Include="ViewModel\JobEmployerViewModel.cs" />
     <Compile Include="ViewModel\JobSeekerApplicationViewModel.cs" />
     <Compile Include="ViewModel\JobSeekerProfileViewModel.cs" />
     <Compile Include="ViewModel\JobViewModel.cs" />
@@ -313,9 +315,12 @@
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
     <Folder Include="Resumes\" />
+    <Folder Include="Views\Default\" />
+    <Folder Include="Views\EmployerDashboardViewModel\" />
     <Folder Include="Views\ExternalJob\" />
     <Folder Include="Views\JobDetailsViewModel\" />
     <Folder Include="Views\JobEditViewModel\" />
+    <Folder Include="Views\JobEmployerViewModel\" />
     <Folder Include="Views\JobSeekerApplicationViewModel\" />
     <Folder Include="Views\SavedJobViewModel\" />
   </ItemGroup>

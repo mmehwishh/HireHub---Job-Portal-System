@@ -1,93 +1,117 @@
-﻿@model Job_Portal_System.EMPLOYER
+﻿@model Job_Portal_System.ViewModel.EmployerDashboardViewModel
 @{
     ViewBag.Title = "Employer Dashboard";
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
 }
 
-<style>
-    /* Dashboard Hero Section */
-    .dashboard-hero {
-        background: linear-gradient(to right, #002E7F, #004bb8);
-        padding: 50px 30px;
-        text-align: center;
-        color: white;
-        border-radius: 0 0 20px 20px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-        margin-bottom: 40px;
-    }
+<div class="hh-card" style="max-width:1100px; margin:18px auto; padding:18px;">
+    <div class="hh-page-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+            <h1 style="margin:0;">Welcome back, @(Model.Employer.company_name ?? "Employer")</h1>
+            <div class="subtitle" style="margin-top:6px; color:var(--text-muted);">Overview of your hiring activity and quick actions.</div>
+        </div>
 
-        .dashboard-hero h2 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
+        <div style="display:flex; gap:8px; align-items:center;">
+            <a href="@Url.Action("PostJob", "Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-plus"></i> Post Job</a>
+            <a href="@Url.Action("MyProfile", "Employeer")" class="hh-btn hh-btn-ghost">Company Profile</a>
+        </div>
+    </div>
 
-        .dashboard-hero p {
-            font-size: 16px;
-            opacity: 0.9;
-            margin: 5px 0;
-        }
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-top:18px;">
+        <div class="hh-card" style="padding:12px; text-align:center;">
+            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Total Jobs</div>
+            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.TotalJobs</div>
+            <div style="color:var(--text-muted); margin-top:6px;">Active: <strong>@Model.ActiveJobs</strong></div>
+        </div>
 
-    /* Dashboard Card */
-    .dashboard-card {
-        max-width: 900px;
-        background: #fff;
-        margin: auto;
-        padding: 35px;
-        border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
+        <div class="hh-card" style="padding:12px; text-align:center;">
+            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Applicants</div>
+            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.TotalApplicants</div>
+            <div style="color:var(--text-muted); margin-top:6px;">New: <strong>@Model.RecentApplications.Count()</strong></div>
+        </div>
 
-        .dashboard-card h3 {
-            font-size: 24px;
-            color: #002E7F;
-            margin-bottom: 15px;
-        }
+        <div class="hh-card" style="padding:12px; text-align:center;">
+            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Notifications</div>
+            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.UnreadNotifications</div>
+            <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+        </div>
 
-        .dashboard-card p {
-            font-size: 15px;
-            color: #333;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
+        <div class="hh-card" style="padding:12px; text-align:center;">
+            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Messages</div>
+            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.UnreadMessages</div>
+            <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+        </div>
+    </div>
 
-            .dashboard-card p strong {
-                color: #002E7F;
-            }
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-top:18px;">
+        <section class="hh-card" style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0;">Recent Jobs</h3>
+                <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost hh-btn-sm">Manage Jobs</a>
+            </div>
 
-    .btn-edit {
-        background: #002E7F;
-        color: #fff;
-        padding: 12px 28px;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: 0.3s;
-    }
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                @if (Model.RecentJobs != null && Model.RecentJobs.Any())
+                {
+                    foreach (var j in Model.RecentJobs)
+                    {
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px; border-radius:10px; background:#fff; border:1px solid rgba(2,46,127,0.04);">
+                            <div>
+                                <div style="font-weight:700; color:var(--text-primary);">@j.job_title</div>
+                                <div style="font-size:13px; color:var(--text-muted);">@((j.posted_date.HasValue) ? j.posted_date.Value.ToString("dd MMM yyyy") : "-") · @j.location</div>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <a href="@Url.Action("EditJob", "Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="@Url.Action("JobApplications", "Application", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">Applicants</a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">No recent jobs.</div>
+                }
+            </div>
+        </section>
 
-        .btn-edit:hover {
-            background: #003b99;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-</style>
+        <aside class="hh-card" style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0;">Recent Applicants</h3>
+                <a href="@Url.Action("JobApplications", "Application")" class="hh-btn hh-btn-ghost hh-btn-sm">View all</a>
+            </div>
 
-<!-- HERO SECTION -->
-<div class="dashboard-hero">
-    <h2>Welcome, @Model.company_name</h2>
-    <p>@Model.industry</p>
-    <p>@Model.location</p>
-</div>
-
-<!-- DASHBOARD DETAILS CARD -->
-<div class="dashboard-card">
-    <p><strong>Website:</strong> <a href="@Model.website" target="_blank" style="color:#004bb8;">@Model.website</a></p>
-    <p><strong>Description:</strong> @Model.company_description</p>
-
-    <div class="text-center mt-4">
-        <a href="@Url.Action("MyProfile", "Employeer")" class="btn-edit">
-            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
-        </a>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
+                {
+                    foreach (var a in Model.RecentApplications)
+                    {
+                        var seeker = db.JOB_SEEKER_PROFILE.FirstOrDefault(s => s.seeker_id == a.seeker_id);
+                        var seeker_name = db.USERS.FirstOrDefault(u => u.UserId == a.seeker_id).full_name ?? "Applicant";
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="width:44px; height:44px; border-radius:8px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;">@(seeker_name ?? "Applicant")</div>
+                                <div style="font-size:13px; color:var(--text-muted);">Applied to: @(db.JOBS.Find(a.job_id).job_title ?? "-")</div>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("ViewResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-outline hh-btn-sm">Resume</a>
+                                <a href="@Url.Action("DownloadResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-ghost hh-btn-sm">Download</a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">No recent applicants.</div>
+                }
+            </div>
+        </aside>
     </div>
 </div>
+
+@* small helper: we used db inside view for quick seeker lookup; keep it simple and server-safe for small lists *@
+@functions {
+    private JobDBEntities3 db = new JobDBEntities3();
+}
