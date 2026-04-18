@@ -1,29 +1,159 @@
-﻿@{
+﻿Job Portal System\Views\JobSeeker\Dashboard.cshtml
+@model Job_Portal_System.ViewModel.JobSeekerDashboardViewModel
+@{
+    ViewBag.Title = "Dashboard";
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
-    var stats = Model;
 }
 
-<h2>Dashboard Overview</h2>
-
-<div class="row">
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>Total Applications</h4>
-            
+<div class="hh-hero hh-hero-small" style="max-width:1100px; margin:18px auto; border-radius:12px;">
+    <div class="hh-hero-inner" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px;">
+        <div style="display:flex; gap:12px; align-items:center;">
+            <div class="hh-hero-avatar" style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px;">
+                @Model.Initials
+            </div>
+            <div>
+                <div style="font-size:20px; font-weight:800; color:var(--text-primary);">Welcome back, @Model.FullName</div>
+                <div style="color:var(--text-muted); margin-top:6px;">Your personalized hiring and job activity at a glance.</div>
+            </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>Saved Jobs</h4>
-            
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>Skills Added</h4>
-          
+        <div style="display:flex; gap:10px;">
+            <a href="@Url.Action("BrowseJobs","Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Browse Jobs</a>
+            <a href="@Url.Action("ManageSkills","JobSeeker")" class="hh-btn hh-btn-ghost">Manage Skills</a>
         </div>
     </div>
 </div>
+
+<div style="max-width:1100px; margin:12px auto; display:grid; grid-template-columns: repeat(4,1fr); gap:12px;">
+    <div class="hh-card" style="padding:14px; text-align:center;">
+        <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Applications</div>
+        <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:8px;">@Model.TotalApplications</div>
+        <div style="color:var(--text-muted); margin-top:6px;">Saved: <strong>@Model.SavedJobsCount</strong></div>
+    </div>
+
+    <div class="hh-card" style="padding:14px; text-align:center;">
+        <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Skills</div>
+        <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:8px;">@Model.TotalSkills</div>
+        <div style="color:var(--text-muted); margin-top:6px;">Keep skills updated for better matches</div>
+    </div>
+
+    <div class="hh-card" style="padding:14px; text-align:center;">
+        <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Notifications</div>
+        <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:8px;">@Model.UnreadNotifications</div>
+        <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+    </div>
+
+    <div class="hh-card" style="padding:14px; text-align:center;">
+        <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Messages</div>
+        <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:8px;">@Model.UnreadMessages</div>
+        <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+    </div>
+</div>
+
+<div style="max-width:1100px; margin:18px auto; display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
+    <section class="hh-card" style="padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;">Recommended for you</h3>
+            <a href="@Url.Action("BrowseJobs","Job")" class="hh-btn hh-btn-ghost hh-btn-sm">Browse all</a>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+            @foreach (var j in Model.RecommendedJobs.Take(6))
+            {
+                <article class="hh-card" style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="min-width:0;">
+                            <div style="font-weight:800; color:var(--text-primary);">@j.job_title</div>
+                            <div style="color:var(--text-muted); font-size:13px; margin-top:6px;">@j.EMPLOYER.company_name · @j.location</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:13px; color:var(--text-muted);">Posted: @(j.posted_date.HasValue ? j.posted_date.Value.ToString("dd MMM") : "-")</div>
+                            <div style="margin-top:8px;">
+                                <span class="hh-badge hh-badge-gray">@((j.job_type ?? "-"))</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="color:var(--text-second); font-size:14px; line-height:1.35; max-height:4.4em; overflow:hidden; text-overflow:ellipsis;">
+                        @((j.job_description ?? "").Length > 200 ? ((j.job_description ?? "").Substring(0, 197) + "...") : (j.job_description ?? ""))
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; gap:8px; align-items:center;">
+                        <div style="display:flex; gap:8px;">
+                            <a href="@Url.Action("JobDetails","Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> View</a>
+                            <a href="@Url.Action("Apply","Applications", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm"><i class="fa-solid fa-paper-plane"></i> Apply</a>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:13px;">@j.salary_range</div>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+    <aside class="hh-card" style="padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0;">Saved Jobs</h3>
+            <a href="@Url.Action("SavedJobsList","SavedJobs")" class="hh-btn hh-btn-ghost hh-btn-sm">Manage</a>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            @if (Model.SavedJobs != null && Model.SavedJobs.Any())
+            {
+                foreach (var s in Model.SavedJobs)
+                {
+                    <div style="display:flex; justify-content:space-between; gap:8px; align-items:center; padding:10px; border-radius:8px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid rgba(2,46,127,0.04);">
+                        <div>
+                            <div style="font-weight:700; color:var(--text-primary);">@s.JOB.job_title</div>
+                            <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">@s.JOB.EMPLOYER.company_name · @s.JOB.location</div>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <a href="@Url.Action("JobDetails","Job", new { id = s.job_id })" class="hh-btn hh-btn-outline hh-btn-sm">View</a>
+                            <a href="@Url.Action("Create","SavedJobs", new { job_id = s.job_id })" class="hh-btn hh-btn-ghost hh-btn-sm">Save</a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted">You have no saved jobs yet.</div>
+            }
+        </div>
+
+        <hr style="margin:12px 0; border-color:rgba(2,46,127,0.04);" />
+
+        <div>
+            <h4 style="margin:0 0 8px 0;">Recent applications</h4>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
+                {
+                    foreach (var a in Model.RecentApplications)
+                    {
+                        <div style="display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px; border-radius:8px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid rgba(2,46,127,0.04);">
+                            <div>
+                                <div style="font-weight:700;">@a.JOB.job_title</div>
+                                <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Applied: @(a.applied_date.HasValue ? a.applied_date.Value.ToString("dd MMM yyyy") : "-")</div>
+                            </div>
+                            <div>
+                                <span class="hh-badge hh-badge-gray" style="font-weight:700;">@a.status</span>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">No recent applications.</div>
+                }
+            </div>
+        </div>
+    </aside>
+</div>
+
+<style>
+    /* small responsive helpers for job seeker dashboard */
+    @@media (max-width: 980px) {
+        .hh-hero-inner { flex-direction:column; align-items:flex-start; gap:10px; }
+        .hh-hero-avatar { margin-bottom:6px; }
+        .hh-card { padding:10px; }
+        section.hh-card { padding:12px; }
+    }
+</style>

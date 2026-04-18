@@ -226,6 +226,7 @@
     <Compile Include="USER_SKILLS.cs">
       <DependentUpon>JobPortal.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\JobSeekerDashboardViewModel.cs" />
     <Compile Include="ViewModel\EmployerDashboardViewModel.cs" />
     <Compile Include="ViewModel\EmployerProfileViewModel.cs" />
     <Compile Include="ViewModel\ExternalJob.cs" />

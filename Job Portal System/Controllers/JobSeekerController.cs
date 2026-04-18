@@ -78,15 +78,88 @@ namespace Job_Portal_System.Controllers
         // ----------- DASHBOARD ----------- //
         public ActionResult Dashboard()
         {
-            var stats = new
+            if (Session["UserId"] == null)
+                return RedirectToAction("Login", "Account");
+
+            int uid = Convert.ToInt32(Session["UserId"]);
+
+            // Basic counts
+            var totalApplications = db.APPLICATIONS.Count(a => a.seeker_id == uid);
+            var savedJobsCount = db.SAVED_JOBS.Count(s => s.seeker_id == uid);
+            var totalSkills = db.USER_SKILLS.Count(us => us.seeker_id == uid);
+            var unreadNotifs = db.NOTIFICATIONS.Count(n => n.user_id == uid && ((n.read_status ?? "").ToUpper() == "UNREAD"));
+
+            int unreadMessages = 0;
+            try
             {
-                TotalApplications = db.APPLICATIONS.Count(),
-                SavedJobs = db.SAVED_JOBS.Count(),
-                TotalSkills = db.Skills.Count()
+                // Replace with your real messages table if present
+                // unreadMessages = db.Messages.Count(m => m.ReceiverID == uid && m.Read == false);
+            }
+            catch { unreadMessages = 0; }
+
+            // Recent applications (for job seeker)
+            var recentApplications = db.APPLICATIONS
+                                       .Include(a => a.JOB)
+                                       .Where(a => a.seeker_id == uid)
+                                       .OrderByDescending(a => a.applied_date)
+                                       .Take(6)
+                                       .ToList();
+
+            // Saved jobs (with job details)
+            var savedJobs = db.SAVED_JOBS
+                              .Include(s => s.JOB)
+                              .Where(s => s.seeker_id == uid)
+                              .OrderByDescending(s => s.saved_at)
+                              .Take(6)
+                              .ToList();
+
+            // Recommended jobs based on user's skills (best-effort)
+            var skillIds = db.USER_SKILLS
+                             .Where(us => us.seeker_id == uid)
+                             .Select(us => us.SkillID)
+                             .ToList();
+
+            var recommendedJobs = new List<JOB>();
+            if (skillIds.Any())
+            {
+                recommendedJobs = db.JOB_SKILLS
+                                    .Where(js => skillIds.Contains(js.skillID))
+                                    .Select(js => js.JOB)
+                                    .Distinct()
+                                    .OrderByDescending(j => j.posted_date)
+                                    .Take(8)
+                                    .ToList();
+            }
+
+            // Recent jobs (global popular / latest) fallback
+            var recentJobs = db.JOBS
+                               .OrderByDescending(j => j.posted_date)
+                               .Take(8)
+                               .ToList();
+
+            // Build view model
+            var user = db.USERS.Find(uid);
+            var vm = new JobSeekerDashboardViewModel
+            {
+                FullName = user?.full_name ?? (Session["UserName"] as string ?? "Job Seeker"),
+                Initials = (user != null && !string.IsNullOrWhiteSpace(user.full_name)) ?
+                           string.Concat(user.full_name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                     .Take(2)
+                                                     .Select(p => p[0])).ToUpper() : "JS",
+                TotalApplications = totalApplications,
+                SavedJobsCount = savedJobsCount,
+                TotalSkills = totalSkills,
+                UnreadNotifications = unreadNotifs,
+                UnreadMessages = unreadMessages,
+                RecentApplications = recentApplications,
+                SavedJobs = savedJobs,
+                RecommendedJobs = recommendedJobs.Any() ? recommendedJobs : recentJobs,
+                RecentJobs = recentJobs
             };
 
-            return View(stats);
+            return View(vm);
         }
+
 
         // ----------- MY PROFILE ----------- //
         public ActionResult MyProfile()
