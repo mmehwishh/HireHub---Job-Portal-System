@@ -154,6 +154,65 @@ namespace Job_Portal_System.Controllers
             return RedirectToAction("JobSeekerNotifications");
         }
 
+
+        //EMPLOYER NOTIFICATIONS
+        public ActionResult EmployeerNotifications()
+        {
+            int uid;
+            if (!int.TryParse(Convert.ToString(Session["UserId"]), out uid) || uid <= 0)
+                return RedirectToAction("Login", "Account");
+
+            var notes = db.NOTIFICATIONS
+                          .Where(n => n.user_id == uid)
+                          .OrderByDescending(n => n.created_at)
+                          .ToList();
+
+            return View(notes);
+        }
+
+        [HttpPost]
+        public JsonResult EmployeerMarkAsRead(int id)
+        {
+            var note = db.NOTIFICATIONS.Find(id);
+            int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+            if (note != null && note.user_id == uid)
+            {
+                note.read_status = "READ";
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public JsonResult EmployeerMarkAsUnread(int id)
+        {
+            var note = db.NOTIFICATIONS.Find(id);
+            int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+            if (note != null && note.user_id == uid)
+            {
+                note.read_status = "UNREAD";
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public JsonResult EmployeerMarkAllRead()
+        {
+            int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+            if (uid <= 0) return Json(new { success = false });
+            var notes = db.NOTIFICATIONS.Where(n => n.user_id == uid && ((n.read_status ?? "").ToUpper() == "UNREAD")).ToList();
+            foreach (var n in notes) n.read_status = "READ";
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
+
+
+
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

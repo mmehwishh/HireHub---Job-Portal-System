@@ -156,6 +156,49 @@ namespace Job_Portal_System.Controllers
             return View(results);
         }
 
+
+        public ActionResult Apply(int jobId)
+        {
+            if (Session["UserId"] == null)
+                return RedirectToAction("Login", "Account");
+
+            int seekerId = (int)Session["UserId"];
+
+            // Check if already applied
+            var alreadyApplied = db.APPLICATIONS
+                .FirstOrDefault(a => a.job_id == jobId && a.seeker_id == seekerId);
+
+            if (alreadyApplied != null)
+            {
+                TempData["Error"] = "You have already applied for this job.";
+                return RedirectToAction("JobDetails", "Jobs", new { id = jobId });
+            }
+
+            APPLICATION newApp = new APPLICATION
+            {
+                job_id = jobId,
+                seeker_id = seekerId,
+                applied_date = DateTime.Now,
+                status = "PENDING"
+            };
+
+            var user_id1 = db.JOBS.FirstOrDefault(j => j.job_id == jobId).employer_id;
+
+            NOTIFICATION newnotf = new NOTIFICATION
+            {
+                user_id = user_id1,  // employer ID
+                message = "A new application has been submitted for your job '" + db.JOBS.FirstOrDefault(j => j.job_id == jobId).job_title + "'.",
+                created_at = DateTime.Now,
+                read_status = "UNREAD"
+            };
+            db.NOTIFICATIONS.Add(newnotf);
+            db.APPLICATIONS.Add(newApp);
+            db.SaveChanges();
+
+            TempData["Success"] = "Application submitted successfully!";
+            return RedirectToAction("JobDetails", "Job", new { id = jobId });
+        }
+
         public ActionResult JobDetails(int id)
         {
             if (Session["UserId"] == null)

@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Job_Portal_System;
+using Job_Portal_System.ViewModel;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using Job_Portal_System;
-using Job_Portal_System.ViewModel;
-using System.IO;
 
 
 namespace Job_Portal_System.Controllers
@@ -15,13 +16,59 @@ namespace Job_Portal_System.Controllers
     {
         private JobDBEntities3 db = new JobDBEntities3();
 
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            base.OnActionExecuting(filterContext);
+
+            try
+            {
+                if (Session["UserId"] != null)
+                {
+                    int currentUserId = Convert.ToInt32(Session["UserId"]);
+
+                    // Unread notifications
+                    var unreadNotifs = db.NOTIFICATIONS.Count(n => n.user_id == currentUserId && ((n.read_status ?? "").ToUpper() == "UNREAD"));
+                    filterContext.Controller.ViewBag.UnreadNotifications = unreadNotifs;
+
+                    // Unread messages (best-effort, adjust if you have messages table)
+                    int unreadMessages = 0;
+                    try
+                    {
+                        // Example; replace with your messages table if applicable
+                        // unreadMessages = db.Messages.Count(m => m.ReceiverID == currentUserId && m.Read == false);
+                    }
+                    catch { unreadMessages = 0; }
+
+                    filterContext.Controller.ViewBag.UnreadMessages = unreadMessages;
+
+                    // Derive initials/name for header
+                    var user = db.USERS.Find(currentUserId);
+                    var displayName = user != null ? (user.full_name ?? user.username) : (Session["UserName"] as string ?? "Employer");
+                    filterContext.Controller.ViewBag.UserName = displayName;
+                    var initials = "";
+                    if (!string.IsNullOrWhiteSpace(displayName))
+                    {
+                        var parts = displayName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        initials = parts.Length == 0 ? "EM" : (parts.Length == 1 ? parts[0].Substring(0, 1) : (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)));
+                        initials = initials.ToUpperInvariant();
+                    }
+                    filterContext.Controller.ViewBag.UserInitials = initials;
+                }
+            }
+            catch
+            {
+                filterContext.Controller.ViewBag.UnreadNotifications = filterContext.Controller.ViewBag.UnreadNotifications ?? 0;
+                filterContext.Controller.ViewBag.UnreadMessages = filterContext.Controller.ViewBag.UnreadMessages ?? 0;
+            }
+        }
+
         // GET: Employer Dashboard
         public ActionResult Dashboard()
         {
             if (Session["Email"] == null)
                 return RedirectToAction("Login", "Account");
 
-            string email = (Session["Email"] != null) ? Session["Email"].ToString() : null;
             int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
 
             var employer = db.EMPLOYERS.FirstOrDefault(e => e.employer_id == uid);
@@ -31,8 +78,60 @@ namespace Job_Portal_System.Controllers
                 return RedirectToAction("CreateProfile", "Employeer");
             }
 
-            return View(employer);
+            // Gather employer jobs
+            var jobs = db.JOBS
+                         .Where(j => j.employer_id == uid)
+                         .OrderByDescending(j => j.posted_date)
+                         .ToList();
+
+            // Recent applications for employer jobs
+            var jobIds = jobs.Select(j => j.job_id).ToList();
+
+            var recentApplications = new List<APPLICATION>();
+            if (jobIds.Any())
+            {
+                recentApplications = db.APPLICATIONS
+                    .Where(a => jobIds.Contains(a.job_id))
+                    .OrderByDescending(a => a.application_id)
+                    .Take(5)
+                    .ToList();
+            }
+
+            // Basic counts
+            int totalJobs = jobs.Count;
+            int activeJobs = jobs.Count(j => (j.status ?? "").ToLower().Contains("open") || (j.status ?? "").ToLower().Contains("active"));
+            int totalApplicants = db.APPLICATIONS.Count(a => jobIds.Contains(a.job_id));
+
+            // Notifications (UNREAD)
+            int unreadNotifications = db.NOTIFICATIONS.Count(n => n.user_id == uid && n.read_status == "UNREAD");
+
+            // Messages: if you have a messages table, replace this with the real query.
+            int unreadMessages = 0;
+            try
+            {
+                // best-effort: if there is a CHATS or MESSAGES table in model, try to compute; otherwise keep 0
+                // unreadMessages = db.CHAT_MESSAGES.Count(m => m.receiver_id == uid && m.read_status == false);
+            }
+            catch
+            {
+                unreadMessages = 0;
+            }
+
+            var vm = new EmployerDashboardViewModel
+            {
+                Employer = employer,
+                TotalJobs = totalJobs,
+                ActiveJobs = activeJobs,
+                TotalApplicants = totalApplicants,
+                UnreadNotifications = unreadNotifications,
+                UnreadMessages = unreadMessages,
+                RecentJobs = jobs.Take(5).ToList(),
+                RecentApplications = recentApplications
+            };
+
+            return View(vm);
         }
+
 
 
         public ActionResult DownloadResume(int seekerId)

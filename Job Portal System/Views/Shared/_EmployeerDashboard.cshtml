@@ -20,6 +20,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title - Employer Dashboard</title>
 
+    @RenderSection("styles", required: false)
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -113,7 +115,12 @@
             <div class="hh-nav-section">
                 <div class="hh-nav-label">Communication</div>
                 <a href="/Chat/Inbox" class="hh-nav-link"><i class="fa-solid fa-envelope"></i> Messages <span class="hh-nav-badge">@unreadMessages</span></a>
+                <a href="/Notification/EmployeerNotifications" class="hh-nav-link"><i class="fa-solid fa-bell"></i> Notifications <span class="hh-nav-badge">@unreadMessages</span></a>
+
             </div>
+
+            
+
         </nav>
 
         <div class="hh-sidebar-footer">

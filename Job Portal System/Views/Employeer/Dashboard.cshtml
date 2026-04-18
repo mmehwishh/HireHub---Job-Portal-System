@@ -4,64 +4,83 @@
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
 }
 
-<div class="hh-card" style="max-width:1100px; margin:18px auto; padding:18px;">
-    <div class="hh-page-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-        <div>
-            <h1 style="margin:0;">Welcome back, @(Model.Employer.company_name ?? "Employer")</h1>
-            <div class="subtitle" style="margin-top:6px; color:var(--text-muted);">Overview of your hiring activity and quick actions.</div>
+<div class="eh-hero">
+    <div class="eh-hero-inner">
+        <div class="eh-hero-left">
+            <div class="eh-logo-wrap" aria-hidden="true">
+                <div class="eh-logo-mark"><i class="fa-solid fa-building"></i></div>
+                <div>
+                    <div class="eh-hero-title">@((Model.Employer.company_name) ?? "Employer")</div>
+                    <div class="eh-hero-sub">@((Model.Employer.industry) ?? "")</div>
+                </div>
+            </div>
         </div>
 
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div class="eh-hero-actions">
             <a href="@Url.Action("PostJob", "Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-plus"></i> Post Job</a>
-            <a href="@Url.Action("MyProfile", "Employeer")" class="hh-btn hh-btn-ghost">Company Profile</a>
+            <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost">Manage Jobs</a>
         </div>
     </div>
+</div>
 
-    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-top:18px;">
-        <div class="hh-card" style="padding:12px; text-align:center;">
-            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Total Jobs</div>
-            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.TotalJobs</div>
-            <div style="color:var(--text-muted); margin-top:6px;">Active: <strong>@Model.ActiveJobs</strong></div>
+<div class="eh-container">
+    <section class="eh-stats">
+        <div class="eh-stat">
+            <div class="eh-stat-icon bg-gradient-blue"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="eh-stat-body">
+                <div class="eh-stat-label">Total Jobs</div>
+                <div class="eh-stat-value">@Model.TotalJobs</div>
+                <div class="eh-stat-sub">Active: <strong>@Model.ActiveJobs</strong></div>
+            </div>
         </div>
 
-        <div class="hh-card" style="padding:12px; text-align:center;">
-            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Applicants</div>
-            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.TotalApplicants</div>
-            <div style="color:var(--text-muted); margin-top:6px;">New: <strong>@Model.RecentApplications.Count()</strong></div>
+        <div class="eh-stat">
+            <div class="eh-stat-icon bg-gradient-green"><i class="fa-solid fa-user-check"></i></div>
+            <div class="eh-stat-body">
+                <div class="eh-stat-label">Applicants</div>
+                <div class="eh-stat-value">@Model.TotalApplicants</div>
+                <div class="eh-stat-sub">New: <strong>@Model.RecentApplications.Count()</strong></div>
+            </div>
         </div>
 
-        <div class="hh-card" style="padding:12px; text-align:center;">
-            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Notifications</div>
-            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.UnreadNotifications</div>
-            <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+        <div class="eh-stat">
+            <div class="eh-stat-icon bg-gradient-yellow"><i class="fa-solid fa-bell"></i></div>
+            <div class="eh-stat-body">
+                <div class="eh-stat-label">Notifications</div>
+                <div class="eh-stat-value">@Model.UnreadNotifications</div>
+                <div class="eh-stat-sub">Unread</div>
+            </div>
         </div>
 
-        <div class="hh-card" style="padding:12px; text-align:center;">
-            <div style="font-weight:700; color:var(--text-muted); font-size:13px;">Messages</div>
-            <div style="font-size:22px; font-weight:800; color:var(--text-primary); margin-top:6px;">@Model.UnreadMessages</div>
-            <div style="color:var(--text-muted); margin-top:6px;">Unread</div>
+        <div class="eh-stat">
+            <div class="eh-stat-icon bg-gradient-indigo"><i class="fa-solid fa-envelope"></i></div>
+            <div class="eh-stat-body">
+                <div class="eh-stat-label">Messages</div>
+                <div class="eh-stat-value">@Model.UnreadMessages</div>
+                <div class="eh-stat-sub">Unread</div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-top:18px;">
-        <section class="hh-card" style="padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0;">Recent Jobs</h3>
-                <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost hh-btn-sm">Manage Jobs</a>
+    <section class="eh-main-grid">
+        <div class="eh-card eh-recent-jobs">
+            <div class="eh-card-head">
+                <h3>Recent Jobs</h3>
+                <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost hh-btn-sm">View all</a>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:10px;">
+            <div class="eh-list">
                 @if (Model.RecentJobs != null && Model.RecentJobs.Any())
                 {
                     foreach (var j in Model.RecentJobs)
                     {
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px; border-radius:10px; background:#fff; border:1px solid rgba(2,46,127,0.04);">
-                            <div>
-                                <div style="font-weight:700; color:var(--text-primary);">@j.job_title</div>
-                                <div style="font-size:13px; color:var(--text-muted);">@((j.posted_date.HasValue) ? j.posted_date.Value.ToString("dd MMM yyyy") : "-") · @j.location</div>
+                        <div class="eh-list-item">
+                            <div class="eh-list-item-left">
+                                <div class="eh-item-title">@j.job_title</div>
+                                <div class="eh-item-meta">@((j.posted_date.HasValue) ? j.posted_date.Value.ToString("dd MMM yyyy") : "-") · @j.location</div>
                             </div>
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <a href="@Url.Action("EditJob", "Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <div class="eh-list-item-actions">
+                                <a href="@Url.Action("EditJob", "Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <a href="@Url.Action("JobApplications", "Application", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">Applicants</a>
                             </div>
                         </div>
@@ -69,34 +88,32 @@
                 }
                 else
                 {
-                    <div class="text-muted">No recent jobs.</div>
+                    <div class="eh-empty">You haven't posted any jobs yet.</div>
                 }
             </div>
-        </section>
+        </div>
 
-        <aside class="hh-card" style="padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0;">Recent Applicants</h3>
+        <aside class="eh-card eh-recent-applicants">
+            <div class="eh-card-head">
+                <h3>Recent Applicants</h3>
                 <a href="@Url.Action("JobApplications", "Application")" class="hh-btn hh-btn-ghost hh-btn-sm">View all</a>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:10px;">
+            <div class="eh-list-compact">
                 @if (Model.RecentApplications != null && Model.RecentApplications.Any())
                 {
                     foreach (var a in Model.RecentApplications)
                     {
                         var seeker = db.JOB_SEEKER_PROFILE.FirstOrDefault(s => s.seeker_id == a.seeker_id);
-                        var seeker_name = db.USERS.FirstOrDefault(u => u.UserId == a.seeker_id).full_name ?? "Applicant";
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <div style="width:44px; height:44px; border-radius:8px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">
-                                <i class="fa-solid fa-user"></i>
+                        var seeker_name = db.USERS.FirstOrDefault(u => u.UserId == seeker.seeker_id).full_name ?? "Applicant";
+                        <div class="eh-compact-row">
+                            <div class="eh-avatar">@Html.Raw("<i class='fa-solid fa-user'></i>")</div>
+                            <div class="eh-compact-body">
+                                <div class="eh-compact-name">@(seeker_name ?? "Applicant")</div>
+                                <div class="eh-compact-meta">@((db.JOBS.Find(a.job_id).job_title) ?? "-")</div>
                             </div>
-                            <div style="flex:1;">
-                                <div style="font-weight:700;">@(seeker_name ?? "Applicant")</div>
-                                <div style="font-size:13px; color:var(--text-muted);">Applied to: @(db.JOBS.Find(a.job_id).job_title ?? "-")</div>
-                            </div>
-                            <div>
-                                <a href="@Url.Action("ViewResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-outline hh-btn-sm">Resume</a>
+                            <div class="eh-compact-actions">
+                                <a href="@Url.Action("ViewResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-outline hh-btn-sm">View</a>
                                 <a href="@Url.Action("DownloadResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-ghost hh-btn-sm">Download</a>
                             </div>
                         </div>
@@ -104,14 +121,76 @@
                 }
                 else
                 {
-                    <div class="text-muted">No recent applicants.</div>
+                    <div class="eh-empty">No recent applicants.</div>
                 }
             </div>
         </aside>
-    </div>
+    </section>
 </div>
 
-@* small helper: we used db inside view for quick seeker lookup; keep it simple and server-safe for small lists *@
+@section styles {
+    <style>
+        /* Container */
+        .eh-hero {
+            background: linear-gradient(90deg, rgba(0,46,127,0.95), rgba(0,59,153,0.9));
+            color: #fff;
+            padding: 20px 0;
+            border-radius: 12px;
+            margin: 18px auto 6px;
+            max-width: 1100px;
+            box-shadow: 0 10px 30px rgba(2,33,71,0.08);
+        }
+        .eh-hero-inner { display:flex; justify-content:space-between; align-items:center; padding:8px 18px; }
+        .eh-logo-mark { width:56px; height:56px; border-radius:10px; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:22px; margin-right:12px; }
+        .eh-logo-wrap { display:flex; align-items:center; gap:12px; }
+        .eh-hero-title { font-size:20px; font-weight:800; letter-spacing:0.2px; }
+        .eh-hero-sub { font-size:13px; opacity:0.9; margin-top:4px; color:rgba(255,255,255,0.9); }
+
+        .eh-container { max-width:1100px; margin: 12px auto; }
+
+        /* Stats */
+        .eh-stats { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-top:14px; }
+        .eh-stat { background: linear-gradient(180deg,#fff, #fff); border-radius:10px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow: 0 8px 20px rgba(7,20,60,0.04); }
+        .eh-stat-icon { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; flex-shrink:0; }
+        .bg-gradient-blue { background: linear-gradient(135deg, var(--blue-light), var(--blue)); }
+        .bg-gradient-green { background: linear-gradient(135deg,#2ecc71,#1fa65b); }
+        .bg-gradient-yellow { background: linear-gradient(135deg,#ffb454,#ff9a1f); }
+        .bg-gradient-indigo { background: linear-gradient(135deg,#7c4dff,#5b2be6); }
+        .eh-stat-body .eh-stat-label { color:var(--text-muted); font-size:13px; font-weight:700; }
+        .eh-stat-value { font-size:20px; font-weight:800; color:var(--text-primary); margin-top:6px; }
+        .eh-stat-sub { font-size:13px; color:var(--text-muted); margin-top:6px; }
+
+        /* Main grid */
+        .eh-main-grid { display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-top:18px; }
+        .eh-card { background: var(--card-bg, #fff); border-radius:10px; padding:12px; box-shadow: 0 8px 30px rgba(7,20,60,0.04); }
+        .eh-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+
+        .eh-list { display:flex; flex-direction:column; gap:10px; }
+        .eh-list-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; background:linear-gradient(180deg,#ffffff,#fbfdff); border:1px solid rgba(2,46,127,0.04); transition: transform .12s ease, box-shadow .12s ease; }
+        .eh-list-item:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(2,33,71,0.06); }
+        .eh-item-title { font-weight:700; color:var(--text-primary); }
+        .eh-item-meta { font-size:13px; color:var(--text-muted); margin-top:6px; }
+
+        .eh-list-item-actions a { margin-left:8px; }
+
+        .eh-list-compact { display:flex; flex-direction:column; gap:8px; }
+        .eh-compact-row { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid rgba(2,46,127,0.04); }
+        .eh-avatar { width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; font-weight:700; }
+        .eh-compact-name { font-weight:700; }
+        .eh-compact-meta { font-size:13px; color:var(--text-muted); margin-top:4px; }
+
+        .eh-empty { color:var(--text-muted); padding:12px; text-align:center; }
+
+        /* Responsive */
+        @@media (max-width:980px) {
+            .eh-stats { grid-template-columns: repeat(2,1fr); }
+            .eh-main-grid { grid-template-columns: 1fr; }
+            .eh-hero-inner { flex-direction:column; gap:12px; align-items:flex-start; }
+        }
+    </style>
+}
+
 @functions {
+    // small view-level db helper used for display only (keeps change minimal)
     private JobDBEntities3 db = new JobDBEntities3();
 }

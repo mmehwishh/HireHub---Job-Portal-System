@@ -304,6 +304,7 @@
     <Content Include="Views\Job\DiscoverJobs.cshtml" />
     <Content Include="Views\Chat\JobSeekerInbox.cshtml" />
     <Content Include="Views\Chat\EmployerIndex.cshtml" />
+    <Content Include="Views\Notification\EmployeerNotifications.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

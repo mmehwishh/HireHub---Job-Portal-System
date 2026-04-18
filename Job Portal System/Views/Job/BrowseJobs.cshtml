@@ -78,8 +78,9 @@
                     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                         <a href="@Url.Action("JobDetails","Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> View</a>
 
-                        <a href="@Url.Action("Apply","Job", new { id = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm"><i class="fa-solid fa-paper-plane"></i> Apply</a>
-
+                        <a href="@Url.Action("Apply", "Application", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">
+                            <i class="fa-solid fa-paper-plane"></i> Apply
+                        </a>
                         <button type="button" class="hh-btn hh-btn-ghost hh-btn-sm btn-save-job" data-jobid="@j.job_id" data-fallback="@Url.Action("Create","SavedJobs", new { job_id = j.job_id })"><i class="fa-solid fa-bookmark"></i> Save</button>
                     </div>
 
