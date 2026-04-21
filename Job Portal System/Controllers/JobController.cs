@@ -128,6 +128,8 @@ namespace Job_Portal_System.Controllers
 
         public ActionResult BrowseJobs(string search, string location, string company, int? page)
         {
+            int currentUserId = Convert.ToInt32(Session["UserId"]);
+
             var jobsQuery = db.JOBS
                 .Include(j => j.EMPLOYER)
                 .AsQueryable();
@@ -150,8 +152,16 @@ namespace Job_Portal_System.Controllers
 
             // Return all matching results ordered by posted date (no Skip/Take)
             var results = jobsQuery
-                .OrderByDescending(x => x.posted_date)
-                .ToList();
+            .OrderByDescending(x => x.posted_date)
+            .AsEnumerable() 
+            .Select(x => new JobBrowseViewModel
+            {
+                Job = x,
+                // Check if this user has already applied to this specific job
+                IsApplied = db.APPLICATIONS.Any(a => a.job_id == x.job_id && a.seeker_id == currentUserId),
+                IsSaved = db.SAVED_JOBS.Any(s => s.job_id == x.job_id && s.seeker_id == currentUserId)
+            })
+            .ToList();
 
             return View(results);
         }

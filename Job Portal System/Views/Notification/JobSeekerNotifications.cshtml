@@ -1,4 +1,4 @@
-﻿\JobSeekerNotifications.cshtml
+﻿
 @model IEnumerable<Job_Portal_System.NOTIFICATION>
 
 @{
@@ -31,7 +31,7 @@
 
         <div style="display:flex; gap:8px; align-items:center;">
             <button id="btnMarkAll" class="hh-btn hh-btn-outline hh-btn-sm" type="button"><i class="fa-solid fa-check-double"></i> Mark all read</button>
-            <a href="@Url.Action("Index","Notification")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
+            <a href="@Url.Action("JobSeekerNotifications","Notification")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
         </div>
     </div>
 
@@ -82,7 +82,7 @@
                                     }
                                 }
 
-                                <a href="@Url.Action("Details","Notification", new { id = note.notification_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+                                @*<a href="@Url.Action("Details","Notification", new { id = note.notification_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> Details</a>*@
 
                                 @* show delete link that falls back to scaffolded delete view; JS will intercept to confirm *@
                                 <a href="@Url.Action("Delete","Notification", new { id = note.notification_id })" class="hh-btn hh-btn-danger hh-btn-sm delete-notif" data-id="@note.notification_id"><i class="fa-solid fa-trash"></i> Delete</a>
@@ -142,7 +142,7 @@
             $(document).on('click', '.mark-unread-btn', function (e) {
                 var id = $(this).data('id');
                 // If server supports toggling unread, call an endpoint; otherwise simply update UI
-                $.post('@Url.Action("JobSeekerMarkAsUnread","Notification")', { id: id })
+                $.post('@Url.Action("JobseekerMarkAsUnread", "Notification")', { id: id })
                     .done(function () {
                         var $row = $('.notif-row[data-id="' + id + '"]');
                         $row.find('.mark-unread-btn').replaceWith('<form class="mark-read-form" style="display:inline-block;"><input type="hidden" name="id" value="' + id + '"/><button type="submit" class="hh-btn hh-btn-primary hh-btn-sm mark-read-btn"><i class="fa-solid fa-check"></i> Mark read</button></form>');

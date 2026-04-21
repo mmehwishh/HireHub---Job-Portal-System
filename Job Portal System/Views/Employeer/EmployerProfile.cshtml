@@ -1,0 +1,115 @@
+﻿
+@model Job_Portal_System.ViewModel.EmployerProfileViewModel
+@{
+    ViewBag.Title = Model.CompanyName ?? "Company Profile";
+    Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
+    var recent = ViewBag.RecentJobs as IEnumerable<Job_Portal_System.JOB> ?? Enumerable.Empty<Job_Portal_System.JOB>();
+    var employerId = ViewBag.EmployerId ?? 0;
+}
+
+<div class="hh-card" style="max-width:1100px; margin:20px auto; padding:18px;">
+    <div class="hh-page-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:76px; height:76px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; font-weight:800; font-size:22px;">
+                @if (!string.IsNullOrEmpty(Model.CompanyLogo))
+                {
+                    <img src="@Model.CompanyLogo" alt="@Model.CompanyName" style="width:100%; height:100%; object-fit:cover;" />
+                }
+                else
+                {
+                    <i class="fa-solid fa-building"></i>
+                }
+            </div>
+
+            <div>
+                <div style="font-size:20px; font-weight:800; color:var(--text-primary);">@Model.CompanyName</div>
+                <div style="color:var(--text-muted); margin-top:6px;">@Model.Industry &nbsp;·&nbsp; @Model.Location</div>
+                <div style="margin-top:8px; color:var(--text-second); max-width:720px;">@Html.Raw(System.Web.HttpUtility.HtmlEncode(Model.CompanyDescription ?? "").Replace("\n", "<br/>"))</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+            <a href="@Url.Action("Index","Chat", new { receiverId = employerId })" class="hh-btn hh-btn-outline"><i class="fa-solid fa-envelope"></i> Message</a>
+            @*@if (!string.IsNullOrEmpty(Model.Website))
+            {
+                <a href="@Model.Website" target="_blank" class="hh-btn hh-btn-ghost"><i class="fa-solid fa-globe"></i> Website</a>
+            }
+            <a href="@Url.Action("ManageJobs", "Job", new { employerId = employerId })" class="hh-btn hh-btn-primary"><i class="fa-solid fa-briefcase"></i> View Openings</a>*@
+        
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px; margin-top:18px;">
+        <main class="hh-card" style="padding:14px;">
+            <h3 style="margin-top:0;">About @Model.CompanyName</h3>
+            <p style="color:var(--text-second); line-height:1.6;">@Model.CompanyDescription</p>
+
+            <div class="hh-divider" style="margin:14px 0;"></div>
+
+            <h4 style="margin:0 0 10px 0;">Open positions</h4>
+            @if (recent.Any())
+            {
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+                    @foreach (var j in recent)
+                    {
+                        <article class="hh-card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <div style="font-weight:800; color:var(--text-primary);">@j.job_title</div>
+                                    <div style="font-size:13px; color:var(--text-muted); margin-top:6px;">@j.location · @j.job_type</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:13px; color:var(--text-muted);">Posted: @(j.posted_date.HasValue ? j.posted_date.Value.ToString("dd MMM") : "-")</div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <a href="@Url.Action("JobDetails","Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm">View</a>
+                                <a href="@Url.Action("Apply","Applications", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">Apply</a>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-muted">No open positions at the moment.</div>
+            }
+        </main>
+
+        <aside class="hh-card" style="padding:12px;">
+            <div style="text-align:center;">
+                <div style="font-weight:700; color:var(--text-primary);">Company details</div>
+
+                <div style="margin-top:12px; text-align:left; color:var(--text-muted); font-size:14px;">
+                    <div><strong>Industry</strong></div>
+                    <div>@Model.Industry</div>
+
+                    <div style="margin-top:8px;"><strong>Location</strong></div>
+                    <div>@Model.Location</div>
+
+                    @if (!string.IsNullOrEmpty(Model.Website))
+                    {
+                        <div style="margin-top:8px;"><strong>Website</strong></div>
+                        <div><a href="@Model.Website" target="_blank">@Model.Website</a></div>
+                    }
+                </div>
+
+                <div class="hh-divider" style="margin:12px 0;"></div>
+
+                @*<div style="display:flex; gap:8px; justify-content:center;">
+                    <a href="@Url.Action("EmployeerNotifications", "Notification")" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-bell"></i> Follow</a>
+                    <a href="@Url.Action("MyProfile", "Employeer")" class="hh-btn hh-btn-ghost hh-btn-sm">Report</a>
+                </div>*@
+            </div>
+        </aside>
+    </div>
+</div>
+
+<style>
+    @@media (max-width:920px) {
+        .hh-page-header { flex-direction:column; align-items:flex-start; gap:10px; }
+        div[style*="grid-template-columns: 2fr 1fr"] { grid-template-columns: 1fr; }
+    }
+</style>
+

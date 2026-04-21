@@ -151,7 +151,7 @@
         <a href="#">Help</a>
     </footer>
 
-    @RenderSection("scripts", required: false)
+
 
     <!-- Scripts -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
@@ -233,6 +233,8 @@
                 el.addEventListener('touchstart', function () { }, { passive: true });
             });
         })();
+
     </script>
+    @RenderSection("scripts", required: false)
 </body>
 </html>

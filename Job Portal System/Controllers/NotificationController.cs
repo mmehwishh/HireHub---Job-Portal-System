@@ -198,6 +198,21 @@ namespace Job_Portal_System.Controllers
             return Json(new { success = false });
         }
 
+
+        [HttpPost]
+        public JsonResult JobseekerMarkAsUnread(int id)
+        {
+            var note = db.NOTIFICATIONS.Find(id);
+            int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+            if (note != null && note.user_id == uid)
+            {
+                note.read_status = "UNREAD";
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
         [HttpPost]
         public JsonResult EmployeerMarkAllRead()
         {
@@ -209,6 +224,16 @@ namespace Job_Portal_System.Controllers
             return Json(new { success = true });
         }
 
+        [HttpPost]
+        public JsonResult JobSeekerMarkAllRead()
+        {
+            int uid = (Session["UserId"] != null) ? Convert.ToInt32(Session["UserId"]) : 0;
+            if (uid <= 0) return Json(new { success = false });
+            var notes = db.NOTIFICATIONS.Where(n => n.user_id == uid && ((n.read_status ?? "").ToUpper() == "UNREAD")).ToList();
+            foreach (var n in notes) n.read_status = "READ";
+            db.SaveChanges();
+            return Json(new { success = true });
+        }
 
 
 

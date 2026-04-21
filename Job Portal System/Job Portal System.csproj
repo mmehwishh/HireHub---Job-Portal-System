@@ -226,6 +226,7 @@
     <Compile Include="USER_SKILLS.cs">
       <DependentUpon>JobPortal.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\JobBrowseViewModel.cs" />
     <Compile Include="ViewModel\JobSeekerDashboardViewModel.cs" />
     <Compile Include="ViewModel\EmployerDashboardViewModel.cs" />
     <Compile Include="ViewModel\EmployerProfileViewModel.cs" />
@@ -306,6 +307,7 @@
     <Content Include="Views\Chat\JobSeekerInbox.cshtml" />
     <Content Include="Views\Chat\EmployerIndex.cshtml" />
     <Content Include="Views\Notification\EmployeerNotifications.cshtml" />
+    <Content Include="Views\Employeer\EmployerProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

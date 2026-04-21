@@ -1,8 +1,7 @@
-﻿@model IEnumerable<Job_Portal_System.JOB>
+﻿@*@model IEnumerable Job_Portal_System.ViewModel.JobBrowseViewModel*@
 
 @{
     Layout = "~/Views/Shared/_JobSeekerDashboard.cshtml";
-    var jobs = Model ?? Enumerable.Empty<Job_Portal_System.JOB>();
 }
 
 <div class="hh-card" style="max-width:1100px; margin:18px auto; padding:18px;">
@@ -27,7 +26,7 @@
     </form>
 
     <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
-        <div style="color:var(--text-muted);">Showing <strong>@jobs.Count()</strong> result(s)</div>
+        <div style="color:var(--text-muted);">Showing <strong>@Model.Count</strong> result(s)</div>
         <div style="display:flex; gap:8px;">
             <button id="filterToggle" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-filter"></i> Quick Filter</button>
             <a href="@Url.Action("BrowseJobs","Job")" class="hh-btn hh-btn-ghost hh-btn-sm"><i class="fa-solid fa-sync"></i> Refresh</a>
@@ -35,11 +34,11 @@
     </div>
 
     <div id="jobsGrid" style="margin-top:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:14px;">
-        @foreach (var j in jobs)
+        @foreach (var j in Model)
         {
-            var company = j.EMPLOYER.company_name ?? "";
-            var posted = (j.posted_date.HasValue ? j.posted_date.Value.ToString("dd MMM yyyy") : "");
-            <article class="hh-card job-item" data-title="@((j.job_title ?? "").ToLowerInvariant())" data-company="@((company ?? "").ToLowerInvariant())" data-desc="@((j.job_description ?? "").ToLowerInvariant())" data-type="@((j.job_type ?? "").ToLowerInvariant())" style="padding:14px; display:flex; flex-direction:column; gap:12px;">
+            var company = j.Job.EMPLOYER.company_name ?? "";
+            var posted = j.Job.posted_date.ToString("dd MMM yyyy");
+            <article class="hh-card job-item" data-title="@((j.Job.job_title ?? "").ToLowerInvariant())" data-company="@((company ?? "").ToLowerInvariant())" data-desc="@((j.Job.job_description ?? "").ToLowerInvariant())" data-type="@((j.Job.job_type ?? "").ToLowerInvariant())" style="padding:14px; display:flex; flex-direction:column; gap:12px;">
                 <header style="display:flex; gap:12px; align-items:flex-start;">
                     <div style="width:56px; height:56px; border-radius:10px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">
                         <i class="fa-solid fa-briefcase"></i>
@@ -49,20 +48,20 @@
                         <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
                             <div style="min-width:0;">
                                 <h2 style="margin:0; font-size:16px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                    @j.job_title
+                                    @j.Job.job_title
                                 </h2>
                                 <div style="color:var(--text-muted); font-size:13px; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                    @company &nbsp;·&nbsp; @(j.location ?? "—")
+                                    @company &nbsp;·&nbsp; @(j.Job.location ?? "—")
                                 </div>
                             </div>
 
                             <div style="text-align:right;">
                                 <div style="color:var(--text-muted); font-size:13px;">Posted: @posted</div>
                                 <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
-                                    <span class="hh-badge hh-badge-gray" style="font-weight:600;">@((j.job_type ?? "—"))</span>
-                                    @if (!string.IsNullOrEmpty(j.salary_range))
+                                    <span class="hh-badge hh-badge-gray" style="font-weight:600;">@((j.Job.job_type ?? "—"))</span>
+                                    @if (!string.IsNullOrEmpty(j.Job.salary_range))
                                     {
-                                        <span class="hh-badge hh-badge-blue" style="font-weight:600;">@j.salary_range</span>
+                                        <span class="hh-badge hh-badge-blue" style="font-weight:600;">@j.Job.salary_range</span>
                                     }
                                 </div>
                             </div>
@@ -71,20 +70,49 @@
                 </header>
 
                 <div style="color:var(--text-second); font-size:14px; line-height:1.35; max-height:5.4em; overflow:hidden; text-overflow:ellipsis;">
-                    @((j.job_description ?? "").Length > 320 ? ((j.job_description ?? "").Substring(0, 317) + "...") : (j.job_description ?? ""))
+                    @((j.Job.job_description ?? "").Length > 320 ? ((j.Job.job_description ?? "").Substring(0, 317) + "...") : (j.Job.job_description ?? ""))
                 </div>
 
                 <footer style="display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:auto;">
                     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                        <a href="@Url.Action("JobDetails","Job", new { id = j.job_id })" class="hh-btn hh-btn-outline hh-btn-sm"><i class="fa-solid fa-eye"></i> View</a>
-
-                        <a href="@Url.Action("Apply", "Application", new { jobId = j.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">
-                            <i class="fa-solid fa-paper-plane"></i> Apply
+                        <a href="@Url.Action("JobDetails","Job", new { id = j.Job.job_id })" class="hh-btn hh-btn-outline hh-btn-sm">
+                            <i class="fa-solid fa-eye"></i> View
                         </a>
-                        <button type="button" class="hh-btn hh-btn-ghost hh-btn-sm btn-save-job" data-jobid="@j.job_id" data-fallback="@Url.Action("Create","SavedJobs", new { job_id = j.job_id })"><i class="fa-solid fa-bookmark"></i> Save</button>
+
+                        @if (j.IsApplied)
+                        {
+                            @* Agar apply ho chuka hai toh button disable kar dein aur text change kar dein *@
+                            <button type="button" class="hh-btn hh-btn-primary hh-btn-sm" disabled style="opacity: 0.7; cursor: not-allowed;">
+                                <i class="fa-solid fa-check-double"></i> Applied
+                            </button>
+                        }
+                        else
+                        {
+                            @* Agar apply nahi kiya toh link show karein *@
+                            <a href="@Url.Action("Apply", "Application", new { jobId = j.Job.job_id })" class="hh-btn hh-btn-primary hh-btn-sm">
+                                <i class="fa-solid fa-paper-plane"></i> Apply
+                            </a>
+                        }
+
+                        @if (j.IsSaved)
+                        {
+                            @* Agar already saved hai toh disabled ya "Saved" state dikhaein *@
+                            <button type="button" class="hh-btn hh-btn-ghost hh-btn-sm" disabled style="color: var(--blue);">
+                                <i class="fa-solid fa-bookmark"></i> Saved
+                            </button>
+                        }
+                        else
+                        {
+                            @* Normal Save Button *@
+                            <button type="button" class="hh-btn hh-btn-ghost hh-btn-sm btn-save-job"
+                                    data-jobid="@j.Job.job_id"
+                                    data-fallback="@Url.Action("SaveJob","SavedJobs", new { job_id = j.Job.job_id })">
+                                <i class="fa-regular fa-bookmark"></i> Save
+                            </button>
+                        }
                     </div>
 
-                    <div style="color:var(--text-muted); font-size:13px;">@((j.EMPLOYER.company_name ?? ""))</div>
+                    <div style="color:var(--text-muted); font-size:13px;">@((j.Job.EMPLOYER.company_name ?? ""))</div>
                 </footer>
             </article>
         }
@@ -93,19 +121,46 @@
 
 <style>
     /* Small per-view tweaks; main theme in Content/HireHub.DarkBlue.css */
-    .page-title { font-size:22px; margin:0; }
-    .subtitle { margin-top:6px; color:var(--text-muted); }
+    .page-title {
+        font-size: 22px;
+        margin: 0;
+    }
+
+    .subtitle {
+        margin-top: 6px;
+        color: var(--text-muted);
+    }
 
     /* small hover */
-    .job-item { transition: transform .12s ease, box-shadow .12s ease; }
-    .job-item:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(2,33,71,0.04); }
+    .job-item {
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .job-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 30px rgba(2,33,71,0.04);
+        }
 
     /* responsive adjustments */
     @@media (max-width:880px) {
-        #jobSearchForm { flex-direction:column; align-items:stretch; }
-        #jobSearchForm > * { width:100%!important; }
-        footer[style*="justify-content:space-between"] { flex-direction:column; align-items:stretch; gap:8px; }
-        .job-item { padding:12px; }
+        #jobSearchForm {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            #jobSearchForm > * {
+                width: 100% !important;
+            }
+
+        footer[style*="justify-content:space-between"] {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .job-item {
+            padding: 12px;
+        }
     }
 </style>
 

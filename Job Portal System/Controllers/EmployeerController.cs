@@ -151,6 +151,42 @@ namespace Job_Portal_System.Controllers
             return File(filePath, "application/pdf");
         }
 
+        public ActionResult EmployerProfile(int id)
+        {
+            // Load employer
+            var employer = db.EMPLOYERS.FirstOrDefault(e => e.employer_id == id);
+            if (employer == null)
+                return HttpNotFound();
+
+            // Map to view model
+            var user = db.USERS.FirstOrDefault(u => u.UserId == id);
+            var vm = new EmployerProfileViewModel
+            {
+                FullName = user?.full_name ?? user?.username ?? employer.company_name,
+                CompanyName = employer.company_name,
+                Industry = employer.industry,
+                CompanyDescription = employer.company_description,
+                Website = employer.website,
+                Location = employer.location,
+                CompanyLogo = string.IsNullOrEmpty(employer.companyLogo) ? Url.Content("~/Images/CompanyLogos/default-logo.webp") : employer.companyLogo
+            };
+
+            // Recent public jobs (only active/open)
+            var recentJobs = db.JOBS
+                               .Where(j => j.employer_id == id && (j.status == null || !j.status.ToLower().Contains("closed")))
+                               .OrderByDescending(j => j.posted_date)
+                               .Take(6)
+                               .ToList();
+
+            ViewBag.RecentJobs = recentJobs;
+            ViewBag.EmployerId = id;
+
+            return View(vm);
+        }
+
+
+
+
         public ActionResult ViewResume(int seekerId)
         {
             var seeker = db.JOB_SEEKER_PROFILE.FirstOrDefault(s => s.seeker_id == seekerId);
