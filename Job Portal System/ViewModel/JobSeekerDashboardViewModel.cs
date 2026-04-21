@@ -8,6 +8,7 @@ namespace Job_Portal_System.ViewModel
     {
         public string FullName { get; set; }
         public string Initials { get; set; }
+        public string profile_pic_path { get; set; }
 
         public int TotalApplications { get; set; }
         public int SavedJobsCount { get; set; }

@@ -142,6 +142,7 @@ namespace Job_Portal_System.Controllers
             var vm = new JobSeekerDashboardViewModel
             {
                 FullName = user?.full_name ?? (Session["UserName"] as string ?? "Job Seeker"),
+                profile_pic_path = db.JOB_SEEKER_PROFILE.FirstOrDefault(u=> u.seeker_id == user.UserId)?.ProfilePicturePath,
                 Initials = (user != null && !string.IsNullOrWhiteSpace(user.full_name)) ?
                            string.Concat(user.full_name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                                                      .Take(2)
@@ -379,12 +380,12 @@ namespace Job_Portal_System.Controllers
                 db.USER_SKILLS.Remove(uskill);
                 db.SaveChanges();
 
-                var skill = db.Skills.Find(id);
-                if (skill != null)
-                {
-                    db.Skills.Remove(skill);
-                    db.SaveChanges();
-                }
+                //var skill = db.Skills.Find(id);
+                //if (skill != null)
+                //{
+                //    db.Skills.Remove(skill);
+                //    db.SaveChanges();
+                //}
             }
             
             return RedirectToAction("ManageSkills");
