@@ -1,0 +1,250 @@
+﻿@{
+    Layout = null;
+    var redirectUrl = Url.Action("Login", "Account");
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HireHub</title>
+
+    <!-- Keep consistent with app theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="~/Content/HireHub.DarkBlue.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --hh-blue: var(--blue, #002E7F);
+            --hh-blue-light: var(--blue-light, #3b82f6);
+            --hh-text: var(--text-primary, #0b2545);
+            --hh-muted: var(--text-muted, #6b7280);
+            --bg: #0b1220;
+        }
+
+        html,body {
+            height:100%;
+            margin:0;
+            font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, rgba(2,18,44,0.96) 0%, rgba(4,28,64,0.96) 100%);
+            color:#fff;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        .splash-wrap {
+            min-height:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:30px;
+        }
+
+        .splash-card {
+            width:min(880px, 96%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+            border-radius:14px;
+            padding:34px;
+            box-shadow: 0 18px 50px rgba(2,18,44,0.5);
+            display:flex;
+            gap:28px;
+            align-items:center;
+            overflow:hidden;
+            transform:translateY(0);
+            transition:opacity .6s ease, transform .6s ease;
+        }
+
+        .splash-brand {
+            display:flex;
+            gap:18px;
+            align-items:center;
+            min-width:0;
+            flex:1 1 480px;
+        }
+
+        .logo-mark {
+            width:96px;
+            height:96px;
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg,var(--hh-blue-light),var(--hh-blue));
+            box-shadow: 0 8px 30px rgba(2,46,127,0.18);
+            flex-shrink:0;
+            transform:translateY(0);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo-mark svg { width:44px; height:44px; color:#fff; fill:#fff; opacity:.96; }
+
+        @@keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+
+        .brand-text {
+            min-width:0;
+        }
+
+        .brand-title {
+            font-size:28px;
+            font-weight:700;
+            color:var(--hh-blue-light);
+            letter-spacing:0.2px;
+            margin:0;
+        }
+
+        .brand-sub {
+            margin-top:6px;
+            color:var(--hh-muted);
+            font-size:14px;
+            max-width:60ch;
+        }
+
+        .splash-actions {
+            display:flex;
+            flex-direction:column;
+            align-items:flex-end;
+            gap:12px;
+            justify-content:center;
+            flex:0 0 260px;
+        }
+
+        .progress-ring {
+            width:160px;
+            height:160px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            position:relative;
+        }
+
+        .progress-ring .percent {
+            position:absolute;
+            text-align:center;
+        }
+
+        .percent .num {
+            font-weight:700;
+            font-size:28px;
+            color: #fff;
+        }
+
+        .percent .lbl {
+            font-size:12px;
+            color:var(--hh-muted);
+        }
+
+        /* ring animation using conic-gradient */
+        .ring {
+            width:160px;
+            height:160px;
+            border-radius:50%;
+            background: conic-gradient(var(--hh-blue-light) 0deg, var(--hh-blue) 0deg);
+            filter: drop-shadow(0 6px 18px rgba(2,46,127,0.12));
+            transition: background .5s linear;
+        }
+
+        .loading-dots { display:flex; gap:6px; align-items:center; justify-content:center; margin-top:6px; }
+        .dot {
+            width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.18);
+            animation: dotPulse 1.2s infinite ease-in-out;
+        }
+        .dot:nth-child(2){ animation-delay: .15s;}
+        .dot:nth-child(3){ animation-delay: .3s;}
+        @@keyframes dotPulse {
+            0% { transform: scale(.8); opacity:.45; background:rgba(255,255,255,0.12); }
+            50% { transform: scale(1.25); opacity:1; background:#fff; }
+            100% { transform: scale(.8); opacity:.45; background:rgba(255,255,255,0.12); }
+        }
+
+        /* exit state */
+        .splash-card.hidden {
+            opacity:0;
+            transform:translateY(-10px) scale(.995);
+            pointer-events:none;
+        }
+
+        /* responsive */
+        @@media (max-width:880px) {
+            .splash-card { flex-direction:column; align-items:center; text-align:center; gap:18px; }
+            .splash-actions { align-items:center; flex:unset; }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-wrap" role="main" aria-label="HireHub loading screen">
+        <div class="splash-card" id="splashCard" role="article" aria-hidden="false" aria-live="polite">
+            <div class="splash-brand">
+                <div class="logo-mark" aria-hidden="true">
+                    <!-- small HireHub mark -->
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                        <path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-10-2h4v2h-4V5zm2 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                    </svg>
+                </div>
+
+                <div class="brand-text">
+                    <h1 class="brand-title">HireHub</h1>
+                    <div class="brand-sub">Connecting talent with opportunity — professional hiring, faster matches. Welcome.</div>
+                </div>
+            </div>
+
+            <div class="splash-actions" aria-hidden="true">
+                <div class="progress-ring" role="status" aria-live="polite" aria-atomic="true">
+                    <div class="ring" id="ring"></div>
+                    <div class="percent" id="percent">
+                        <div class="num" id="num">0%</div>
+                        <div class="lbl">Loading</div>
+                    </div>
+                </div>
+
+                <div class="loading-dots" aria-hidden="true">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+        (function () {
+            const ring = document.getElementById('ring');
+            const num = document.getElementById('num');
+            const card = document.getElementById('splashCard');
+
+            // duration of splash in ms
+            const duration = 2200;
+            const start = performance.now();
+
+            function update(timestamp) {
+                const elapsed = timestamp - start;
+                const progress = Math.min(1, elapsed / duration);
+                const percent = Math.round(progress * 100);
+                num.textContent = percent + '%';
+
+                // conic gradient angle calculation
+                const angle = Math.round(progress * 360);
+                ring.style.background = `conic-gradient(var(--hh-blue-light) ${angle}deg, rgba(255,255,255,0.05) ${angle}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    // small pause then fade then redirect
+                    setTimeout(() => {
+                        card.classList.add('hidden');
+                        setTimeout(() => {
+                            window.location.href = '@redirectUrl';
+                        }, 350);
+                    }, 280);
+                }
+            }
+
+            requestAnimationFrame(update);
+        })();
+    </script>
+</body>
+</html>

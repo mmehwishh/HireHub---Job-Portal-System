@@ -140,6 +140,7 @@
       <DependentUpon>JobPortal.edmx</DependentUpon>
       <LastGenOutput>JobPortal.cs</LastGenOutput>
     </Content>
+    <None Include="Properties\PublishProfiles\site64635-WebDeploy.pubxml" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
@@ -172,6 +173,7 @@
     <Compile Include="Controllers\JobSeekerController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SavedJobsController.cs" />
+    <Compile Include="Controllers\SplashController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="EMPLOYER.cs">
       <DependentUpon>JobPortal.tt</DependentUpon>
@@ -278,6 +280,7 @@
     <Content Include="Views\Chat\EmployerIndex.cshtml" />
     <Content Include="Views\Notification\EmployeerNotifications.cshtml" />
     <Content Include="Views\Employeer\EmployerProfile.cshtml" />
+    <Content Include="Views\Splash\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
