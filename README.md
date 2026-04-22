@@ -136,8 +136,7 @@ git clone https://github.com/your-username/hirehub.git
 
 ## 👨‍💻 Author
 
-HireHub Development Team
-ASP.NET MVC 5 Project — Academic + Practical Implementation
+Mehwish Zehra — Academic + Practical Implementation
 
 ---
 
