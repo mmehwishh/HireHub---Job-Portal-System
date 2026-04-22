@@ -133,7 +133,7 @@
                 <div style="width:86px; height:86px; margin:0 auto 10px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--bg);">
                     @*@Html.Raw(Model.Employerr_detail.companyLogo ?? "<i class='fa-solid fa-building' style='font-size:32px;color:var(--text-muted);'></i>")*@
 
-                    <img src="@(!string.IsNullOrEmpty(@company_logo) ? @company_logo : Url.Content("~/Content/Images/default-profile.png"))" style="width:86px; height:86px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center;" />
+                    <img src="@(!string.IsNullOrEmpty(@company_logo) ? @company_logo : Url.Content("~/Images/logos/default-logo.jpg"))" style="width:86px; height:86px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center;" />
 
                 </div>
 

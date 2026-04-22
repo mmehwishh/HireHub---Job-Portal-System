@@ -9,14 +9,17 @@
     <div class="hh-hero-inner" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px;">
         <div style="display:flex; gap:12px; align-items:center;">
             <div class="hh-hero-avatar" style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px;">
-                @if (!string.IsNullOrEmpty(Model.profile_pic_path))
+                @*@if (!string.IsNullOrEmpty(Model.profile_pic_path))
                 {
-                    <img src="@(!string.IsNullOrEmpty(Model.profile_pic_path) ? Model.profile_pic_path : Url.Content("~/Content/Images/default-profile.png"))" style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center;"/>
+                    <img src="@(!string.IsNullOrEmpty(Model.profile_pic_path) ? Model.profile_pic_path : Url.Content("~/Images/CompanyLogos/default-logo.png"))" style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center;" />
                 }
                 else
                 {
                     @Model.Initials
-                }
+                }*@
+
+                <img src="@(!string.IsNullOrEmpty(Model.profile_pic_path) ? Model.profile_pic_path : Url.Content("~/Images/CompanyLogos/default-logo.png"))" style="width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--blue-light),var(--blue)); color:#fff; display:flex; align-items:center; justify-content:center;" />
+
 
             </div>
             <div>

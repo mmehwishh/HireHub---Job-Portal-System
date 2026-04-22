@@ -168,7 +168,7 @@ namespace Job_Portal_System.Controllers
                 CompanyDescription = employer.company_description,
                 Website = employer.website,
                 Location = employer.location,
-                CompanyLogo = string.IsNullOrEmpty(employer.companyLogo) ? Url.Content("~/Images/CompanyLogos/default-logo.webp") : employer.companyLogo
+                CompanyLogo = string.IsNullOrEmpty(employer.companyLogo) ? Url.Content("~/Images/logos/default-logo.jpg") : employer.companyLogo
             };
 
             // Recent public jobs (only active/open)
