@@ -1,89 +1,138 @@
-# HireHub - Job Portal Management System 🚀
+# 🚀 HireHub — Job Portal System
 
-**HireHub** is a full-stack web application developed using **ASP.NET MVC** and **SQL Server**. It is designed to bridge the gap between job seekers and employers, providing a streamlined platform for job postings, applications, and profile management.
-> **Status:** 🛠️ Work in Progress
-## 🌟 Key Features
-* **Job Seeker Module:** Create profiles, upload resumes, browse jobs, and track applications.
-* **Employer Module:** Post new job openings, manage listings, and review applicant profiles.
-* **Search & Filter:** Advanced search functionality to find jobs based on categories and roles.
-* **Responsive UI:** Clean and modern interface built with Bootstrap for a seamless user experience.
-* **Real-Time Bi-Directional Chat:** Instant messaging without page refreshes using SignalR WebSockets.
-* **Interview Scheduler:** Employers can schedule interviews with custom notes and meeting links.
-* **Status Tracking:** Real-time updates on application status (Pending, Approved, Rejected, Interview Scheduled).
-
-
-Here’s your **clean, professional GitHub README.md** with proper formatting, sections, and markdown styling 👇
+![.NET](https://img.shields.io/badge/.NET-ASP.NET%20MVC%205-blueviolet)
+![Entity Framework](https://img.shields.io/badge/Entity%20Framework-6.0-blue)
+![Database](https://img.shields.io/badge/Database-First%20Approach-orange)
+![License](https://img.shields.io/badge/License-Educational-lightgrey)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
 ---
 
-# 🛠 Tech Stack & Dependencies
+## 📌 Overview
 
-## 🚀 Core Stack
+**HireHub** is a full-featured **ASP.NET MVC 5 job portal system** designed to simulate real-world recruitment workflows.  
+It supports job posting, applications, candidate management, real-time chat, notifications, and external job integration.
 
-* **Backend:** ASP.NET MVC 5 (C#)
-* **Database:** MS SQL Server
-* **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 4/5
-* **ORM:** Entity Framework (Database First Approach)
-
-## 📦 Key Dependencies (NuGet Packages)
-
-* **Microsoft.AspNet.SignalR** → Real-time chat functionality
-* **EntityFramework** → Database operations
-* **Newtonsoft.Json** → JSON handling in AJAX calls
-* **jQuery** → DOM manipulation & SignalR client-side logic
+Built using:
+- ASP.NET MVC 5
+- Entity Framework 6 (Database First)
+- SignalR (Real-time communication)
+- Adzuna API (External job data)
+- Custom Dark Blue UI Theme
 
 ---
 
-# 💻 How to Run the Project Locally
+## 🎯 Key Features
 
-## 🗄️ Database Setup
-
-Since the database is locally connected, follow these steps:
-
-1. Open **SQL Server Management Studio (SSMS)**
-2. Locate the `HireHub_DB.sql` file in the repository
-3. Drag & drop the file into SSMS
-4. Click **Execute** to generate tables and sample data
+### 💼 Job Management
+- Post, update, and manage jobs (Employer side)
+- Browse, apply, and save jobs (Job Seeker side)
+- Skill tagging system (Many-to-Many relationship)
+- Duplicate prevention in skills mapping
+- External job fetching via **Adzuna API**
 
 ---
 
-## 🔗 Update Connection String
-
-Open `web.config` and update the connection string to match your local SQL Server instance:
-
-```xml
-<connectionStrings>
-  <add name="YourConnectionName" 
-       connectionString="Data Source=YOUR_SERVER;Initial Catalog=HireHub_DB;Integrated Security=True" 
-       providerName="System.Data.SqlClient" />
-</connectionStrings>
-```
+### 🏢 Employer Dashboard
+- Real-time analytics:
+  - Active Jobs
+  - Total Applicants
+  - Unread Messages
+- Candidate resume viewing & secure PDF download
+- Interview scheduling with **transaction-safe operations**
 
 ---
 
-## ▶️ Run the Application
-
-1. Open the solution file (`.sln`) in **Visual Studio**
-2. Restore NuGet Packages
-
-   * Right-click Solution → **Restore NuGet Packages**
-3. Build the solution
-
-   * `Ctrl + Shift + B`
-4. Press **F5** to run the project
+### 👤 Job Seeker Module
+- Profile management (skills, resume upload)
+- Application tracking:
+  - PENDING
+  - APPROVED
+  - REJECTED
+- Job bookmarking system (Saved Jobs)
+- Dynamic UI updates (notification badges globally)
 
 ---
 
-# 🏗 Project Structure
-
-* **Models** → Entity Framework database entities & data structures
-* **ViewModels** → Custom models for complex views (e.g., `JobSeekerApplicationViewModel`)
-* **Controllers** → Handle user requests, business logic, and database interaction
-* **Views** → `.cshtml` UI files and dashboard layouts
+### 📩 Notifications & Chat System
+- AJAX-based notification system (mark read/unread)
+- Real-time messaging using **SignalR (ChatHub)**
+- Seamless SPA-like experience
 
 ---
 
-# 👩‍💻 Developed By
+### 🔐 Security & Authentication
+- Session-based authentication (UserId + Role)
+- Strict server-side validation
+- Ownership verification for sensitive operations
+- Protection against unauthorized access
 
-**Mehwish Zehra**
+---
+
+## 🛠️ Technical Architecture
+
+### 🗄️ Database Layer
+- Entity Framework 6 (Database First)
+- EDMX Model: `JobDBEntities3`
+- Eager loading using `.Include()` to avoid N+1 queries
+
+### ⚙️ Performance & Reliability
+- Database transactions for critical workflows
+- Optimized query handling
+- Scalable design for large datasets
+
+---
+
+## 📂 Project Structure
+/Controllers → Business Logic (MVC Controllers)
+/Views/Shared → Shared layouts (Dashboards)
+/Content → Custom CSS Theme (Dark Blue UI)
+/Models → EF Generated Models
+/JobPortal.edmx → Database Schema Mapping
+
+## ⚙️ Setup Instructions
+
+1️⃣ Clone Repository
+```bash
+git clone https://github.com/your-username/hirehub.git
+
+2️⃣ Configure Database
+
+Rename: web.config.example → web.config
+Update connection string: JobDBEntities3 → Your SQL Server configuration
+
+3️⃣ Run Project
+Open in Visual Studio 2022
+Build solution
+Run using IIS Express
+
+**💡 Highlights**
+Real-world recruitment workflow simulation
+Clean MVC architecture
+Hybrid system (Internal + External job sources)
+Real-time communication layer
+Scalable and modular design
+
+** 👨‍💻 Author **
+
+HireHub Development Team
+ASP.NET MVC 5 Project — Academic + Practical Implementation
+
+**📜 License**
+
+This project is intended for educational and academic purposes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
