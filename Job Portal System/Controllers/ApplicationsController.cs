@@ -14,14 +14,6 @@ namespace Job_Portal_System.Controllers
     {
         private JobDBEntities3 db = new JobDBEntities3();
 
-        // -----------------------------------------
-        // Job Seeker: Apply for a job
-        // -----------------------------------------
-
-
-        // -----------------------------------------
-        // Job Seeker: View my applications
-        // -----------------------------------------
         public ActionResult MyApplications()
         {
             if (Session["UserId"] == null)

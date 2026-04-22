@@ -115,7 +115,7 @@
 
 <!-- HERO SECTION -->
 <div class="profile-hero">
-    <img src="@(!string.IsNullOrEmpty(Model.CompanyLogo) ? Url.Content(Model.CompanyLogo + "?" + DateTime.Now.Ticks) : Url.Content("~/Images/CompanyLogos/default-logo.webp"))" alt="Company Logo" />
+    <img src="@Model.CompanyLogo" alt="Company Logo" />
 
     <h2 class="hero-name">@Model.FullName</h2>
     <p class="hero-tagline">@Model.CompanyName — @Model.Industry</p>

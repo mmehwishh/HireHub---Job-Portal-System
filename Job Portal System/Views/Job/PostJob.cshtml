@@ -1,69 +1,107 @@
-﻿html
+﻿
 @model Job_Portal_System.ViewModel.JobViewModel
 @{
     ViewBag.Title = "Post a Job";
     Layout = "~/Views/Shared/_EmployeerDashboard.cshtml";
+
+    // helper lists for selects
+    var jobTypeItems = new List<SelectListItem> {
+        new SelectListItem { Text = "-- Select job type --", Value = "" },
+        new SelectListItem { Text = "Full-time", Value = "Full-time" },
+        new SelectListItem { Text = "Part-time", Value = "Part-time" },
+        new SelectListItem { Text = "Contract", Value = "Contract" },
+        new SelectListItem { Text = "Remote", Value = "Remote" },
+        new SelectListItem { Text = "Internship", Value = "Internship" }
+    };
+
+    var salaryItems = new List<SelectListItem> {
+        new SelectListItem { Text = "-- Select salary range --", Value = "" },
+        new SelectListItem { Text = "Less than $30k", Value = "Less than $30k" },
+        new SelectListItem { Text = "$30k - $50k", Value = "$30k - $50k" },
+        new SelectListItem { Text = "$50k - $70k", Value = "$50k - $70k" },
+        new SelectListItem { Text = "$70k - $100k", Value = "$70k - $100k" },
+        new SelectListItem { Text = "$100k+", Value = "$100k+" },
+        new SelectListItem { Text = "Competitive / Market rate", Value = "Competitive" },
+        new SelectListItem { Text = "Other (specify)", Value = "Other" }
+    };
+
+    var minExpiry = DateTime.Now.ToString("yyyy-MM-dd");
 }
 
 <div class="hh-card" style="max-width:980px; margin:18px auto; padding:20px;">
     <div class="hh-page-header" style="margin-bottom:12px;">
         <h1 style="margin:0 0 6px 0;">Post a Job</h1>
-        <p class="subtitle" style="margin:0; color:var(--text-muted);">Create a clear, concise job post — use comma separated skills. Design and colors follow HireHub theme.</p>
+        <p class="subtitle" style="margin:0; color:var(--text-muted);">Create a clear, concise job post — follow the guided inputs to ensure quality listings.</p>
     </div>
 
     <div class="form-card" style="padding:18px; border-radius:12px;">
-        @using (Html.BeginForm("PostJob", "Job", FormMethod.Post, new { @class = "hh-form" }))
+        @using (Html.BeginForm("PostJob", "Job", FormMethod.Post, new { @class = "hh-form", id = "postJobForm", novalidate = "novalidate" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                <!-- Job Title (required) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.JobTitle, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.JobTitle, new { @class = "hh-input", placeholder = "e.g. Senior .NET Developer" })
+                    @Html.TextBoxFor(m => m.JobTitle, new { @class = "hh-input", placeholder = "e.g. Senior .NET Developer", maxlength = "255", required = "required", aria_required = "true", title = "Provide a clear job title" })
+                    <small class="hint" style="color:var(--text-muted);">Use a concise title including seniority and role (max 255 characters).</small>
                     @Html.ValidationMessageFor(m => m.JobTitle, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Job Type (required select) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.JobType, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.JobType, new { @class = "hh-input", placeholder = "Full-time / Part-time / Contract / Remote" })
+                    @Html.DropDownListFor(m => m.JobType, new SelectList(jobTypeItems, "Value", "Text", Model.JobType), new { @class = "hh-input", required = "required", aria_required = "true" })
+                    <small class="hint" style="color:var(--text-muted);">Choose the employment type to help candidates filter.</small>
                     @Html.ValidationMessageFor(m => m.JobType, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Job Description (required) -->
                 <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.JobDescription, new { @class = "form-label" })
-                    @Html.TextAreaFor(m => m.JobDescription, 6, 60, new { @class = "hh-textarea", placeholder = "Describe the role, responsibilities and expectations" })
+                    @Html.TextAreaFor(m => m.JobDescription, 6, 60, new { @class = "hh-textarea", placeholder = "Describe the role, responsibilities and expectations (include what success looks like)", maxlength = "4000", required = "required", aria_required = "true" })
+                    <small class="hint" style="color:var(--text-muted);">Be specific: responsibilities, required experience, what success looks like.</small>
                     @Html.ValidationMessageFor(m => m.JobDescription, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Requirements -->
                 <div class="form-group" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.Requirements, new { @class = "form-label" })
-                    @Html.TextAreaFor(m => m.Requirements, 4, 60, new { @class = "hh-textarea", placeholder = "Key requirements, years of experience, qualifications" })
+                    @Html.TextAreaFor(m => m.Requirements, 4, 60, new { @class = "hh-textarea", placeholder = "List must-have skills, years of experience, qualifications", maxlength = "1000" })
+                    <small class="hint" style="color:var(--text-muted);">List essential skills & experience. Use bullet points if necessary.</small>
                     @Html.ValidationMessageFor(m => m.Requirements, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Location (required) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.Location, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Location, new { @class = "hh-input", placeholder = "City, region or Remote" })
+                    @Html.TextBoxFor(m => m.Location, new { @class = "hh-input", placeholder = "City, region or Remote", maxlength = "255", required = "required" })
+                    <small class="hint" style="color:var(--text-muted);">Use formats like "Karachi, Pakistan" or "Remote".</small>
                     @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Salary Range (select + other) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.SalaryRange, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.SalaryRange, new { @class = "hh-input", placeholder = "e.g. $40k - $60k or Market rate" })
+                    @Html.DropDownListFor(m => m.SalaryRange, new SelectList(salaryItems, "Value", "Text", Model.SalaryRange), new { @class = "hh-input", id = "salarySelect", aria_describedby = "salaryHelp" })
+                    <input type="text" id="salaryOther" class="hh-input" placeholder="Specify salary (e.g. $85,000/year)" style="margin-top:8px; display:none;" maxlength="100" />
+                    <small id="salaryHelp" class="hint" style="color:var(--text-muted);">Choose a range so candidates can self-select. If 'Other', specify exact text.</small>
                     @Html.ValidationMessageFor(m => m.SalaryRange, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Expiry date (required, min = today) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     @Html.LabelFor(m => m.ExpiryDate, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "hh-input", type = "date" })
+                    @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "hh-input", type = "date", min = minExpiry, required = "required" })
+                    <small class="hint" style="color:var(--text-muted);">Last date to apply (can't be in the past).</small>
                     @Html.ValidationMessageFor(m => m.ExpiryDate, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Skills (same chips UI) -->
                 <div class="form-group" style="display:flex; flex-direction:column;">
                     <label class="form-label">Required Skills</label>
                     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                        @* visible input used for datalist/autocomplete and also to capture typed skills; posted value is in hidden input below *@
                         <input id="skillInput" class="hh-input" list="skillsList" placeholder="e.g. C#, SQL, React" style="flex:1;" />
                         <button type="button" id="addSkillBtn" class="hh-btn hh-btn-outline hh-btn-sm" title="Add skill"><i class="fa-solid fa-plus"></i></button>
                     </div>
@@ -96,15 +134,32 @@
 </div>
 
 @section scripts {
-    <script>(function () {
-            // Skills chip UI: keeps hidden RequiredSkills in sync (comma-separated)
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        (function () {
+            // show/hide salary-other input
+            function toggleSalaryOther() {
+                var val = $('#salarySelect').val();
+                if (val === 'Other') {
+                    $('#salaryOther').show().attr('name', 'SalaryOther').focus();
+                } else {
+                    // copy selected value to hidden SalaryRange input on submit (server model binding will pick SalaryRange)
+                    $('#salaryOther').hide().removeAttr('name');
+                }
+            }
+            $('#salarySelect').on('change', toggleSalaryOther);
+            toggleSalaryOther();
+
+            // Skills chip UI
             var input = document.getElementById('skillInput');
             var addBtn = document.getElementById('addSkillBtn');
             var preview = document.getElementById('skillsPreview');
             var hidden = document.getElementById('RequiredSkills');
 
             function normalizeList(str) {
-                return str.split(',')
+                return (str || '').split(',')
                     .map(function (s) { return s.trim(); })
                     .filter(function (s) { return s.length > 0; })
                     .reduce(function (unique, item) {
@@ -149,7 +204,6 @@
             addBtn.addEventListener('click', function () {
                 var v = (input.value || '').trim();
                 if (!v) return;
-                // support comma separated paste
                 var existing = hidden.value || '';
                 var merged = existing ? existing + ',' + v : v;
                 hidden.value = normalizeList(merged).join(', ');
@@ -164,7 +218,38 @@
                 }
             });
 
-            // init from model value if present
             renderChips();
-        })();</script>
+
+            // Client-side: ensure SalaryRange set either by select or "Other" text
+            $('#postJobForm').on('submit', function (e) {
+                var salaryVal = $('#salarySelect').val();
+                if (salaryVal === '') {
+                    // allow empty salary but encourage selection — not blocking; uncomment next lines to enforce
+                    // alert('Please select a salary range or choose Other and specify.');
+                    // e.preventDefault(); return false;
+                }
+                if (salaryVal === 'Other') {
+                    var other = $('#salaryOther').val().trim();
+                    if (!other) {
+                        alert('Please specify the salary when selecting "Other".');
+                        $('#salaryOther').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    // copy to the model-bound input for server
+                    // create a hidden input named SalaryRange if not present (the DropDownListFor will post SalaryRange too)
+                    if ($('input[name="SalaryRange"]').length === 0) {
+                        $('<input>').attr({ type: 'hidden', name: 'SalaryRange', value: other }).appendTo('#postJobForm');
+                    } else {
+                        $('input[name="SalaryRange"]').val(other);
+                    }
+                } else {
+                    // set the selected value to SalaryRange hidden input (DropDownListFor already posts SalaryRange)
+                }
+
+                // expiry date HTML5 min attribute prevents past; unobtrusive validation will handle required fields.
+                return true;
+            });
+        })();
+    </script>
 }

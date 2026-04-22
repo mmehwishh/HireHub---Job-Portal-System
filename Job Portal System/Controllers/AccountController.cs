@@ -11,11 +11,6 @@ namespace Job_Portal_System.Controllers
     {
         private JobDBEntities3 db = new JobDBEntities3();
 
-        // ---------- GET: /Account/Index ----------
-        public ActionResult Index()
-        {
-            return RedirectToAction("Login");
-        }
 
         // ---------- LOGIN ----------
         public ActionResult Login()

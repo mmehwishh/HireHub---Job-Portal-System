@@ -332,7 +332,7 @@ else
                 <h5 class="modal-title" id="scheduleModalLabel">
                     Schedule Interview — <span id="modalSeekerName"></span>
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" onclick="$('#scheduleModal').modal('hide')" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -392,105 +392,136 @@ else
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="submitSchedule()">Save Interview</button>
+                <button type="button" class="btn btn-secondary" onclick="$('#scheduleModal').modal('hide')" >Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveInterviewBtn">Save Interview</button>
             </div>
 
         </div>
     </div>
 </div>
 
-<script>
-    // ── Reject ──────────────────────────────────────────────
-    function rejectApplication(appId) {
-        var reason = prompt("Enter rejection reason (optional):");
-        if (reason === null) return;
+@section scripts {
+    <script>
+        (function ($) {
+            // Reject
+            window.rejectApplication = function (appId) {
+                var reason = prompt("Enter rejection reason (optional):");
+                if (reason === null) return;
 
-        $.post('/Employeer/RejectApplication', { id: appId, feedback: reason }, function (res) {
-            if (res.success) {
-                alert("Application rejected.");
-                location.reload();
-            } else {
-                alert("Error: " + res.message);
+                $.post('@Url.Action("RejectApplication", "Employeer")', { id: appId, feedback: reason }, function (res) {
+                    if (res && res.success) {
+                        alert("Application rejected.");
+                        location.reload();
+                    } else {
+                        alert("Error: " + (res && res.message ? res.message : "Unknown"));
+                    }
+                }).fail(function () {
+                    alert("Server error while rejecting application.");
+                });
+            };
+
+            // Open modal
+            window.openScheduleModal = function (appId, seekerName) {
+                $('#modalAppId').val(appId);
+                $('#modalSeekerName').text(seekerName);
+
+                // Reset fields
+                $('#intType').val('Online');
+                $('#intDate').val('');
+                $('#intLocation').val('');
+                $('#intInterviewer').val('');
+                $('#intEmail').val('');
+                $('#intNotes').val('');
+                $('#internalNotes').val('');
+                $('#intStatus').val('Scheduled');
+
+                // Fetch existing interview if any
+                $.get('@Url.Action("GetInterview", "Employeer")', { appId: appId })
+                    .done(function (data) {
+                        if (data) {
+                            $('#intType').val(data.interview_type || 'Online');
+                            $('#intLocation').val(data.location_or_link || '');
+                            $('#intInterviewer').val(data.interviewer_name || '');
+                            $('#intEmail').val(data.interviewer_email || '');
+                            $('#intNotes').val(data.notes_for_seeker || '');
+                            $('#internalNotes').val(data.internal_notes || '');
+                            $('#intStatus').val(data.interview_status || 'Scheduled');
+
+                            if (data.interview_date) {
+                                // Handle both ISO string or /Date(...) JSON.NET formats
+                                var dt = null;
+                                if (typeof data.interview_date === 'string' && data.interview_date.indexOf('/Date(') === 0) {
+                                    var ms = parseInt(data.interview_date.replace(/\/Date\((\d+)\)\//, '$1'));
+                                    dt = new Date(ms);
+                                } else {
+                                    dt = new Date(data.interview_date);
+                                }
+                                if (!isNaN(dt)) {
+                                    var pad = function (n) { return ("0" + n).slice(-2); };
+                                    $('#intDate').val(
+                                        dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate()) +
+                                        "T" + pad(dt.getHours()) + ":" + pad(dt.getMinutes())
+                                    );
+                                }
+                            }
+                        }
+                    })
+                    .fail(function () {
+                        // ignore fetch error but still show modal
+                        console.warn('Could not load existing interview details.');
+                    })
+                    .always(function () {
+                        // Show modal after attempt to fetch - ensures bootstrap and jQuery are loaded
+                        //$('#scheduleModal').modal({ backdrop: 'static', keyboard: false });
+                        $('#scheduleModal').modal('show');
+                    });
+            };
+
+            // Submit schedule
+            function submitSchedule() {
+                var dateVal = $('#intDate').val();
+                var appId = $('#modalAppId').val();
+
+                if (!dateVal) { alert("Please select a date and time."); return; }
+                if (!appId) { alert("Error: Application ID missing."); return; }
+
+                var payload = {
+                    appId: appId,
+                    type: $('#intType').val(),
+                    date: dateVal,
+                    location: $('#intLocation').val(),
+                    interviewer: $('#intInterviewer').val(),
+                    email: $('#intEmail').val(),
+                    notes: $('#intNotes').val(),
+                    internalNotes: $('#internalNotes').val(),
+                    status: $('#intStatus').val()
+                };
+
+                $('#saveInterviewBtn').prop('disabled', true);
+                $.post('@Url.Action("ScheduleInterview", "Employeer")', payload)
+                    .done(function (res) {
+                        if (res && res.success) {
+                            $('#scheduleModal').modal('hide');
+                            alert("Interview saved successfully.");
+                            location.reload();
+                        } else {
+                            alert("Error: " + (res && res.message ? res.message : 'Unable to save interview.'));
+                        }
+                    })
+                    .fail(function (xhr) {
+                        console.error(xhr.responseText);
+                        alert("A server error occurred. Check console for details.");
+                    })
+                    .always(function () {
+                        $('#saveInterviewBtn').prop('disabled', false);
+                    });
             }
-        });
-    }
 
-    // ── Open modal ──────────────────────────────────────────
-    function openScheduleModal(appId, seekerName) {
-        $('#modalAppId').val(appId);
-        $('#modalSeekerName').text(seekerName);
+            // Wire submit button (use delegated binding in case of partial updates)
+            $(document).on('click', '#saveInterviewBtn', submitSchedule);
 
-        // Reset fields
-        $('#intType').val('Online');
-        $('#intDate').val('');
-        $('#intLocation').val('');
-        $('#intInterviewer').val('');
-        $('#intEmail').val('');
-        $('#intNotes').val('');
-        $('#internalNotes').val('');
-        $('#intStatus').val('Scheduled');
-
-        // Fetch existing interview if any
-        $.get('/Employeer/GetInterview', { appId: appId }, function (data) {
-            if (data) {
-                $('#intType').val(data.interview_type);
-                $('#intLocation').val(data.location_or_link);
-                $('#intInterviewer').val(data.interviewer_name);
-                $('#intEmail').val(data.interviewer_email);
-                $('#intNotes').val(data.notes_for_seeker);
-                $('#internalNotes').val(data.internal_notes);
-                $('#intStatus').val(data.interview_status);
-
-                // Parse the /Date(...)/ format from JSON.NET
-                if (data.interview_date) {
-                    var ms = parseInt(data.interview_date.replace(/\/Date\((\d+)\)\//, '$1'));
-                    var dt = new Date(ms);
-                    var pad = function (n) { return ("0" + n).slice(-2); };
-                    $('#intDate').val(
-                        dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate()) +
-                        "T" + pad(dt.getHours()) + ":" + pad(dt.getMinutes())
-                    );
-                }
-            }
-
-            // KEY FIX: use jQuery Bootstrap modal API correctly
-            $('#scheduleModal').modal({ backdrop: 'static', keyboard: false });
-            $('#scheduleModal').modal('show');
-        });
-    }
-
-    // ── Submit ──────────────────────────────────────────────
-    function submitSchedule() {
-        var dateVal = $('#intDate').val();
-        var appId = $('#modalAppId').val();
-
-        if (!dateVal) { alert("Please select a date and time."); return; }
-        if (!appId) { alert("Error: Application ID missing."); return; }
-
-        var payload = {
-            appId: appId,
-            type: $('#intType').val(),
-            date: dateVal,
-            location: $('#intLocation').val(),
-            interviewer: $('#intInterviewer').val(),
-            email: $('#intEmail').val(),
-            notes: $('#intNotes').val(),
-            internalNotes: $('#internalNotes').val(),
-            status: $('#intStatus').val()
-        };
-
-        $.post('/Employeer/ScheduleInterview', payload, function (res) {
-            if (res.success) {
-                $('#scheduleModal').modal('hide');
-                alert("Interview saved successfully.");
-                location.reload();
-            } else {
-                alert("Error: " + res.message);
-            }
-        }).fail(function (xhr) {
-            console.error(xhr.responseText);
-            alert("A server error occurred. Check console for details.");
-        });
-    }
-</script>
+            // Expose submitSchedule to global in case other code calls it
+            window.submitSchedule = submitSchedule;
+        })(jQuery);
+    </script>
+}

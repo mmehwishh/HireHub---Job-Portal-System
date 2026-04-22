@@ -252,7 +252,16 @@ namespace Job_Portal_System.Controllers
             if (Session["UserId"] == null)
                 return RedirectToAction("Login", "Account");
 
-            return View();
+            // Provide an instance so the strongly-typed view helpers never see a null Model
+            var vm = new JobViewModel();
+
+            // Provide existing skills for the datalist/autocomplete in the view
+            ViewBag.ExistingSkills = db.Skills
+                                       .OrderBy(s => s.skillName)
+                                       .Select(s => s.skillName)
+                                       .ToList();
+
+            return View(vm);
         }
 
         [HttpPost]
@@ -262,72 +271,110 @@ namespace Job_Portal_System.Controllers
             if (Session["UserId"] == null)
                 return RedirectToAction("Login", "Account");
 
-            if (ModelState.IsValid)
+            // If the view exposed a free-text salary field when "Other" was selected, prefer it.
+            var salaryOther = Request.Form["SalaryOther"];
+            if (!string.IsNullOrWhiteSpace(salaryOther))
             {
-                JOB job = new JOB
-                {
-                    employer_id = Convert.ToInt32(Session["UserId"]),
-                    job_title = model.JobTitle,
-                    job_description = model.JobDescription,
-                    requirements = model.Requirements,
-                    location = model.Location,
-                    salary_range = model.SalaryRange,
-                    job_type = model.JobType,
-                    posted_date = DateTime.Now,
-                    expiry_date = model.ExpiryDate,
-                    status = "ACTIVE"
-                };
-
-                db.JOBS.Add(job);
-                db.SaveChanges(); 
-
-                
-                if (!string.IsNullOrEmpty(model.RequiredSkills))
-                {
-                    var skillNames = model.RequiredSkills.Split(',')
-                                        .Select(s => s.Trim())
-                                        .Where(s => !string.IsNullOrEmpty(s))
-                                        .ToList();
-
-                    foreach (var name in skillNames)
-                    {
-                        var existingSkill = db.Skills.FirstOrDefault(s => s.skillName.ToLower() == name.ToLower());
-
-                        int currentSkillId;
-
-                        if (existingSkill == null)
-                        {
-                            var newSkill = new Skill { skillName = name };
-                            db.Skills.Add(newSkill);
-                            currentSkillId = newSkill.SkillID;
-
-                            JOB_SKILLS js = new JOB_SKILLS
-                            {
-                                job_id = job.job_id,
-                                skillID = currentSkillId
-                            };
-                            db.JOB_SKILLS.Add(js);
-                        }
-                        else
-                        {
-                            currentSkillId = existingSkill.SkillID;
-                            JOB_SKILLS js = new JOB_SKILLS
-                            {
-                                job_id = job.job_id,
-                                skillID = currentSkillId
-                            };
-                            db.JOB_SKILLS.Add(js);
-                        }
-
-                    }
-
-                    db.SaveChanges();
-                }
-
-                return RedirectToAction("ManageJobs");
+                model.SalaryRange = salaryOther.Trim();
             }
 
-            return View(model);
+            // Normalize / trim inputs to avoid accidental whitespace-only values
+            model.JobTitle = model.JobTitle?.Trim();
+            model.JobDescription = model.JobDescription?.Trim();
+            model.Requirements = model.Requirements?.Trim();
+            model.Location = model.Location?.Trim();
+            model.JobType = model.JobType?.Trim();
+            model.SalaryRange = model.SalaryRange?.Trim();
+            model.RequiredSkills = model.RequiredSkills?.Trim();
+
+            // Server-side validation (defensive)
+            if (string.IsNullOrWhiteSpace(model.JobTitle))
+                ModelState.AddModelError(nameof(model.JobTitle), "Job title is required.");
+
+            if (model.JobTitle != null && model.JobTitle.Length > 255)
+                ModelState.AddModelError(nameof(model.JobTitle), "Job title must be 255 characters or fewer.");
+
+            if (string.IsNullOrWhiteSpace(model.JobType))
+                ModelState.AddModelError(nameof(model.JobType), "Job type is required.");
+
+            if (string.IsNullOrWhiteSpace(model.Location))
+                ModelState.AddModelError(nameof(model.Location), "Location is required.");
+
+            if (model.Location != null && model.Location.Length > 255)
+                ModelState.AddModelError(nameof(model.Location), "Location must be 255 characters or fewer.");
+
+            // Expiry date must not be in the past (if provided)
+            if (model.ExpiryDate.HasValue && model.ExpiryDate.Value.Date < DateTime.UtcNow.Date)
+                ModelState.AddModelError(nameof(model.ExpiryDate), "Expiry date cannot be in the past.");
+
+            if (!ModelState.IsValid)
+            {
+                // return view with validation messages
+                return View(model);
+            }
+
+            // All good — persist
+            JOB job = new JOB
+            {
+                employer_id = Convert.ToInt32(Session["UserId"]),
+                job_title = model.JobTitle,
+                job_description = model.JobDescription,
+                requirements = model.Requirements,
+                location = model.Location,
+                salary_range = model.SalaryRange,
+                job_type = model.JobType,
+                posted_date = DateTime.Now,
+                expiry_date = model.ExpiryDate,
+                status = "ACTIVE"
+            };
+
+            db.JOBS.Add(job);
+            db.SaveChanges();
+
+            // Handle skills: ensure SkillID exists before creating JOB_SKILLS
+            if (!string.IsNullOrEmpty(model.RequiredSkills))
+            {
+                var skillNames = model.RequiredSkills.Split(',')
+                                    .Select(s => s.Trim())
+                                    .Where(s => !string.IsNullOrEmpty(s))
+                                    .ToList();
+
+                foreach (var name in skillNames)
+                {
+                    // find existing skill (case-insensitive)
+                    var existingSkill = db.Skills.FirstOrDefault(s => s.skillName.ToLower() == name.ToLower());
+                    int currentSkillId;
+
+                    if (existingSkill == null)
+                    {
+                        // create and save to get the generated SkillID
+                        var newSkill = new Skill { skillName = name };
+                        db.Skills.Add(newSkill);
+                        db.SaveChanges(); // ensure SkillID is populated
+                        currentSkillId = newSkill.SkillID;
+                    }
+                    else
+                    {
+                        currentSkillId = existingSkill.SkillID;
+                    }
+
+                    // avoid duplicate mapping
+                    var alreadyMapped = db.JOB_SKILLS.Any(js => js.job_id == job.job_id && js.skillID == currentSkillId);
+                    if (!alreadyMapped)
+                    {
+                        var js = new JOB_SKILLS
+                        {
+                            job_id = job.job_id,
+                            skillID = currentSkillId
+                        };
+                        db.JOB_SKILLS.Add(js);
+                    }
+                }
+
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("ManageJobs");
         }
 
         // GET: Manage Jobs
@@ -392,8 +439,6 @@ namespace Job_Portal_System.Controllers
         // POST: Edit Job
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // [Bind(Prefix = "Job")] lagane se MVC ko pata chal jayega ke 
-        // form se "Job.Something" wala data pick karna hai
         public ActionResult EditJob([Bind(Prefix = "Job")] JOB jobData)
         {
             if (Session["UserId"] == null)
@@ -479,8 +524,20 @@ namespace Job_Portal_System.Controllers
                 {
                     db.APPLICATIONS.RemoveRange(all_applications);
                 }
+                var all_job_sills = db.JOB_SKILLS.Where(j => j.job_id == id).ToList();
+                if (all_job_sills.Any())
+                {
+                    db.JOB_SKILLS.RemoveRange(all_job_sills);
+                }
+
+                var saved_jobs = db.SAVED_JOBS.Where(j => j.job_id == id).ToList();
+                if (saved_jobs.Any())
+                {
+                    db.SAVED_JOBS.RemoveRange(saved_jobs);
+                }
 
                 db.JOBS.Remove(job);
+                
                 db.SaveChanges();
             }
 

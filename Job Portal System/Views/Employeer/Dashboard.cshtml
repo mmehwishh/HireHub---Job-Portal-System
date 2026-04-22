@@ -18,7 +18,7 @@
 
         <div class="eh-hero-actions">
             <a href="@Url.Action("PostJob", "Job")" class="hh-btn hh-btn-primary"><i class="fa-solid fa-plus"></i> Post Job</a>
-            <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn hh-btn-ghost">Manage Jobs</a>
+            <a href="@Url.Action("ManageJobs", "Job")" class="hh-btn " style="color:white">Manage Jobs</a>
         </div>
     </div>
 </div>
@@ -96,8 +96,7 @@
         <aside class="eh-card eh-recent-applicants">
             <div class="eh-card-head">
                 <h3>Recent Applicants</h3>
-                <a href="@Url.Action("JobApplications", "Application")" class="hh-btn hh-btn-ghost hh-btn-sm">View all</a>
-            </div>
+                </div>
 
             <div class="eh-list-compact">
                 @if (Model.RecentApplications != null && Model.RecentApplications.Any())
@@ -113,8 +112,7 @@
                                 <div class="eh-compact-meta">@((db.JOBS.Find(a.job_id).job_title) ?? "-")</div>
                             </div>
                             <div class="eh-compact-actions">
-                                <a href="@Url.Action("ViewResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-outline hh-btn-sm">View</a>
-                                <a href="@Url.Action("DownloadResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-ghost hh-btn-sm">Download</a>
+                                <a href="@Url.Action("ViewResume", "Employeer", new { seekerId = a.seeker_id })" class="hh-btn hh-btn-outline hh-btn-sm">View Reusume</a>
                             </div>
                         </div>
                     }

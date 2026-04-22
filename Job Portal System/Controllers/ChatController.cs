@@ -58,14 +58,12 @@ namespace Job_Portal_System.Controllers
                 }
             }
 
-            // Un logon ki IDs nikalna jinse baat hui hai
             var userIds = db.Messages
                 .Where(m => m.SenderID == currentUserId || m.ReceiverID == currentUserId)
                 .Select(m => m.SenderID == currentUserId ? m.ReceiverID : m.SenderID)
                 .Distinct()
                 .ToList();
 
-            // Un users ki details (names) nikalna
             var conversations = db.USERS
                 .Where(u => userIds.Contains(u.UserId))
                 .ToList();
