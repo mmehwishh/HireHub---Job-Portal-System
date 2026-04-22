@@ -1,7 +1,7 @@
 # 🚀 HireHub — Job Portal System
 
 ![.NET](https://img.shields.io/badge/.NET-ASP.NET%20MVC%205-blueviolet)
-![Entity Framework](https://img.shields.io/badge/Entity%20Framework-6.0-blue)
+![Entity Framework](https://img.shields.io/badge/Entity%20Framework-4.0-blue)
 ![Database](https://img.shields.io/badge/Database-First%20Approach-orange)
 ![License](https://img.shields.io/badge/License-Educational-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Active-success)
@@ -21,6 +21,14 @@ Built using:
 - Custom Dark Blue UI Theme
 
 ---
+
+## Live view : http://hirehubjobportal.runasp.net/
+
+## Test credentials:
+Role          | Email Address        | Password
+--------------|----------------------|----------
+Job Seeker 👤 | kazim@example.com    | pass123
+Employer 💼   | mehwish@example.com  | pass123
 
 ## 🎯 Key Features
 
@@ -84,12 +92,13 @@ Built using:
 ---
 
 ## 📂 Project Structure
-/Controllers → Business Logic (MVC Controllers)
-/Views/Shared → Shared layouts (Dashboards)
-/Content → Custom CSS Theme (Dark Blue UI)
-/Models → EF Generated Models
-/JobPortal.edmx → Database Schema Mapping
 
+```text
+├── /Controllers      # Business Logic (MVC Controllers)
+├── /Models           # Entity Framework Generated Models
+├── /Views/Shared     # Shared Layouts & Admin Dashboards
+├── /Content          # Custom CSS Themes (Dark Blue UI)
+└── JobPortal.edmx    # Database Schema & EF Mapping
 ## ⚙️ Setup Instructions
 
 1️⃣ Clone Repository
