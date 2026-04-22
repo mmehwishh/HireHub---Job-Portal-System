@@ -99,39 +99,51 @@ Employer 💼   | mehwish@example.com  | pass123
 ├── /Views/Shared     # Shared Layouts & Admin Dashboards
 ├── /Content          # Custom CSS Themes (Dark Blue UI)
 └── JobPortal.edmx    # Database Schema & EF Mapping
+```
+
+---
+
 ## ⚙️ Setup Instructions
 
-1️⃣ Clone Repository
+### 1️⃣ Clone Repository
+
 ```bash
 git clone https://github.com/your-username/hirehub.git
+```
 
-2️⃣ Configure Database
+### 2️⃣ Configure Database
 
-Rename: web.config.example → web.config
-Update connection string: JobDBEntities3 → Your SQL Server configuration
+* Rename: `web.config.example` → `web.config`
+* Update connection string: `JobDBEntities3` → Your SQL Server configuration
 
-3️⃣ Run Project
-Open in Visual Studio 2022
-Build solution
-Run using IIS Express
+### 3️⃣ Run Project
 
-**💡 Highlights**
-Real-world recruitment workflow simulation
-Clean MVC architecture
-Hybrid system (Internal + External job sources)
-Real-time communication layer
-Scalable and modular design
+* Open in **Visual Studio 2022**
+* Build solution
+* Run using **IIS Express**
 
-** 👨‍💻 Author **
+---
+
+## 💡 Highlights
+
+* Real-world recruitment workflow simulation
+* Clean MVC architecture
+* Hybrid system (Internal + External job sources)
+* Real-time communication layer
+* Scalable and modular design
+
+---
+
+## 👨‍💻 Author
 
 HireHub Development Team
 ASP.NET MVC 5 Project — Academic + Practical Implementation
 
-**📜 License**
+---
+
+## 📜 License
 
 This project is intended for educational and academic purposes.
-
-
 
 
 
