@@ -121,6 +121,7 @@
     <Content Include="Content\HireHub.DarkBlue.css" />
     <Content Include="Content\site.css" />
     <Content Include="Global.asax" />
+    <Content Include="web.config.example.xml" />
     <EntityDeploy Include="JobPortal.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>JobPortal.Designer.cs</LastGenOutput>
